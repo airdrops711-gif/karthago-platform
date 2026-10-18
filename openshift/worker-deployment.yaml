@@ -20,7 +20,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: celery-worker
-          image: image-registry.openshift-image-registry.svc:5000/<namespace>/dropship-app:latest
+          image: image-registry.openshift-image-registry.svc:5000/saif711-dev/dropship-app:latest
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
