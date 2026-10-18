@@ -6,6 +6,6 @@ selectolax>=0.3.15
 playwright>=1.45.0
 celery>=5.3.0
 redis>=5.0.0
-meilisearch-python>=0.26.0
+# meilisearch-python removed - using raw HTTP client for Meilisearch integration
 python-dotenv>=1.0.0
 Pillow>=10.0.0
