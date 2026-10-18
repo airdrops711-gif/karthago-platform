@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dropship-worker
+  labels:
+    app: dropship-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dropship-worker
+  template:
+    metadata:
+      labels:
+        app: dropship-worker
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: celery-worker
+          image: image-registry.openshift-image-registry.svc:5000/<namespace>/dropship-app:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          command: ["celery"]
+          args: ["-A", "config", "worker", "--loglevel=info"]
+          envFrom:
+            - configMapRef:
+                name: dropship-config
+            - secretRef:
+                name: dropship-secrets
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"

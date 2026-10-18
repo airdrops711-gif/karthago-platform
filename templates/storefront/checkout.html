@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Checkout &mdash; Karthago Commerce{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow border p-6">
+        <h1 class="text-2xl font-bold mb-6">Checkout &mdash; Cash on Delivery</h1>
+        <form method="post" action="{% url 'orders:checkout' %}">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" name="full_name" required class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <input type="tel" name="phone" required class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" name="email" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Governorate</label>
+                    <select name="governorate" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-amber-500">
+                        {% for code, name in governorates %}
+                        <option value="{{ code }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                    <textarea name="address" rows="3" required class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-amber-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Total Amount (TND)</label>
+                    <input type="number" name="total_amount" step="0.001" required class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-amber-500">
+                </div>
+            </div>
+            <div class="mt-6">
+                <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-medium">Place Order</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

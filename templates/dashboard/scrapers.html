@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Scrapers &mdash; Karthago Commerce{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Scraper Management</h1>
+<div class="bg-white p-6 rounded-lg shadow border">
+    <h2 class="text-lg font-bold mb-4">Sources</h2>
+    <ul class="space-y-2">
+        {% for source in sources %}
+        <li class="p-3 border rounded">{{ source.name }} &mdash; {{ source.engine }} &mdash; every {{ source.sync_frequency_hours }}h</li>
+        {% empty %}
+        <li class="text-gray-500">No sources configured.</li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="bg-white p-6 rounded-lg shadow border mt-6">
+    <h2 class="text-lg font-bold mb-4">Recent Logs</h2>
+    <table class="w-full text-left text-sm">
+        <thead><tr class="border-b"><th class="pb-2">Source</th><th class="pb-2">Status</th><th class="pb-2">Found</th><th class="pb-2">Updated</th><th class="pb-2">Started</th></tr></thead>
+        <tbody>
+            {% for log in logs %}
+            <tr class="border-b"><td class="py-2">{{ log.source.name }}</td><td class="py-2">{{ log.status }}</td><td class="py-2">{{ log.products_found }}</td><td class="py-2">{{ log.products_updated }}</td><td class="py-2">{{ log.started_at }}</td></tr>
+            {% empty %}
+            <tr><td colspan="5" class="py-2 text-gray-500">No logs yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
