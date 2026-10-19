@@ -35,15 +35,19 @@
                     {% if selected_category %}
                     <input type="hidden" name="category" value="{{ selected_category }}">
                     {% endif %}
-                    <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}min_price=0&max_price=50" class="block w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">Moins de 50 DT</a>
-                    <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}min_price=50&max_price=150" class="block w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">50 &ndash; 150 DT</a>
-                    <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}min_price=150" class="block w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">Plus de 150 DT</a>
+                    <input type="text" name="q" value="{{ q }}" class="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Rechercher un produit">
+                    <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if q %}q={{ q|urlencode }}&{% endif %}min_price=0&max_price=50" class="block w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">Moins de 50 DT</a>
+                    <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if q %}q={{ q|urlencode }}&{% endif %}min_price=50&max_price=150" class="block w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">50 &ndash; 150 DT</a>
+                    <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if q %}q={{ q|urlencode }}&{% endif %}min_price=150" class="block w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">Plus de 150 DT</a>
                 </form>
             </div>
             <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
                 <form method="get">
                     {% if selected_category %}
                     <input type="hidden" name="category" value="{{ selected_category }}">
+                    {% endif %}
+                    {% if q %}
+                    <input type="hidden" name="q" value="{{ q }}">
                     {% endif %}
                     {% if min_price %}
                     <input type="hidden" name="min_price" value="{{ min_price }}">

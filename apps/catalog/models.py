@@ -81,6 +81,15 @@ class Product(models.Model):
         validators=[MinValueValidator(0)],
         help_text="Computed retail price in TND.",
     )
+    currency = models.CharField(
+        max_length=8, default="TND",
+        help_text="Source currency of raw_cost (TND, EUR, USD...).",
+    )
+    currency_rate = models.DecimalField(
+        max_digits=12, decimal_places=6, default=1,
+        validators=[MinValueValidator(0)],
+        help_text="Conversion rate from source currency to TND.",
+    )
     stock = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     sync_to_meilisearch = models.BooleanField(default=True)
@@ -94,12 +103,24 @@ class Product(models.Model):
         return self.title
 
     def compute_retail_price(self):
-        """Retail Price = (Source Cost * (1 + Markup% / 100)) + Fixed Margin Fee."""
+        """Retail Price = (Source Cost * FX * (1 + Markup% / 100)) + Fixed Margin Fee."""
         from decimal import Decimal
-        cost = self.raw_cost or Decimal("0")
-        markup = self.markup_percent or Decimal("0")
-        fixed = self.fixed_margin_fee or Decimal("0")
-        return (cost * (1 + markup / Decimal("100"))) + fixed
+        # Coerce everything to Decimal: model defaults may still hold int/float
+        # on freshly instantiated objects, and Decimal + float raises TypeError.
+        def dec(value):
+            if value is None:
+                return Decimal("0")
+            if isinstance(value, Decimal):
+                return value
+            return Decimal(str(value))
+
+        cost = dec(self.raw_cost)
+        rate = dec(self.currency_rate) or Decimal("1")
+        markup = dec(self.markup_percent)
+        fixed = dec(self.fixed_margin_fee)
+        cost_tnd = cost * rate
+        result = (cost_tnd * (1 + markup / Decimal("100"))) + fixed
+        return result.quantize(Decimal("0.001"))
 
     def save(self, *args, **kwargs):
         if not self.retail_price:

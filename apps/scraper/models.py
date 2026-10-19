@@ -21,6 +21,15 @@ class ScrapedSource(models.Model):
     brand_selector = models.CharField(max_length=255, blank=True)
     model_selector = models.CharField(max_length=255, blank=True)
     category_selector = models.CharField(max_length=255, blank=True)
+    currency = models.CharField(max_length=8, default="TND", help_text="Source currency.")
+    currency_rate = models.DecimalField(
+        max_digits=12, decimal_places=6, default=1,
+        help_text="Conversion rate from source currency to TND.",
+    )
+    category_name = models.CharField(
+        max_length=100, blank=True,
+        help_text="Category assigned to scraped products.",
+    )
     sync_frequency_hours = models.PositiveIntegerField(default=4, help_text="Sync every N hours.")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

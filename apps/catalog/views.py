@@ -11,13 +11,6 @@ class ProductListView(ListView):
     context_object_name = "products"
     paginate_by = 20
 
-    def get_queryset(self):
-        queryset = Product.objects.all().select_related("category")
-        category_slug = self.request.GET.get("category")
-        if category_slug:
-            queryset = queryset.filter(category__slug=category_slug)
-        return queryset
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["categories"] = Category.objects.all()
@@ -26,13 +19,20 @@ class ProductListView(ListView):
         context["max_price"] = self.request.GET.get("max_price", "")
         context["in_stock"] = self.request.GET.get("in_stock", "")
         context["sort_by"] = self.request.GET.get("sort_by", "-created_at")
+        context["q"] = self.request.GET.get("q", "")
+        context["total_count"] = self.get_queryset().count()
         return context
 
     def get_queryset(self):
-        queryset = Product.objects.all().select_related("category")
+        queryset = Product.objects.filter(is_active=True).select_related("category")
         category_slug = self.request.GET.get("category")
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(
+                Q(title__icontains=query) | Q(description__icontains=query)
+            )
         min_price = self.request.GET.get("min_price")
         if min_price:
             try:

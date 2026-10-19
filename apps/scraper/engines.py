@@ -53,15 +53,45 @@ class HTTPEngine(BaseEngine):
             return node.attributes.get(attr, "") if node else ""
 
         def get_images(selector):
-            """Collect all image URLs, preferring data-src (lazy loading) over src."""
-            if not selector:
-                return ""
-            nodes = container.css(selector)
+            """Collect all image URLs, preferring lazy-load attributes over src.
+
+            Handles: data-src, data-lazy-src, data-image-url, src.
+            Skips data: URIs (inline placeholders).
+            """
             urls = []
-            for node in nodes:
-                url = node.attributes.get("data-src") or node.attributes.get("src", "")
-                if url and not url.startswith("data:"):
-                    urls.append(url)
+            seen = set()
+
+            def add(raw):
+                if not raw:
+                    return
+                raw = raw.strip()
+                if not raw or raw.startswith("data:"):
+                    return
+                if raw.startswith("//"):
+                    raw = "https:" + raw
+                if raw not in seen:
+                    seen.add(raw)
+                    urls.append(raw)
+
+            # 1) Slider elements carrying the real image URL
+            for node in container.css("[data-image-url]"):
+                add(node.attributes.get("data-image-url", ""))
+
+            # 2) img tags matched by selector
+            if selector:
+                for node in container.css(selector):
+                    add(node.attributes.get("data-src", ""))
+                    add(node.attributes.get("data-lazy-src", ""))
+                    add(node.attributes.get("data-image-url", ""))
+                    add(node.attributes.get("src", ""))
+
+            # 3) Fallback: any img inside the container
+            if not urls:
+                for node in container.css("img"):
+                    add(node.attributes.get("data-src", ""))
+                    add(node.attributes.get("data-lazy-src", ""))
+                    add(node.attributes.get("src", ""))
+
             return ",".join(urls)
 
         title = get(selectors.get("title", ""))
@@ -78,12 +108,19 @@ class HTTPEngine(BaseEngine):
             elif "instock" in container_classes:
                 stock = max(stock, 1)
 
+        # Product detail URL
+        product_url = ""
+        link = container.css_first("a[href]")
+        if link:
+            product_url = link.attributes.get("href", "")
+
         return {
             "title": title,
             "price": normalize_tunisian_price(price_raw),
             "price_raw": price_raw,
             "stock": stock,
             "images": images_raw,
+            "url": product_url,
         }
 
     @staticmethod
@@ -175,15 +212,45 @@ class PlaywrightEngine(BaseEngine):
             return node.attributes.get(attr, "") if node else ""
 
         def get_images(selector):
-            """Collect all image URLs, preferring data-src (lazy loading) over src."""
-            if not selector:
-                return ""
-            nodes = container.css(selector)
+            """Collect all image URLs, preferring lazy-load attributes over src.
+
+            Handles: data-src, data-lazy-src, data-image-url, src.
+            Skips data: URIs (inline placeholders).
+            """
             urls = []
-            for node in nodes:
-                url = node.attributes.get("data-src") or node.attributes.get("src", "")
-                if url and not url.startswith("data:"):
-                    urls.append(url)
+            seen = set()
+
+            def add(raw):
+                if not raw:
+                    return
+                raw = raw.strip()
+                if not raw or raw.startswith("data:"):
+                    return
+                if raw.startswith("//"):
+                    raw = "https:" + raw
+                if raw not in seen:
+                    seen.add(raw)
+                    urls.append(raw)
+
+            # 1) Slider elements carrying the real image URL
+            for node in container.css("[data-image-url]"):
+                add(node.attributes.get("data-image-url", ""))
+
+            # 2) img tags matched by selector
+            if selector:
+                for node in container.css(selector):
+                    add(node.attributes.get("data-src", ""))
+                    add(node.attributes.get("data-lazy-src", ""))
+                    add(node.attributes.get("data-image-url", ""))
+                    add(node.attributes.get("src", ""))
+
+            # 3) Fallback: any img inside the container
+            if not urls:
+                for node in container.css("img"):
+                    add(node.attributes.get("data-src", ""))
+                    add(node.attributes.get("data-lazy-src", ""))
+                    add(node.attributes.get("src", ""))
+
             return ",".join(urls)
 
         title = get(selectors.get("title", ""))
@@ -200,12 +267,18 @@ class PlaywrightEngine(BaseEngine):
             elif "instock" in container_classes:
                 stock = max(stock, 1)
 
+        product_url = ""
+        link = container.css_first("a[href]")
+        if link:
+            product_url = link.attributes.get("href", "")
+
         return {
             "title": title,
             "price": normalize_tunisian_price(price_raw),
             "price_raw": price_raw,
             "stock": stock,
             "images": images_raw,
+            "url": product_url,
         }
 
     @staticmethod

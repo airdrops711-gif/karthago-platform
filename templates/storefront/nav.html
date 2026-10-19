@@ -20,8 +20,8 @@
 
         <div class="flex items-center gap-4">
             <a href="{% url 'dashboard:overview' %}" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">Tableau de bord</a>
-            <a href="#" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50 relative">
-                Panier <span class="absolute -top-2 -right-2 bg-amber-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+            <a href="{% url 'orders:cart' %}" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50 relative">
+                Panier <span class="absolute -top-2 -right-2 bg-amber-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">{{ cart_item_count|default:0 }}</span>
             </a>
             <button class="text-gray-400 hover:text-amber-600" onclick="document.getElementById('mobile-menu').classList.remove('hidden')">
                 ☰
@@ -44,7 +44,10 @@
 
     <!-- Cart badge (top-right of nav) -->
 <div class="absolute top-3 right-4 flex items-center gap-1">
-    <span class="w-6 h-6 rounded-full bg-amber-600 text-white text-xs font-bold flex items-center justify-center" id="cart-badge">0</span>
+    <a href="{% url 'orders:cart' %}" class="relative text-gray-600 hover:text-amber-600 transition">
+        <span class="text-xl" aria-label="Panier">🛒</span>
+        <span class="absolute -top-1 -right-2 bg-amber-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center" id="cart-badge">{{ cart_item_count|default:0 }}</span>
+    </a>
 </div>
 
 <!-- Mobile off-canvas drawer (Alpine.js) -->
@@ -88,7 +91,7 @@
 
                 <div class="mt-6 space-y-3">
                     <a href="{% url 'dashboard:overview' %}" class="block py-3 px-4 rounded-lg bg-amber-600 text-white text-center font-medium">Tableau de bord admin</a>
-                    <a href="#" class="block py-3 px-4 rounded-lg border border-gray-200 text-gray-700 text-center font-medium hover:bg-gray-50">Panier</a>
+                    <a href="{% url 'orders:cart' %}" class="block py-3 px-4 rounded-lg border border-gray-200 text-gray-700 text-center font-medium hover:bg-gray-50">Panier</a>
                 </div>
             </div>
         </div>

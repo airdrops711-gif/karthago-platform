@@ -1,5 +1,6 @@
 """Celery tasks for periodic scraping and sync."""
 import asyncio
+from decimal import Decimal
 from celery import shared_task
 from django.utils import timezone
 from .models import ScrapedSource, ScraperLog
@@ -40,11 +41,18 @@ def sync_source(self, source_id):
     results, error = _asyncio_run(engine.scrape(source, selectors))
 
     from apps.catalog.models import Product, Supplier, MarginRule, Category, ProductImage
+    from django.utils.text import slugify
 
     supplier, _ = Supplier.objects.get_or_create(name=source.name)
-    category, _ = Category.objects.get_or_create(name="General", defaults={"slug": "general"})
+    # Use the source-specific category when configured, else fall back to General
+    cat_name = (source.category_name or "General").strip() or "General"
+    category, _ = Category.objects.get_or_create(
+        name=cat_name,
+        defaults={"slug": slugify(cat_name)[:100] or "general"},
+    )
     margin_rule, _ = MarginRule.objects.get_or_create(
-        name="Default", defaults={"markup_percent": 30, "fixed_margin_fee": 5.000}
+        name="Default",
+        defaults={"markup_percent": Decimal("30"), "fixed_margin_fee": Decimal("5.000")},
     )
 
     found = 0
@@ -53,14 +61,20 @@ def sync_source(self, source_id):
         found += 1
         # Cap stock to a reasonable max to avoid integer overflow
         stock_val = min(item["stock"], 999999)
+        # Use the product's own URL when available so each source row is unique
+        item_url = item.get("url") or source.base_url
+        if item_url.startswith("//"):
+            item_url = "https:" + item_url
         obj, created = Product.objects.update_or_create(
-            source=source.base_url,
+            source=item_url,
             title=item["title"],
             defaults={
                 "supplier": supplier,
                 "category": category,
                 "margin_rule": margin_rule,
                 "raw_cost": item["price"],
+                "currency": source.currency or "TND",
+                "currency_rate": source.currency_rate or Decimal("1"),
                 "markup_percent": margin_rule.markup_percent,
                 "fixed_margin_fee": margin_rule.fixed_margin_fee,
                 "stock": stock_val,
