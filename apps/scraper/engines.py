@@ -18,9 +18,15 @@ class HTTPEngine(BaseEngine):
 
     async def scrape(self, source, selectors):
         results = []
-        async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "fr-TN,fr;q=0.9,en;q=0.8",
+            "Referer": "https://www.google.com/",
+        }
+        async with httpx.AsyncClient(timeout=30, follow_redirects=True, headers=headers) as client:
             try:
-                resp = await client.get(source.base_url, headers={"User-Agent": "KarthagoBot/1.0"})
+                resp = await client.get(source.base_url)
                 resp.raise_for_status()
             except Exception as exc:
                 return results, str(exc)

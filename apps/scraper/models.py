@@ -40,7 +40,7 @@ class ScraperLog(models.Model):
     products_found = models.PositiveIntegerField(default=0)
     products_updated = models.PositiveIntegerField(default=0)
     errors = models.TextField(blank=True)
-    status = models.CharField(max_length=20, default="running")
+    status = models.CharField(max_length=30, default="running")
 
     def __str__(self):
         return f"{self.source.name} - {self.started_at}"
