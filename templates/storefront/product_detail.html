@@ -1,17 +1,111 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}{{ product.title }} &mdash; Karthago Commerce{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <div class="bg-white rounded-lg shadow border p-6">
-        <h1 class="text-2xl font-bold mb-4">{{ product.title }}</h1>
-        <p class="text-gray-600 mb-4">{{ product.description }}</p>
-        <div class="flex items-center gap-4 mb-6">
-            <span class="text-2xl font-bold text-amber-700">{{ product.retail_price }} TND</span>
-            <span class="text-gray-500">Stock: {{ product.stock }}</span>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Product images -->
+        <div class="lg:col-span-5">
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="relative h-64 bg-gray-50">
+                    {% if product.images %}
+                    <img src="{{ product.images.first.url }}" alt="{{ product.title }}" id="main-image" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-gray-300 text-xl">📦</div>
+                    {% endif %}
+                    {% if product.discount_percent > 0 %}
+                    <span class="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">-{{ product.discount_percent }}%</span>
+                    {% endif %}
+                </div>
+                <div class="p-4 grid grid-cols-4 gap-2">
+                    {% if product.images %}
+                    {% for image in product.images.all %}
+                    <button onclick="document.getElementById('main-image').src='{{ image.url }}'" class="aspect-square bg-gray-50 rounded overflow-hidden border-2 border-transparent hover:border-amber-300 transition">
+                        <img src="{{ image.url }}" class="w-full h-full object-cover cursor-pointer">
+                    </button>
+                    {% endfor %}
+                    {% else %}
+                    <button class="aspect-square bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">📦</button>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <button class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-medium" onclick="location.href='{% url 'orders:checkout' %}'">
-            Buy Now (COD)
-        </button>
+
+        <!-- Product info -->
+        <div class="lg:col-span-7">
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-bold text-amber-700 uppercase tracking-wider">{{ product.category.name }}</span>
+                    {% if product.discount_percent > 0 %}
+                    <span class="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded">Promo</span>
+                    {% endif %}
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ product.title }}</h1>
+                <p class="text-gray-600 mb-6">{{ product.description }}</p>
+
+                <div class="mb-6">
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-3xl font-bold text-amber-700">{{ product.retail_price }}</span>
+                        <span class="text-lg font-bold text-amber-700">DT</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">Prix de vente conseill&eacute; en dinars tunisiens.</p>
+                </div>
+
+                <div class="mb-6">
+                    <div class="flex items-center gap-4 mb-3">
+                        <span class="text-sm font-medium text-gray-700">Disponibilit&eacute;</span>
+                        <span class="px-2 py-1 rounded-full text-xs font-bold {% if product.stock > 0 %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                            {% if product.stock > 0 %}En stock ({{ product.stock }}){% else %}Rupture de stock{% endif %}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium text-gray-700">Quantit&eacute;</label>
+                        <input type="number" value="1" min="1" max="{{ product.stock }}" class="w-16 border border-gray-300 rounded px-2 py-2 text-center focus:ring-2 focus:ring-amber-500 outline-none">
+                    </div>
+                </div>
+
+                <!-- Sticky CTA on mobile -->
+                <div class="md:hidden mb-6">
+                    <button class="w-full bg-amber-600 hover:bg-amber-700 text-white px-6 py-4 rounded-xl font-bold text-lg shadow-lg transition flex items-center justify-center gap-2">
+                        Commander Directement
+                    </button>
+                    <p class="text-center text-xs text-gray-500 mt-3">Paiement &agrave; la livraison</p>
+                </div>
+
+                <div class="hidden md:block">
+                    <button class="w-full bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition flex items-center justify-center gap-3">
+                        Commander Directement <span>&rarr;</span>
+                    </button>
+                    <p class="text-center text-xs text-gray-500 mt-3">Paiement &agrave; la livraison &bull; 24&ndash;48h</p>
+                </div>
+            </div>
+
+            <!-- Delivery trust badges -->
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-6 mt-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-amber-600 font-bold text-xl">🚚</span>
+                        <span class="text-xs font-medium text-amber-800">Livraison 24&ndash;48h</span>
+                        <span class="text-[10px] text-amber-600">24 gouvernorats</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-amber-600 font-bold text-xl">&#10003;</span>
+                        <span class="text-xs font-medium text-amber-800">V&e9rifiez avant de payer</span>
+                        <span class="text-[10px] text-amber-600">COD s&eacute;curis&eacute;</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-amber-600 font-bold text-xl">&#9744;</span>
+                        <span class="text-xs font-medium text-amber-800">Retour sous 7 jours</span>
+                        <span class="text-[10px] text-amber-600">Satisfait ou rembours&eacute;</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-amber-600 font-bold text-xl">&#9993;</span>
+                        <span class="text-xs font-medium text-amber-800">Support WhatsApp</span>
+                        <span class="text-[10px] text-amber-600">7j/7</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

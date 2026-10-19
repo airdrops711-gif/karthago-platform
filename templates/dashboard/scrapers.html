@@ -1,28 +1,173 @@
 {% extends "base.html" %}
-{% block title %}Scrapers &mdash; Karthago Commerce{% endblock %}
+{% block title %}Contrôle des scrapers &mdash; Karthago Commerce{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">Scraper Management</h1>
-<div class="bg-white p-6 rounded-lg shadow border">
-    <h2 class="text-lg font-bold mb-4">Sources</h2>
-    <ul class="space-y-2">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Contrôle des scrapers</h1>
+            <p class="text-gray-600 mt-1">Pilotage visuel du moteur de collecte produit.</p>
+        </div>
+        <button onclick="document.getElementById('add-source-modal').classList.remove('hidden')" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow transition flex items-center gap-2">
+            <span>+</span> Ajouter une source
+        </button>
+    </div>
+
+    <!-- Source cards grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {% for source in sources %}
-        <li class="p-3 border rounded">{{ source.name }} &mdash; {{ source.engine }} &mdash; every {{ source.sync_frequency_hours }}h</li>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">{{ source.name }}</h3>
+                    <p class="text-xs text-gray-500 truncate max-w-xs">{{ source.base_url }}</p>
+                </div>
+                <span class="px-2 py-1 rounded-full text-xs font-bold {% if source.engine == 'DYNAMIC' %}bg-purple-100 text-purple-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                    {{ source.get_engine_display }}
+                </span>
+            </div>
+
+            <div class="space-y-3 mb-6">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-600">S&e9;lecteur conteneur</span>
+                    <span class="font-mono text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">{{ source.product_container_selector }}</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-600">Titre</span>
+                    <span class="font-mono text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">{{ source.title_selector }}</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-600">Prix</span>
+                    <span class="font-mono text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">{{ source.price_selector }}</span>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-600">Frequence</span>
+                    <span class="font-medium">{{ source.sync_frequency_hours }}h</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-4 border-t">
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold {% if source.is_active %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                    {% if source.is_active %}&#9679; Actif{% else %}&#9679; Inactif{% endif %}
+                </span>
+                <button hx-post="{% url 'scraper:run' source.id %}" hx-target="#run-result-{{ source.id }}" hx-swap="innerHTML" class="ml-auto text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded transition">
+                    Lancer maintenant
+                </button>
+                <div id="run-result-{{ source.id }}" class="text-xs mt-1"></div>
+            </div>
+        </div>
         {% empty %}
-        <li class="text-gray-500">No sources configured.</li>
+        <div class="col-span-full text-center py-16 text-gray-500">
+            <p class="text-lg">Aucune source de scraping configur&e9;e.</p>
+            <button onclick="document.getElementById('add-source-modal').classList.remove('hidden')" class="mt-4 text-amber-600 hover:text-amber-700 font-medium">Ajouter une premi&egrave;re source</button>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
+
+    <!-- Recent logs -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="p-6 border-b flex justify-between items-center">
+            <h3 class="text-lg font-bold text-gray-900">Logs d'exécution r&e9;cents</h3>
+            <a href="#" class="text-sm text-amber-600 hover:underline">Exporter</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b bg-gray-50 text-gray-500">
+                        <th class="px-4 py-3">Source</th>
+                        <th class="px-4 py-3">Statut</th>
+                        <th class="px-4 py-3">Trouv&e9;s</th>
+                        <th class="px-4 py-3">Mis &agrave; jour</th>
+                        <th class="px-4 py-3">Erreurs</th>
+                        <th class="px-4 py-3">D&e9but</th>
+                        <th class="px-4 py-3">Dur&e9;e</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for log in logs %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-3 text-gray-700 font-medium">{{ log.source.name }}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 rounded-full text-xs font-bold {% if log.status == 'completed' %}bg-green-100 text-green-700{% elif log.status == 'completed_with_errors' %}bg-amber-100 text-amber-700{% else %}bg-red-100 text-red-700{% endif %}">
+                                {{ log.status }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-gray-700">{{ log.products_found }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ log.products_updated }}</td>
+                        <td class="px-4 py-3 text-gray-500">{{ log.errors|truncatechars:40 }}</td>
+                        <td class="px-4 py-3 text-gray-500">{{ log.started_at|date:"d/m/Y H:i" }}</td>
+                        <td class="px-4 py-3 text-gray-500">
+                            {% if log.finished_at %}{{ log.finished_at|timesince:log.started_at }}s{% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="px-4 py-8 text-gray-500 text-center">Aucun log d'exécution.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-<div class="bg-white p-6 rounded-lg shadow border mt-6">
-    <h2 class="text-lg font-bold mb-4">Recent Logs</h2>
-    <table class="w-full text-left text-sm">
-        <thead><tr class="border-b"><th class="pb-2">Source</th><th class="pb-2">Status</th><th class="pb-2">Found</th><th class="pb-2">Updated</th><th class="pb-2">Started</th></tr></thead>
-        <tbody>
-            {% for log in logs %}
-            <tr class="border-b"><td class="py-2">{{ log.source.name }}</td><td class="py-2">{{ log.status }}</td><td class="py-2">{{ log.products_found }}</td><td class="py-2">{{ log.products_updated }}</td><td class="py-2">{{ log.started_at }}</td></tr>
-            {% empty %}
-            <tr><td colspan="5" class="py-2 text-gray-500">No logs yet.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+<!-- Add source modal -->
+<div id="add-source-modal" class="fixed inset-0 z-[70] hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('add-source-modal').classList.add('hidden')"></div>
+    <div class="absolute top-4 left-4 right-4 max-w-lg mx-auto bg-white rounded-2xl shadow-2xl flex flex-col">
+        <div class="p-6 border-b flex justify-between items-center">
+            <h2 class="text-xl font-bold text-gray-900">Ajouter une source de scraping</h2>
+            <button onclick="document.getElementById('add-source-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-2xl">✕</button>
+        </div>
+        <form class="p-6 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nom de la source</label>
+                    <input type="text" name="name" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Moteur</label>
+                    <select name="engine" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none">
+                        <option value="STATIC">Statique (HTTPX + Selectolax)</option>
+                        <option value="DYNAMIC">Dynamique (Playwright)</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">URL de base</label>
+                <input type="url" name="base_url" required placeholder="https://exemple.com/produits" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Sélecteur conteneur produit</label>
+                    <input type="text" name="product_container_selector" required placeholder=".product-item" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none font-mono text-xs">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Sélecteur titre</label>
+                    <input type="text" name="title_selector" required placeholder="h2.title" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none font-mono text-xs">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Sélecteur prix</label>
+                    <input type="text" name="price_selector" required placeholder=".price" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none font-mono text-xs">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Sélecteur stock</label>
+                    <input type="text" name="stock_selector" placeholder=".stock" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none font-mono text-xs">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Sélecteur images</label>
+                    <input type="text" name="images_selector" placeholder="img" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none font-mono text-xs">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fréquence (heures)</label>
+                    <input type="number" name="sync_frequency_hours" value="4" min="1" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+            </div>
+            <div class="pt-4 border-t flex justify-end gap-3">
+                <button type="button" onclick="document.getElementById('add-source-modal').classList.add('hidden')" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Annuler</button>
+                <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium">Créer la source</button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

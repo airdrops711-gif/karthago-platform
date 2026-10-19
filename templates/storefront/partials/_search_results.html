@@ -1,0 +1,31 @@
+{% if query %}
+    {% if products %}
+        <div class="p-2 border-b border-gray-100">
+            <p class="text-xs font-bold text-gray-400 uppercase mb-2">Résultats pour "{{ query }}"</p>
+        </div>
+        <div class="divide-y divide-gray-100">
+            {% for product in products %}
+            <a href="{% url 'catalog:product_detail' product.id %}" class="block p-3 hover:bg-gray-50 transition">
+                <div class="flex items-center gap-3">
+                    {% if product.images %}
+                    <img src="{{ product.images.first.url }}" alt="{{ product.title }}" class="w-12 h-12 object-cover rounded">
+                    {% else %}
+                    <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">📦</div>
+                    {% endif %}
+                    <div>
+                        <div class="text-sm font-medium text-gray-900 truncate w-32">{{ product.title }}</div>
+                        <div class="text-xs text-amber-700 font-bold">{{ product.retail_price }} DT</div>
+                    </div>
+                    <span class="ml-auto text-xs {% if product.stock > 0 %}text-green-600{% else %}text-red-500{% endif %} font-medium">
+                        {% if product.stock > 0 %}En stock{% else %}Rupture{% endif %}
+                    </span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="p-4 text-center text-gray-500 text-sm">Aucun produit trouvé.</div>
+    {% endif %}
+{% else %}
+    <div class="p-4 text-center text-gray-400 text-sm">Tapez pour rechercher…</div>
+{% endif %}
