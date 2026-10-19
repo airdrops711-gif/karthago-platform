@@ -1,6 +1,6 @@
 """Dashboard views: custom analytics control plane."""
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Sum, Count, Avg
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
 from django.utils import timezone
@@ -11,7 +11,16 @@ from apps.scraper.models import ScraperLog
 from apps.dashboard.services import financial_unit_economics, delivery_kpis
 
 
+def _is_staff(user):
+    """The dashboard exposes revenue KPIs: restrict it to staff accounts."""
+    return user.is_active and user.is_staff
+
+
+staff_required = user_passes_test(_is_staff)
+
+
 @login_required
+@staff_required
 def overview(request):
     now = timezone.now()
     today = now.date()
@@ -77,6 +86,7 @@ def overview(request):
 
 
 @login_required
+@staff_required
 def scrapers(request):
     from apps.scraper.models import ScrapedSource
     sources = ScrapedSource.objects.all()
@@ -85,6 +95,7 @@ def scrapers(request):
 
 
 @login_required
+@staff_required
 def orders_list(request):
     orders = Order.objects.order_by("-created_at")[:50]
     return render(request, "dashboard/orders.html", {"orders": orders})

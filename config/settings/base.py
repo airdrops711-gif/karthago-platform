@@ -86,6 +86,11 @@ TIME_ZONE = "Africa/Tunis"
 USE_I18N = True
 USE_TZ = True
 
+# The dashboard is staff-only and reuses the Django admin login form.
+# Without this, @login_required redirects to /accounts/login/ (404).
+LOGIN_URL = "/admin/login/"
+LOGIN_REDIRECT_URL = "/dashboard/"
+
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
