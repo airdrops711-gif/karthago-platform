@@ -27,15 +27,20 @@ def nav_categories(request):
 
 
 def cart_item_count(request):
-    """Make the cart item count available in every template (nav badge)."""
+    """Make the cart item count and total available in every template.
+
+    The count drives the nav badge, the total drives the checkout summary.
+    """
     try:
         from apps.orders.models import Cart
+        from apps.orders.services import cart_total
+
         session_key = request.session.session_key or request.COOKIES.get("sessionid", "")
         if session_key:
             count = Cart.objects.filter(session_key=session_key).aggregate(
                 total=Sum("quantity")
             )["total"] or 0
-            return {"cart_item_count": count}
+            return {"cart_item_count": count, "cart_total": cart_total(session_key)}
     except Exception:
         pass
-    return {"cart_item_count": 0}
+    return {"cart_item_count": 0, "cart_total": 0}

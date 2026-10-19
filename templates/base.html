@@ -1,14 +1,32 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Karthago Commerce{% endblock %}</title>
+
+    {% block seo %}
+    <title>{% block title %}Karthago &mdash; Dropshipping Tunisia{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Karthago importe des produits r&eacute;els depuis les meilleurs fournisseurs tunisiens. Paiement &agrave; la livraison dans toute la Tunisie, exp&eacute;dition sous 24 &agrave; 48 heures.{% endblock %}">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    {% endblock %}
+
+    <!-- Open Graph / social sharing -->
+    <meta property="og:site_name" content="Karthago">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{% block seo_title %}Karthago &mdash; Dropshipping Tunisia{% endblock %}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{% block seo_description %}Produits r&eacute;els import&eacute;s des fournisseurs tunisiens, paiement &agrave; la livraison partout en Tunisie.{% endblock %}{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:locale" content="fr_TN">
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.svg' %}{% endblock %}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#d97706">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
@@ -34,7 +52,7 @@
         {% block extra_body %}{% endblock %}
     </main>
 
-    {% include "storefront/checkout_modal.html" with governorates=governorates %}
+    {% include "storefront/checkout_modal.html" with governorates=governorates cart_total=cart_total %}
 
     <footer class="bg-white border-t mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -90,5 +108,8 @@
             </div>
         </div>
     </footer>
+
+    <script src="{% static 'js/app.js' %}" defer></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

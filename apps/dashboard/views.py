@@ -1,14 +1,18 @@
-"""Dashboard views: custom analytics control plane."""
-from django.shortcuts import render
+"""Dashboard views: executive analytics + order command centre."""
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Sum, Count, Avg
-from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
+from django.contrib import messages
+from django.db.models import Sum, Count, Q, Avg
+from django.db.models.functions import TruncDay
 from django.utils import timezone
+from django.http import JsonResponse
 from datetime import timedelta
+
 from apps.catalog.models import Product
-from apps.orders.models import Order, Delivery
+from apps.orders.models import Order, OrderItem, Delivery, OrderEvent
 from apps.scraper.models import ScraperLog
 from apps.dashboard.services import financial_unit_economics, delivery_kpis
+from apps.orders.services import change_order_status
 
 
 def _is_staff(user):
@@ -68,6 +72,20 @@ def overview(request):
         .order_by("-retail_price")[:5]
     )
 
+    # Command centre: the orders waiting for a phone confirmation.
+    action_orders = (
+        Order.objects.filter(status=Order.STATUS_PENDING_CONFIRMATION)
+        .select_related("customer")
+        .prefetch_related("items")[:10]
+    )
+
+    # Margin snapshot: what the business actually earns per order.
+    margin_stats = Order.objects.aggregate(
+        revenue=Sum("total_amount"),
+        cost=Sum("total_cost"),
+        avg_margin=Avg("total_amount"),
+    )
+
     return render(request, "dashboard/overview.html", {
         "total_products": total_products,
         "active_products": active_products,
@@ -82,6 +100,10 @@ def overview(request):
         "gmv_by_day": list(gmv_by_day),
         "orders_by_status": list(orders_by_status),
         "top_products": top_products,
+        "action_orders": action_orders,
+        "total_revenue": margin_stats["revenue"] or 0,
+        "total_cost": margin_stats["cost"] or 0,
+        "gross_margin": (margin_stats["revenue"] or 0) - (margin_stats["cost"] or 0),
     })
 
 
@@ -97,5 +119,136 @@ def scrapers(request):
 @login_required
 @staff_required
 def orders_list(request):
-    orders = Order.objects.order_by("-created_at")[:50]
-    return render(request, "dashboard/orders.html", {"orders": orders})
+    """Command centre: the list of orders, filterable by status."""
+    status = (request.GET.get("status") or "").strip()
+    query = (request.GET.get("q") or "").strip()
+
+    orders = Order.objects.select_related("customer").prefetch_related("items")
+
+    if status:
+        orders = orders.filter(status=status)
+    if query:
+        orders = orders.filter(
+            Q(customer__full_name__icontains=query)
+            | Q(customer__phone__icontains=query)
+            | Q(id__exact=query if query.isdigit() else 0)
+        )
+
+    orders = orders[:100]
+
+    # Counts per status, for the filter pills.
+    counts = {
+        row["status"]: row["count"]
+        for row in Order.objects.values("status").annotate(count=Count("id"))
+    }
+    counts["ALL"] = sum(counts.values())
+
+    return render(
+        request,
+        "dashboard/orders.html",
+        {
+            "orders": orders,
+            "status": status,
+            "q": query,
+            "status_choices": Order.STATUS_CHOICES,
+            "status_counts": counts,
+        },
+    )
+
+
+@login_required
+@staff_required
+def order_detail(request, order_id):
+    """Full command sheet of one order.
+
+    Shows the client details (name, phone, address), every line with its
+    supplier, its original cost and the price charged, and the tracking
+    trail of the status changes.
+    """
+    order = get_object_or_404(
+        Order.objects.select_related("customer").prefetch_related("items", "events"),
+        pk=order_id,
+    )
+    items = list(order.items.all())
+    suppliers = sorted({item.supplier_name for item in items if item.supplier_name})
+    total_cost = sum((item.line_cost_tnd() for item in items), order.total_cost * 0)
+
+    return render(
+        request,
+        "dashboard/order_detail.html",
+        {
+            "order": order,
+            "items": items,
+            "suppliers": suppliers,
+            "item_count": sum(item.quantity for item in items),
+            "total_cost": total_cost,
+            "margin": order.total_amount - total_cost,
+            "margin_percent": order.margin_percent,
+            "status_choices": Order.STATUS_CHOICES,
+            "events": order.events.all(),
+        },
+    )
+
+
+@login_required
+@staff_required
+def order_update_status(request, order_id):
+    """Move an order to a new status (HTMX, from the command sheet)."""
+    order = get_object_or_404(Order, pk=order_id)
+    new_status = (request.POST.get("status") or "").strip()
+    note = (request.POST.get("note") or "").strip()
+
+    try:
+        change_order_status(order, new_status, note=note, user=request.user)
+    except ValueError as exc:
+        messages.error(request, str(exc))
+    else:
+        messages.success(request, f"Commande #{order.id}: {order.get_status_display()}.")
+
+    return redirect("dashboard:order_detail", order_id=order.id)
+
+
+@login_required
+@staff_required
+def order_note(request, order_id):
+    """Append an internal note to an order (HTMX)."""
+    order = get_object_or_404(Order, pk=order_id)
+    note = (request.POST.get("note") or "").strip()
+    if note:
+        OrderEvent.objects.create(
+            order=order,
+            from_status=order.status,
+            to_status=order.status,
+            note=note,
+            created_by=request.user.get_username(),
+        )
+        messages.success(request, "Note ajoutée.")
+    return redirect("dashboard:order_detail", order_id=order.id)
+
+
+@login_required
+@staff_required
+def order_call(request, order_id):
+    """One-click phone confirmation log.
+
+    Records that the operator called the client, without changing the
+    order status: the status is changed explicitly from the command sheet.
+    """
+    order = get_object_or_404(Order, pk=order_id)
+    outcome = (request.POST.get("outcome") or "Appel effectué").strip()
+    OrderEvent.objects.create(
+        order=order,
+        from_status=order.status,
+        to_status=order.status,
+        note=f"Appel client — {outcome}",
+        created_by=request.user.get_username(),
+    )
+    if order.status == Order.STATUS_PENDING_CONFIRMATION:
+        change_order_status(
+            order,
+            Order.STATUS_CONFIRMED,
+            note="Client confirmé par téléphone.",
+            user=request.user,
+        )
+    messages.success(request, f"Commande #{order.id} confirmée.")
+    return redirect("dashboard:order_detail", order_id=order.id)

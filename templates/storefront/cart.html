@@ -4,10 +4,11 @@
 {% block title %}Panier &mdash; Karthago Commerce{% endblock %}
 {% block content %}
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">Votre Panier</h1>
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Votre Panier</h1>
 
     {% if cart_items %}
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <!-- Desktop table -->
+    <div class="hidden md:block bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <table class="w-full text-left">
             <thead class="bg-gray-50">
                 <tr>
@@ -24,21 +25,24 @@
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                             {% if item.product.images.first %}
-                            <img src="{{ item.product.images.first.url }}" alt="{{ item.product.title }}" class="w-12 h-12 object-cover rounded">
+                            <img src="{{ item.product.images.first.url }}" alt="{{ item.product.title }}" class="w-12 h-12 object-cover rounded" loading="lazy">
                             {% else %}
-                            <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">📦</div>
+                            <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">&#128230;</div>
                             {% endif %}
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">{{ item.product.title }}</p>
-                                <p class="text-xs text-gray-500">SKU: {{ item.product.id }}</p>
+                            <div class="min-w-0">
+                                <a href="{% url 'catalog:product_detail' item.product.id %}"
+                                   class="text-sm font-medium text-gray-900 hover:text-amber-700 line-clamp-2">{{ item.product.title }}</a>
+                                {% if item.product.supplier %}
+                                <p class="text-xs text-gray-500 mt-0.5">{{ item.product.supplier.name }}</p>
+                                {% endif %}
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-900 text-right">{{ item.product.retail_price }} DT</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 text-right whitespace-nowrap">{{ item.product.retail_price }} DT</td>
                     <td class="px-6 py-4 text-center">
                         <span class="text-sm font-medium text-gray-900">{{ item.quantity }}</span>
                     </td>
-                    <td class="px-6 py-4 text-sm font-medium text-gray-900 text-right">{{ item.product.retail_price|mul:item.quantity }} DT</td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900 text-right whitespace-nowrap">{{ item.product.retail_price|mul:item.quantity }} DT</td>
                     <td class="px-6 py-4 text-right">
                         <form hx-post="{% url 'orders:remove_from_cart' item.id %}" hx-target="this" hx-swap="outerHTML" class="inline">
                             {% csrf_token %}
@@ -51,23 +55,55 @@
         </table>
     </div>
 
-    <div class="mt-8 flex justify-between items-center">
-        <div class="text-lg font-bold text-gray-900">
-            Total: {{ total }} DT
+    <!-- Mobile cards -->
+    <div class="md:hidden space-y-3">
+        {% for item in cart_items %}
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <div class="flex gap-3">
+                {% if item.product.images.first %}
+                <img src="{{ item.product.images.first.url }}" alt="{{ item.product.title }}" class="w-16 h-16 object-cover rounded shrink-0" loading="lazy">
+                {% else %}
+                <div class="w-16 h-16 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs shrink-0">&#128230;</div>
+                {% endif %}
+                <div class="min-w-0 flex-1">
+                    <a href="{% url 'catalog:product_detail' item.product.id %}"
+                       class="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-amber-700">{{ item.product.title }}</a>
+                    <p class="text-sm text-gray-500 mt-1">
+                        {{ item.product.retail_price }} DT &times; {{ item.quantity }}
+                    </p>
+                    <p class="text-base font-bold text-amber-700 mt-1">
+                        {{ item.product.retail_price|mul:item.quantity }} DT
+                    </p>
+                </div>
+            </div>
+            <form hx-post="{% url 'orders:remove_from_cart' item.id %}" hx-target="this" hx-swap="outerHTML" class="mt-3">
+                {% csrf_token %}
+                <button type="submit" class="w-full border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-medium">
+                    Supprimer
+                </button>
+            </form>
         </div>
-        <a href="{% url 'orders:checkout' %}" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-medium shadow-lg transition">
+        {% endfor %}
+    </div>
+
+    <div class="mt-8 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+        <div class="text-lg font-bold text-gray-900">
+            Total: <span id="cart-total">{{ total }} DT</span>
+        </div>
+        <a href="{% url 'orders:checkout' %}"
+           class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-medium shadow-lg transition text-center">
             Passer la commande &rarr;
         </a>
     </div>
     {% else %}
     <div class="text-center py-16">
         <div class="bg-gray-100 rounded-xl p-8 inline-block mb-6">
-            <span class="text-4xl">🛒</span>
+            <span class="text-4xl" aria-hidden="true">&#128722;</span>
         </div>
         <h2 class="text-2xl font-bold text-gray-900 mb-2">Votre panier est vide</h2>
         <p class="text-gray-600 mb-6">Ajoutez des produits pour commencer vos achats.</p>
         <a href="{% url 'catalog:product_list' %}" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-medium">
-            D&e9couvrir les produits &rarr;
+            D&eacute;couvrir les produits &rarr;
         </a>
     </div>
     {% endif %}

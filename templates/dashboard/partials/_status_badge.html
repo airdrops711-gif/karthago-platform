@@ -1,0 +1,19 @@
+{% comment %}
+Status badge, used in the command centre. Kept in a partial so the
+desktop table and the mobile cards always show the same colours.
+{% endcomment %}
+{% if status == 'DELIVERED_AND_PAID' %}
+<span class="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 whitespace-nowrap">Livr&eacute; &amp; pay&eacute;</span>
+{% elif status == 'RETURNED' %}
+<span class="px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 whitespace-nowrap">Retourn&eacute;</span>
+{% elif status == 'PENDING_CONFIRMATION' %}
+<span class="px-2 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 whitespace-nowrap">&Agrave; confirmer</span>
+{% elif status == 'CONFIRMED' %}
+<span class="px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 whitespace-nowrap">Confirm&eacute;e</span>
+{% elif status == 'ORDERED_FROM_SUPPLIER' %}
+<span class="px-2 py-1 rounded-full text-xs font-bold bg-violet-100 text-violet-700 whitespace-nowrap">Command&eacute; fournisseur</span>
+{% elif status == 'SHIPPED' %}
+<span class="px-2 py-1 rounded-full text-xs font-bold bg-cyan-100 text-cyan-700 whitespace-nowrap">Exp&eacute;di&eacute;</span>
+{% else %}
+<span class="px-2 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700 whitespace-nowrap">{{ status }}</span>
+{% endif %}

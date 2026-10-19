@@ -99,6 +99,56 @@
         </div>
     </div>
 
+    <!-- Command centre: orders awaiting a phone confirmation -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8 overflow-hidden">
+        <div class="p-6 border-b flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h3 class="text-lg font-bold text-gray-900">Commandes &agrave; confirmer</h3>
+                <p class="text-sm text-gray-500 mt-0.5">Appelez le client, puis validez la commande.</p>
+            </div>
+            <a href="{% url 'dashboard:orders' %}" class="text-sm text-amber-600 hover:underline font-medium">Toutes les commandes &rarr;</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="border-b bg-gray-50 text-gray-500">
+                        <th class="px-4 py-3">Commande</th>
+                        <th class="px-4 py-3">Client</th>
+                        <th class="px-4 py-3">T&eacute;l&eacute;phone</th>
+                        <th class="px-4 py-3">Articles</th>
+                        <th class="px-4 py-3 text-right">Total</th>
+                        <th class="px-4 py-3 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for order in action_orders %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <a href="{% url 'dashboard:order_detail' order.id %}" class="font-medium text-gray-900 hover:text-amber-600">#{{ order.id }}</a>
+                        </td>
+                        <td class="px-4 py-3 text-gray-700">{{ order.customer.full_name }}</td>
+                        <td class="px-4 py-3">
+                            <a href="tel:{{ order.customer.phone }}" class="text-amber-700 hover:underline font-medium">{{ order.customer.phone }}</a>
+                        </td>
+                        <td class="px-4 py-3 text-gray-600">{{ order.item_count }}</td>
+                        <td class="px-4 py-3 text-right font-medium text-gray-900">{{ order.total_amount }} DT</td>
+                        <td class="px-4 py-3 text-right">
+                            <a href="{% url 'dashboard:order_detail' order.id %}"
+                               class="inline-block px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold">
+                                Ouvrir
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="px-4 py-8 text-gray-500 text-center">
+                        Aucune commande en attente de confirmation.
+                    </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Recent scraper logs -->
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
         <div class="p-6 border-b flex justify-between items-center">

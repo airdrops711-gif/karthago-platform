@@ -1,4 +1,6 @@
 """Catalog views for storefront."""
+import json
+
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.db.models import Q, Count, F
@@ -194,6 +196,28 @@ class HomeView(ListView):
                 "text": "Marge transparente de 10%",
             },
         ]
+
+        # ItemList of the newest products, for the home page.
+        newest = list(base.order_by("-created_at")[:12])
+        context["itemlist_schema"] = json.dumps(
+            {
+                "@context": "https://schema.org",
+                "@type": "ItemList",
+                "numberOfItems": len(newest),
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": index,
+                        "url": self.request.build_absolute_uri(
+                            f"/product/{product.id}/"
+                        ),
+                        "name": product.title[:120],
+                    }
+                    for index, product in enumerate(newest, start=1)
+                ],
+            },
+            ensure_ascii=False,
+        )
         return context
 
 
@@ -241,6 +265,74 @@ class ProductDetailView(DetailView):
             Product.objects.filter(is_active=True)
             .select_related("category", "supplier")
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product = self.object
+        request = self.request
+        base = request.build_absolute_uri("/")
+
+        images = [img.url for img in product.images.all() if img.url]
+
+        # Product structured data: price, availability, rating-free offer.
+        product_schema = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": product.title,
+            "description": (product.description or product.title)[:500],
+            "sku": str(product.id),
+            "image": [request.build_absolute_uri(url) for url in images[:3]],
+            "category": product.category.name if product.category else "Produit",
+            "brand": {
+                "@type": "Brand",
+                "name": product.supplier.name if product.supplier else "Karthago",
+            },
+            "offers": {
+                "@type": "Offer",
+                "url": request.build_absolute_uri(),
+                "priceCurrency": "TND",
+                "price": f"{product.retail_price:.3f}",
+                "availability": (
+                    "https://schema.org/InStock"
+                    if product.stock > 0
+                    else "https://schema.org/OutOfStock"
+                ),
+                "itemCondition": "https://schema.org/NewCondition",
+                "seller": {"@type": "Organization", "name": "Karthago"},
+            },
+        }
+        if product.compare_at_price and product.compare_at_price > product.retail_price:
+            product_schema["offers"]["priceValidUntil"] = ""
+
+        context["product_schema"] = json.dumps(product_schema, ensure_ascii=False)
+        context["breadcrumb_schema"] = json.dumps(
+            {
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Accueil",
+                        "item": base,
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Catalogue",
+                        "item": request.build_absolute_uri("/catalogue/"),
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": product.title[:120],
+                        "item": request.build_absolute_uri(),
+                    },
+                ],
+            },
+            ensure_ascii=False,
+        )
+        return context
 
 
 def product_search(request):

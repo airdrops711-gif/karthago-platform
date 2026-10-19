@@ -1,44 +1,109 @@
 {% extends "base.html" %}
+{% load catalog_tags %}
 {% block title %}Commandes &mdash; Karthago Commerce{% endblock %}
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Commandes</h1>
-            <p class="text-gray-600 mt-1">Gestion des commandes et suivi COD.</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Commandes</h1>
+            <p class="text-gray-600 mt-1 text-sm">Centre de commande : confirmez, suivez et validez chaque commande.</p>
         </div>
-        <a href="{% url 'dashboard:overview' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Retour tableau de bord</a>
+        <div class="flex flex-wrap gap-2">
+            <a href="{% url 'dashboard:overview' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Tableau de bord</a>
+            <a href="{% url 'dashboard:scrapers' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Scrapers</a>
+        </div>
     </div>
 
-    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+    <!-- Status filter pills -->
+    <div class="flex flex-wrap gap-2 mb-4">
+        <a href="{% url 'dashboard:orders' %}"
+           class="px-3 py-1.5 rounded-full text-xs font-semibold border transition
+                  {% if not status %}bg-gray-900 text-white border-gray-900{% else %}bg-white text-gray-600 border-gray-300 hover:bg-gray-50{% endif %}">
+            Toutes <span class="opacity-70">({{ status_counts.ALL|default:0 }})</span>
+        </a>
+        {% for value, label in status_choices %}
+        <a href="{% url 'dashboard:orders' %}?status={{ value }}"
+           class="px-3 py-1.5 rounded-full text-xs font-semibold border transition
+                  {% if status == value %}bg-amber-600 text-white border-amber-600{% else %}bg-white text-gray-600 border-gray-300 hover:bg-gray-50{% endif %}">
+            {{ label }} <span class="opacity-70">({{ status_counts|get_item:value|default:0 }})</span>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Search -->
+    <form method="get" class="mb-4 flex flex-wrap gap-2 max-w-md">
+        {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+        <input type="text" name="q" value="{{ q }}" placeholder="Nom, t&eacute;l&eacute;phone ou n&deg; de commande"
+               class="flex-1 min-w-[14rem] border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+        <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium">Rechercher</button>
+        {% if q %}
+        <a href="{% url 'dashboard:orders' %}{% if status %}?status={{ status }}{% endif %}"
+           class="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50">Effacer</a>
+        {% endif %}
+    </form>
+
+    <!-- Orders: cards on mobile, table on desktop -->
+    <div class="space-y-3 md:hidden">
+        {% for order in orders %}
+        <a href="{% url 'dashboard:order_detail' order.id %}"
+           class="block bg-white rounded-xl border border-gray-100 shadow-sm p-4 active:bg-gray-50">
+            <div class="flex items-start justify-between gap-3 mb-2">
+                <div class="min-w-0">
+                    <p class="font-bold text-gray-900 truncate">#{{ order.id }} &mdash; {{ order.customer.full_name }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">
+                        <a href="tel:{{ order.customer.phone }}" class="hover:text-amber-600">{{ order.customer.phone }}</a>
+                        &middot; {{ order.customer.governorate }}
+                    </p>
+                </div>
+                {% include "dashboard/partials/_status_badge.html" with status=order.status %}
+            </div>
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-500">{{ order.created_at|date:"d/m H:i" }}</span>
+                <span class="font-bold text-amber-700">{{ order.total_amount }} DT</span>
+            </div>
+        </a>
+        {% empty %}
+        <div class="text-center py-12 text-gray-500 text-sm">Aucune commande.</div>
+        {% endfor %}
+    </div>
+
+    <div class="hidden md:block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b bg-gray-50 text-gray-500">
                         <th class="px-4 py-3">Commande</th>
                         <th class="px-4 py-3">Client</th>
+                        <th class="px-4 py-3">Contact</th>
                         <th class="px-4 py-3">Gouvernorat</th>
+                        <th class="px-4 py-3">Articles</th>
                         <th class="px-4 py-3">Statut</th>
                         <th class="px-4 py-3 text-right">Total (DT)</th>
+                        <th class="px-4 py-3 text-right">Marge</th>
                         <th class="px-4 py-3">Date</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     {% for order in orders %}
                     <tr class="hover:bg-gray-50 transition">
-                        <td class="px-4 py-3 text-gray-900 font-medium">#{{ order.id }}</td>
-                        <td class="px-4 py-3 text-gray-700">{{ order.customer.full_name }}</td>
-                        <td class="px-4 py-3 text-gray-700">{{ order.customer.governorate }}</td>
                         <td class="px-4 py-3">
-                            <span class="px-2 py-1 rounded-full text-xs font-bold {% if order.status == 'DELIVERED_AND_PAID' %}bg-green-100 text-green-700{% elif order.status == 'RETURNED' %}bg-red-100 text-red-700{% elif order.status == 'PENDING_CONFIRMATION' %}bg-amber-100 text-amber-700{% else %}bg-gray-100 text-gray-700{% endif %}">
-                                {{ order.get_status_display }}
-                            </span>
+                            <a href="{% url 'dashboard:order_detail' order.id %}" class="font-medium text-gray-900 hover:text-amber-600">#{{ order.id }}</a>
+                        </td>
+                        <td class="px-4 py-3 text-gray-700">{{ order.customer.full_name }}</td>
+                        <td class="px-4 py-3">
+                            <a href="tel:{{ order.customer.phone }}" class="text-amber-700 hover:underline font-medium">{{ order.customer.phone }}</a>
+                        </td>
+                        <td class="px-4 py-3 text-gray-700">{{ order.customer.governorate }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ order.item_count }}</td>
+                        <td class="px-4 py-3">
+                            {% include "dashboard/partials/_status_badge.html" with status=order.status %}
                         </td>
                         <td class="px-4 py-3 text-right font-medium text-gray-900">{{ order.total_amount }}</td>
-                        <td class="px-4 py-3 text-gray-500">{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                        <td class="px-4 py-3 text-right text-green-700 font-medium">{{ order.margin }} DT</td>
+                        <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ order.created_at|date:"d/m/Y H:i" }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="6" class="px-4 py-8 text-gray-500 text-center">Aucune commande.</td></tr>
+                    <tr><td colspan="9" class="px-4 py-8 text-gray-500 text-center">Aucune commande.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

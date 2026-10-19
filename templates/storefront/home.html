@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% load static catalog_tags %}
-{% block title %}Karthago &mdash; Dropshipping Tunisia{% endblock %}
+{% block title %}Karthago &mdash; Dropshipping Tunisia | Paiement à la livraison{% endblock %}
+{% block meta_description %}Plus de {{ total_products }} produits réels importés des meilleurs fournisseurs tunisiens. Achat en ligne, paiement à la livraison, livraison 24-48h dans les 24 gouvernorats.{% endblock %}
+{% block og_title %}Karthago &mdash; Le e-commerce tunisien, sans boutique{% endblock %}
+{% block og_description %}Produits réels, prix transparents, paiement à la livraison partout en Tunisie.{% endblock %}
+{% block extra_js %}
+{% include "storefront/partials/_jsonld.html" with schema=itemlist_schema %}
+{% endblock %}
 {% block content %}
 
 <!-- ================= HERO ================= -->

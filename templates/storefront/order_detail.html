@@ -1,15 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Commande #{{ order.id }} &mdash; Karthago Commerce{% endblock %}
 {% block content %}
-{% include "storefront/nav.html" %}
 
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-900">Commande #{{ order.id }}</h1>
-            <span class="px-3 py-1 rounded-full text-xs font-bold {% if order.status == 'DELIVERED_AND_PAID' %}bg-green-100 text-green-700{% elif order.status == 'RETURNED' %}bg-red-100 text-red-700{% else %}bg-amber-100 text-amber-700{% endif %}">
-                {{ order.get_status_display }}
-            </span>
+            {% include "dashboard/partials/_status_badge.html" with status=order.status %}
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -41,7 +38,12 @@
                 <tbody>
                     {% for item in order.items.all %}
                     <tr class="border-b">
-                        <td class="py-3 text-gray-700">{{ item.product_title }}</td>
+                        <td class="py-3 text-gray-700">
+                        {{ item.product_title }}
+                        {% if item.supplier_name %}
+                        <span class="block text-xs text-gray-400">Fournisseur : {{ item.supplier_name }}</span>
+                        {% endif %}
+                    </td>
                         <td class="py-3 text-right">{{ item.quantity }}</td>
                         <td class="py-3 text-right">{{ item.unit_price }} DT</td>
                         <td class="py-3 text-right font-medium">{{ item.line_total }} DT</td>

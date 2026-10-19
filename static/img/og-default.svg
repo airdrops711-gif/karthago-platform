@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="180" cy="120" r="220" fill="#ffffff" opacity="0.08"/>
+  <circle cx="1040" cy="540" r="260" fill="#ffffff" opacity="0.08"/>
+  <text x="600" y="300" font-family="Helvetica, Arial, sans-serif" font-size="86" font-weight="bold" fill="#ffffff" text-anchor="middle">Karthago</text>
+  <text x="600" y="368" font-family="Helvetica, Arial, sans-serif" font-size="34" fill="#ffffff" opacity="0.92" text-anchor="middle">Dropshipping tunisien — paiement à la livraison</text>
+  <text x="600" y="432" font-family="Helvetica, Arial, sans-serif" font-size="26" fill="#ffffff" opacity="0.8" text-anchor="middle">Livraison 24-48h dans toute la Tunisie</text>
+</svg>
