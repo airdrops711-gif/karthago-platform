@@ -1,10 +1,17 @@
 """Celery tasks for periodic scraping and sync."""
 import asyncio
+import random
+import time
 from decimal import Decimal
 from celery import shared_task
 from django.utils import timezone
 from .models import ScrapedSource, ScraperLog
 from .engines import get_engine
+
+# Suppliers rate-limit / bot-block when hit back-to-back. The scraper waits
+# this long (plus jitter) between two different source domains.
+DOMAIN_DELAY_SECONDS = 3.0
+DOMAIN_DELAY_JITTER = 2.0
 
 
 def _asyncio_run(coro):
@@ -14,6 +21,29 @@ def _asyncio_run(coro):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     return loop.run_until_complete(coro)
+
+
+def _domain_of(url):
+    """Extract the registrable-ish host from a URL."""
+    from urllib.parse import urlsplit
+
+    try:
+        host = (urlsplit(url).netloc or "").lower()
+        return host[4:] if host.startswith("www.") else host
+    except Exception:
+        return ""
+
+
+def polite_delay(url, last_domain, last_time):
+    """Sleep before hitting a different domain. Returns (domain, timestamp)."""
+    domain = _domain_of(url)
+    now = time.time()
+    if last_domain and domain and domain != last_domain:
+        wait = DOMAIN_DELAY_SECONDS + random.uniform(0, DOMAIN_DELAY_JITTER)
+        elapsed = now - last_time
+        if elapsed < wait:
+            time.sleep(wait - elapsed)
+    return domain, time.time()
 
 
 @shared_task(bind=True)
@@ -30,6 +60,7 @@ def sync_source(self, source_id):
         "product_container": source.product_container_selector,
         "title": source.title_selector,
         "price": source.price_selector,
+        "price_fallbacks": getattr(source, "price_fallbacks", None) or [],
         "stock": source.stock_selector,
         "images": source.images_selector,
         "brand": getattr(source, "brand_selector", ""),
@@ -57,6 +88,8 @@ def sync_source(self, source_id):
 
     found = 0
     updated = 0
+    errors = []
+    skipped_no_price = 0
     for item in results:
         found += 1
         # Cap stock to a reasonable max to avoid integer overflow
@@ -65,23 +98,43 @@ def sync_source(self, source_id):
         item_url = item.get("url") or source.base_url
         if item_url.startswith("//"):
             item_url = "https:" + item_url
-        obj, created = Product.objects.update_or_create(
-            source=item_url,
-            title=item["title"],
-            defaults={
-                "supplier": supplier,
-                "category": category,
-                "margin_rule": margin_rule,
-                "raw_cost": item["price"],
-                "currency": source.currency or "TND",
-                "currency_rate": source.currency_rate or Decimal("1"),
-                "markup_percent": margin_rule.markup_percent,
-                "fixed_margin_fee": margin_rule.fixed_margin_fee,
-                "stock": stock_val,
-                "description": item.get("title", "")[:200],
-                "is_active": stock_val > 0,
-            },
-        )
+        # Guard against column length limits (e.g. very long AliExpress URLs).
+        item_url = item_url[:500]
+        title = (item.get("title") or "").strip()[:255]
+        if not title:
+            continue
+        # Skip landing/category links that the container link heuristic picked up.
+        if item.get("is_product") is False:
+            continue
+        # A product with no parseable price is not sellable; skip it instead of
+        # storing a zero-cost item.
+        if not item.get("price") or item["price"] <= 0:
+            skipped_no_price += 1
+            continue
+        try:
+            # Key on the normalised URL only. Two distinct products can share a
+            # title, and the same product can appear in several category pages.
+            obj, created = Product.objects.update_or_create(
+                source=item_url,
+                defaults={
+                    "title": title,
+                    "supplier": supplier,
+                    "category": category,
+                    "margin_rule": margin_rule,
+                    "raw_cost": item["price"],
+                    "currency": source.currency or "TND",
+                    "currency_rate": source.currency_rate or Decimal("1"),
+                    "markup_percent": margin_rule.markup_percent,
+                    "fixed_margin_fee": margin_rule.fixed_margin_fee,
+                    "stock": stock_val,
+                    "description": title[:200],
+                    "is_active": stock_val > 0,
+                },
+            )
+        except Exception as exc:
+            # One malformed product must not abort the whole source.
+            errors.append(f"{title[:40]!r}: {type(exc).__name__}: {str(exc)[:120]}")
+            continue
         # Save product images
         images_raw = item.get("images", "")
         if images_raw:
@@ -89,21 +142,63 @@ def sync_source(self, source_id):
             obj.images.all().delete()
             img_list = [img.strip() for img in images_raw.split(",") if img.strip()]
             for idx, img_url in enumerate(img_list[:5]):  # Limit to 5 images
-                ProductImage.objects.create(
-                    product=obj,
-                    image=img_url,
-                    alt_text=obj.title,
-                    is_primary=(idx == 0),
-                    order=idx,
-                )
+                try:
+                    ProductImage.objects.create(
+                        product=obj,
+                        image=img_url[:500],
+                        alt_text=obj.title[:255],
+                        is_primary=(idx == 0),
+                        order=idx,
+                    )
+                except Exception as exc:
+                    errors.append(f"image {img_url[:40]!r}: {type(exc).__name__}: {str(exc)[:100]}")
         if not created:
             updated += 1
 
     log.finished_at = timezone.now()
     log.products_found = found
     log.products_updated = updated
-    log.errors = error or ""
-    log.status = "completed" if not error else "completed_with_errors"
+    detail = error or ""
+    if errors:
+        detail = (detail + " | " if detail else "") + "; ".join(errors[:5])
+    log.errors = detail[:2000]
+    if error:
+        log.status = "completed_with_errors"
+    elif errors:
+        log.status = "completed_with_errors"
+    else:
+        log.status = "completed"
     log.save()
 
-    return {"found": found, "updated": updated, "errors": error}
+    return {
+        "found": found,
+        "updated": updated,
+        "skipped_no_price": skipped_no_price,
+        "errors": error or ("; ".join(errors[:3]) if errors else None),
+    }
+
+
+@shared_task(bind=True)
+def sync_all_sources(self):
+    """Scrape every enabled source, pausing between supplier domains.
+
+    A single failing source must not abort the whole run.
+    """
+    results = []
+    last_domain = ""
+    last_time = 0.0
+    for source in ScrapedSource.objects.all().order_by("name"):
+        last_domain, last_time = polite_delay(
+            source.base_url, last_domain, last_time
+        )
+        try:
+            res = sync_source(source.id)
+        except Exception as exc:
+            res = {
+                "found": 0,
+                "updated": 0,
+                "errors": f"{type(exc).__name__}: {str(exc)[:200]}",
+            }
+        results.append({"source": source.name, **res})
+    total = sum(r.get("found", 0) for r in results)
+    return {"total_found": total, "sources": results}

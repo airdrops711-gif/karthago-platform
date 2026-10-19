@@ -58,7 +58,9 @@ class Product(models.Model):
     margin_rule = models.ForeignKey(
         MarginRule, on_delete=models.SET_NULL, null=True, blank=True, related_name="products"
     )
-    source = models.URLField(blank=True, help_text="Original supplier product URL.")
+    # 500 chars: AliExpress product URLs reach ~700 chars with tracking params
+    # before normalisation, and URLField defaults to 200.
+    source = models.URLField(max_length=500, blank=True, help_text="Original supplier product URL.")
     source_id = models.CharField(max_length=255, blank=True, help_text="External supplier product ID.")
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)

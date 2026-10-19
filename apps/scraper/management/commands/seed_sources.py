@@ -195,6 +195,10 @@ SOURCES = [
         "price_selector": "[data-testid='unified-global-product-price-a11y-text']",
         "stock_selector": "",
         "images_selector": "img[data-testid='productTileImage']",
+        "price_fallbacks": [
+            "[data-testid='unified-global-product-price']",
+            "[itemprop='price']",
+        ],
         "category_name": "Electronics",
         "currency": "USD",
         "currency_rate": RATES["USD"],

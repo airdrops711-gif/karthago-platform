@@ -99,3 +99,150 @@ def normalize_tunisian_price(raw):
             except (InvalidOperation, ValueError):
                 continue
     return Decimal("0.000")
+
+
+# Query parameters that change on every request (tracking / session ids).
+# They must be stripped or the same product is re-created on each scrape.
+TRACKING_QUERY_KEYS = {
+    "algo_pvid",
+    "algo_exp_id",
+    "algo_expid",
+    "algo_chname",
+    "spm",
+    "pvid",
+    "algo_source",
+    "gatewayAdapt",
+    "sk",
+    "trk",
+    "trkCampaign",
+    "scm",
+    "thouid",
+    "btsid",
+    "ws_ab_test",
+    "storeName",
+    "curPageLogUid",
+    "pdp_ext_f",
+    "pdp_ext_s",
+    "pdp_npi",
+    "pdp_f_fs",
+    "utparam-url",
+    "utparam_platform",
+    "utparam_campaign",
+    "search_p4p_id",
+    "spm-premium",
+    "aem_p4p_detail",
+    "aem_added_pdp_info",
+    "gatewayAdapt",
+    "spm-premium",
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content",
+    "gclid",
+    "fbclid",
+}
+
+# Substrings that mark a query parameter as volatile/session-bound.
+TRACKING_QUERY_MARKERS = (
+    "loguid",
+    "logid",
+    "session",
+    "timestamp",
+    "_ts",
+    "rand",
+    "token",
+)
+
+
+# URL path fragments that are NOT product detail pages.
+NON_PRODUCT_PATH_MARKERS = (
+    "/ssr/",
+    "/bundle",
+    "/bundle-deal",
+    "/coupon",
+    "/category",
+    "/wholesale",
+    "/search",
+    "/shop",
+    "/cart",
+    "/login",
+    "/register",
+    "/help",
+    "/impress",
+    "/about",
+)
+
+# Path fragments that identify a product detail page.
+PRODUCT_PATH_MARKERS = (
+    "/item/",
+    "/product/",
+    "/produit/",
+    "/produits/",
+    "/p/",
+    "/dp/",
+)
+
+
+def is_product_url(url):
+    """True when the URL looks like a product detail page.
+
+    Filters out AliExpress SSR/bundle-deal and category landing pages that are
+    picked up by the generic "first link in the container" heuristic.
+    """
+    if not url:
+        return False
+    low = url.lower()
+    if any(marker in low for marker in PRODUCT_PATH_MARKERS):
+        return True
+    return not any(marker in low for marker in NON_PRODUCT_PATH_MARKERS)
+
+
+def _is_tracking_key(key):
+    """True when a query key is a tracking / session-bound parameter."""
+    low = key.lower()
+    if low in TRACKING_QUERY_KEYS:
+        return True
+    return any(marker in low for marker in TRACKING_QUERY_MARKERS)
+
+
+def normalize_product_url(raw, max_length=500):
+    """Normalize a supplier product URL into a stable, deduplication-safe form.
+
+    - Expands protocol-relative "//host/path" to "https://host/path".
+    - Drops tracking query parameters that change on every page load.
+    - Sorts the remaining query parameters for a stable key.
+    - Truncates to `max_length` so it fits the DB column.
+    """
+    if not raw:
+        return ""
+    url = str(raw).strip()
+    if not url:
+        return ""
+    if url.startswith("//"):
+        url = "https:" + url
+    if not url.startswith(("http://", "https://")):
+        return url[:max_length]
+
+    try:
+        from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
+        parts = urlsplit(url)
+        query = [
+            (k, v)
+            for k, v in parse_qsl(parts.query, keep_blank_values=True)
+            if not _is_tracking_key(k)
+        ]
+        query.sort()
+        cleaned = urlunsplit(
+            (
+                parts.scheme,
+                parts.netloc,
+                parts.path,
+                urlencode(query),
+                "",
+            )
+        )
+        return cleaned[:max_length]
+    except Exception:
+        return url[:max_length]

@@ -5,7 +5,58 @@ import httpx
 from selectolax.lexbor import LexborHTMLParser as HTMLParser
 from playwright.async_api import async_playwright
 
-from .utils import normalize_tunisian_price
+from .utils import normalize_tunisian_price, normalize_product_url, is_product_url
+
+
+# Full browser-like header set. Some suppliers (quickk.tn) reject requests
+# that lack a Referer or a realistic Accept-Language.
+#
+# NOTE: do NOT advertise "br" in Accept-Encoding. httpx has no brotli decoder,
+# and quickk.tn answers with a truncated/placeholder page when brotli is
+# requested (catalogue renders empty). gzip/deflate are safe.
+BROWSER_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "fr-TN,fr;q=0.9,en;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Referer": "https://www.google.com/",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "cross-site",
+    "Sec-Fetch-User": "?1",
+    "Connection": "keep-alive",
+}
+
+# Markers that show an anti-bot / captcha interstitial instead of the catalogue.
+BLOCK_MARKERS = (
+    "are you a robot",
+    "unusual traffic",
+    "access denied",
+    "enable javascript and cookies",
+    "checking your browser",
+    "cf-browser-verification",
+)
+
+
+def build_headers(source=None):
+    """Return request headers for a source.
+
+    The Referer stays on google.com: pointing it at the supplier's own host
+    triggers a different (catalogue-less) response on some sites.
+    """
+    return dict(BROWSER_HEADERS)
+
+
+def _is_block_page(html):
+    """Detect an anti-bot / captcha interstitial page."""
+    if not html:
+        return False
+    # A real catalogue page is far larger than a block page.
+    if len(html) > 100000:
+        return False
+    low = html.lower()
+    return any(marker in low for marker in BLOCK_MARKERS)
 
 
 class BaseEngine:
@@ -18,12 +69,7 @@ class HTTPEngine(BaseEngine):
 
     async def scrape(self, source, selectors):
         results = []
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language": "fr-TN,fr;q=0.9,en;q=0.8",
-            "Referer": "https://www.google.com/",
-        }
+        headers = build_headers(source)
         async with httpx.AsyncClient(timeout=30, follow_redirects=True, headers=headers) as client:
             try:
                 resp = await client.get(source.base_url)
@@ -33,6 +79,8 @@ class HTTPEngine(BaseEngine):
 
         parser = HTMLParser(resp.text)
         containers = parser.css(selectors.get("product_container", ""))
+        if not containers and _is_block_page(resp.text):
+            return results, "Blocked by anti-bot protection (no product containers matched)"
         for container in containers:
             item = self._extract(container, selectors)
             if item.get("title"):
@@ -96,6 +144,13 @@ class HTTPEngine(BaseEngine):
 
         title = get(selectors.get("title", ""))
         price_raw = get(selectors.get("price", ""))
+        # Fallback price selectors: some layouts rename or re-render the node.
+        if not price_raw:
+            for alt in selectors.get("price_fallbacks", []) or []:
+                candidate = get(alt)
+                if candidate:
+                    price_raw = candidate
+                    break
         stock_raw = get(selectors.get("stock", ""))
         images_raw = get_images(selectors.get("images", ""))
 
@@ -112,7 +167,7 @@ class HTTPEngine(BaseEngine):
         product_url = ""
         link = container.css_first("a[href]")
         if link:
-            product_url = link.attributes.get("href", "")
+            product_url = normalize_product_url(link.attributes.get("href", ""))
 
         return {
             "title": title,
@@ -121,6 +176,7 @@ class HTTPEngine(BaseEngine):
             "stock": stock,
             "images": images_raw,
             "url": product_url,
+            "is_product": is_product_url(product_url),
         }
 
     @staticmethod
@@ -255,6 +311,13 @@ class PlaywrightEngine(BaseEngine):
 
         title = get(selectors.get("title", ""))
         price_raw = get(selectors.get("price", ""))
+        # Fallback price selectors: some layouts rename or re-render the node.
+        if not price_raw:
+            for alt in selectors.get("price_fallbacks", []) or []:
+                candidate = get(alt)
+                if candidate:
+                    price_raw = candidate
+                    break
         stock_raw = get(selectors.get("stock", ""))
         images_raw = get_images(selectors.get("images", ""))
 
@@ -270,7 +333,7 @@ class PlaywrightEngine(BaseEngine):
         product_url = ""
         link = container.css_first("a[href]")
         if link:
-            product_url = link.attributes.get("href", "")
+            product_url = normalize_product_url(link.attributes.get("href", ""))
 
         return {
             "title": title,
@@ -279,6 +342,7 @@ class PlaywrightEngine(BaseEngine):
             "stock": stock,
             "images": images_raw,
             "url": product_url,
+            "is_product": is_product_url(product_url),
         }
 
     @staticmethod

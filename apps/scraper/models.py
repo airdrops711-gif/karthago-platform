@@ -16,6 +16,10 @@ class ScrapedSource(models.Model):
     product_container_selector = models.CharField(max_length=255)
     title_selector = models.CharField(max_length=255)
     price_selector = models.CharField(max_length=255)
+    price_fallbacks = models.JSONField(
+        default=list, blank=True,
+        help_text="Extra price selectors tried when the primary one yields nothing.",
+    )
     stock_selector = models.CharField(max_length=255, blank=True)
     images_selector = models.CharField(max_length=255, blank=True)
     brand_selector = models.CharField(max_length=255, blank=True)
