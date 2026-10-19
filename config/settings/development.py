@@ -2,4 +2,11 @@ from .base import *  # noqa
 
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
-INSTALLED_APPS += ["debug_toolbar"] if False else []
+
+# Use SQLite for local development
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}

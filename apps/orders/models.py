@@ -2,6 +2,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from .constants import TUNISIAN_GOVERNORATES
+from apps.catalog.models import Product
 
 
 class Customer(models.Model):
@@ -70,3 +71,18 @@ class Delivery(models.Model):
 
     def __str__(self):
         return f"Delivery for Order {self.order.id}"
+
+
+class Cart(models.Model):
+    session_key = models.CharField(max_length=40, db_index=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = [("session_key", "product")]
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.quantity}x {self.product.title} ({self.session_key[:8]})"

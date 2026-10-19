@@ -3,7 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.http import HttpResponse
-from .models import Customer, Order, OrderItem
+from django.db.models import Sum
+from .models import Customer, Order, OrderItem, Cart
+from apps.catalog.models import Product
 from .constants import TUNISIAN_GOVERNORATES
 
 
@@ -74,3 +76,56 @@ class OrderDetailView(View):
     def get(self, request, order_id):
         order = get_object_or_404(Order, pk=order_id)
         return render(request, "storefront/order_detail.html", {"order": order})
+
+
+class CartView(View):
+    """Display cart contents for the current session."""
+
+    def get(self, request):
+        session_key = request.session.session_key or request.COOKIES.get("sessionid", "")
+        cart_items = Cart.objects.filter(session_key=session_key).select_related("product")
+        total = sum(item.product.retail_price * item.quantity for item in cart_items)
+        return render(request, "storefront/cart.html", {
+            "cart_items": cart_items,
+            "total": total,
+        })
+
+
+class AddToCartView(View):
+    """Add a product to the cart via HTMX."""
+
+    def post(self, request, product_id):
+        product = get_object_or_404(Product, pk=product_id)
+        session_key = request.session.session_key or request.COOKIES.get("sessionid", "")
+        if not session_key:
+            request.session.create()
+            session_key = request.session.session_key
+
+        quantity = int(request.POST.get("quantity", 1))
+        cart_item, created = Cart.objects.get_or_create(
+            session_key=session_key,
+            product=product,
+            defaults={"quantity": quantity},
+        )
+        if not created:
+            cart_item.quantity += quantity
+            cart_item.save()
+
+        cart_count = Cart.objects.filter(session_key=session_key).aggregate(
+            total=Sum("quantity")
+        )["total"] or 0
+
+        return HttpResponse(
+            f'<span class="text-xs text-green-600 font-medium">+{quantity} ajout&eacute;</span>'
+            f'<script>document.getElementById("cart-badge").textContent="{cart_count}";</script>'
+        )
+
+
+class RemoveFromCartView(View):
+    """Remove an item from the cart."""
+
+    def post(self, request, cart_id):
+        session_key = request.session.session_key or request.COOKIES.get("sessionid", "")
+        cart_item = get_object_or_404(Cart, pk=cart_id, session_key=session_key)
+        cart_item.delete()
+        return redirect("orders:cart")

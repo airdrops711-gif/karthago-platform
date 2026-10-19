@@ -22,7 +22,42 @@ class ProductListView(ListView):
         context = super().get_context_data(**kwargs)
         context["categories"] = Category.objects.all()
         context["selected_category"] = self.request.GET.get("category", "")
+        context["min_price"] = self.request.GET.get("min_price", "")
+        context["max_price"] = self.request.GET.get("max_price", "")
+        context["in_stock"] = self.request.GET.get("in_stock", "")
+        context["sort_by"] = self.request.GET.get("sort_by", "-created_at")
         return context
+
+    def get_queryset(self):
+        queryset = Product.objects.all().select_related("category")
+        category_slug = self.request.GET.get("category")
+        if category_slug:
+            queryset = queryset.filter(category__slug=category_slug)
+        min_price = self.request.GET.get("min_price")
+        if min_price:
+            try:
+                queryset = queryset.filter(retail_price__gte=float(min_price))
+            except ValueError:
+                pass
+        max_price = self.request.GET.get("max_price")
+        if max_price:
+            try:
+                queryset = queryset.filter(retail_price__lte=float(max_price))
+            except ValueError:
+                pass
+        in_stock = self.request.GET.get("in_stock")
+        if in_stock == "1":
+            queryset = queryset.filter(stock__gte=1)
+        sort_by = self.request.GET.get("sort_by", "-created_at")
+        if sort_by == "retail_price":
+            queryset = queryset.order_by("retail_price")
+        elif sort_by == "-retail_price":
+            queryset = queryset.order_by("-retail_price")
+        elif sort_by == "title":
+            queryset = queryset.order_by("title")
+        else:
+            queryset = queryset.order_by("-created_at")
+        return queryset
 
 
 class ProductDetailView(DetailView):

@@ -31,6 +31,9 @@ def sync_source(self, source_id):
         "price": source.price_selector,
         "stock": source.stock_selector,
         "images": source.images_selector,
+        "brand": getattr(source, "brand_selector", ""),
+        "model": getattr(source, "model_selector", ""),
+        "category": getattr(source, "category_selector", ""),
     }
 
     engine = get_engine(source.engine)

@@ -52,10 +52,22 @@ class HTTPEngine(BaseEngine):
             node = container.css_first(selector)
             return node.attributes.get(attr, "") if node else ""
 
+        def get_images(selector):
+            """Collect all image URLs, preferring data-src (lazy loading) over src."""
+            if not selector:
+                return ""
+            nodes = container.css(selector)
+            urls = []
+            for node in nodes:
+                url = node.attributes.get("data-src") or node.attributes.get("src", "")
+                if url and not url.startswith("data:"):
+                    urls.append(url)
+            return ",".join(urls)
+
         title = get(selectors.get("title", ""))
         price_raw = get(selectors.get("price", ""))
         stock_raw = get(selectors.get("stock", ""))
-        images_raw = get_attr(selectors.get("images", ""), "data-src") or get_attr(selectors.get("images", ""), "src")
+        images_raw = get_images(selectors.get("images", ""))
 
         # Determine stock from CSS classes (instock/outofstock) as fallback
         stock = self._parse_stock(stock_raw)
@@ -90,6 +102,38 @@ class HTTPEngine(BaseEngine):
         # Extract the first meaningful number (not part of a price)
         digits = "".join(ch for ch in text if ch.isdigit())
         return int(digits) if digits else 1
+
+    def _extract_brand(self, container, selectors):
+        """Extract brand from product container using selectors or heuristics."""
+        brand_sel = selectors.get("brand", "")
+        if brand_sel:
+            node = container.css_first(brand_sel)
+            if node:
+                return node.text(strip=True)
+        # Heuristic: look for common brand indicators
+        for sel in ["[class*='brand']", "[class*='vendor']", ".brand", ".vendor"]:
+            node = container.css_first(sel)
+            if node:
+                return node.text(strip=True)
+        return ""
+
+    def _extract_model(self, container, selectors):
+        """Extract model from product container."""
+        model_sel = selectors.get("model", "")
+        if model_sel:
+            node = container.css_first(model_sel)
+            if node:
+                return node.text(strip=True)
+        return ""
+
+    def _extract_category(self, container, selectors):
+        """Extract category from product container."""
+        cat_sel = selectors.get("category", "")
+        if cat_sel:
+            node = container.css_first(cat_sel)
+            if node:
+                return node.text(strip=True)
+        return ""
 
 
 class PlaywrightEngine(BaseEngine):
@@ -130,10 +174,22 @@ class PlaywrightEngine(BaseEngine):
             node = container.css_first(selector)
             return node.attributes.get(attr, "") if node else ""
 
+        def get_images(selector):
+            """Collect all image URLs, preferring data-src (lazy loading) over src."""
+            if not selector:
+                return ""
+            nodes = container.css(selector)
+            urls = []
+            for node in nodes:
+                url = node.attributes.get("data-src") or node.attributes.get("src", "")
+                if url and not url.startswith("data:"):
+                    urls.append(url)
+            return ",".join(urls)
+
         title = get(selectors.get("title", ""))
         price_raw = get(selectors.get("price", ""))
         stock_raw = get(selectors.get("stock", ""))
-        images_raw = get_attr(selectors.get("images", ""), "data-src") or get_attr(selectors.get("images", ""), "src")
+        images_raw = get_images(selectors.get("images", ""))
 
         # Determine stock from CSS classes (instock/outofstock) as fallback
         stock = self._parse_stock(stock_raw)

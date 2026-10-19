@@ -19,7 +19,14 @@
         <p class="text-gray-500 text-xs mb-3 line-clamp-2">{{ product.description|truncatechars:80 }}</p>
         <div class="mt-auto flex items-center justify-between">
             <span class="text-lg font-bold text-amber-700">{{ product.retail_price }} DT</span>
-            <a href="{% url 'catalog:product_detail' product.id %}" class="text-amber-600 text-sm font-medium hover:underline">Voir</a>
+            <div class="flex items-center gap-2 mt-2">
+                <a href="{% url 'catalog:product_detail' product.id %}" class="text-amber-600 text-sm font-medium hover:underline">Voir</a>
+                <form hx-post="{% url 'orders:add_to_cart' product.id %}" hx-target="this" hx-swap="innerHTML" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="text-amber-600 text-sm font-medium hover:underline">+ Panier</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

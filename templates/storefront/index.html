@@ -13,10 +13,10 @@
             <p class="text-gray-600 mt-1">Découvrez nos produits avec livraison à travers toute la Tunisie.</p>
         </div>
         <div class="flex items-center gap-3">
-            <select id="sort-select" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white">
-                <option value="-created_at">Nouveautés</option>
-                <option value="retail_price">Prix : croissant</option>
-                <option value="-retail_price">Prix : décroissant</option>
+            <select id="sort-select" name="sort_by" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+                <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Nouveautés</option>
+                <option value="retail_price" {% if sort_by == 'retail_price' %}selected{% endif %}>Prix : croissant</option>
+                <option value="-retail_price" {% if sort_by == '-retail_price' %}selected{% endif %}>Prix : décroissant</option>
             </select>
             <a href="#" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow transition">Commander</a>
         </div>
@@ -31,17 +31,36 @@
             </div>
             <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Prix</h3>
-                <div class="space-y-2">
-                    <button class="w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">Moins de 50 DT</button>
-                    <button class="w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">50 &ndash; 150 DT</button>
-                    <button class="w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">Plus de 150 DT</button>
-                </div>
+                <form method="get" class="space-y-2">
+                    {% if selected_category %}
+                    <input type="hidden" name="category" value="{{ selected_category }}">
+                    {% endif %}
+                    <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}min_price=0&max_price=50" class="block w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">Moins de 50 DT</a>
+                    <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}min_price=50&max_price=150" class="block w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">50 &ndash; 150 DT</a>
+                    <a href="?{% if selected_category %}category={{ selected_category }}&{% endif %}min_price=150" class="block w-full text-left py-2 px-3 rounded border border-gray-200 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">Plus de 150 DT</a>
+                </form>
             </div>
             <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
-                <div class="flex items-center gap-2 mb-3">
-                    <input type="checkbox" id="in-stock" class="rounded border-gray-300 text-amber-600 focus:ring-amber-500">
-                    <label for="in-stock" class="text-sm font-medium text-gray-700">En stock uniquement</label>
-                </div>
+                <form method="get">
+                    {% if selected_category %}
+                    <input type="hidden" name="category" value="{{ selected_category }}">
+                    {% endif %}
+                    {% if min_price %}
+                    <input type="hidden" name="min_price" value="{{ min_price }}">
+                    {% endif %}
+                    {% if max_price %}
+                    <input type="hidden" name="max_price" value="{{ max_price }}">
+                    {% endif %}
+                    <div class="flex items-center gap-2 mb-3">
+                        <input type="checkbox" id="in-stock" name="in_stock" value="1" {% if in_stock %}checked{% endif %} class="rounded border-gray-300 text-amber-600 focus:ring-amber-500">
+                        <label for="in-stock" class="text-sm font-medium text-gray-700">En stock uniquement</label>
+                    </div>
+                    <select name="sort_by" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500">
+                        <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Nouveautés</option>
+                        <option value="retail_price" {% if sort_by == 'retail_price' %}selected{% endif %}>Prix : croissant</option>
+                        <option value="-retail_price" {% if sort_by == '-retail_price' %}selected{% endif %}>Prix : décroissant</option>
+                    </select>
+                </form>
             </div>
         </div>
 
