@@ -46,24 +46,48 @@ class HTTPEngine(BaseEngine):
             node = container.css_first(selector)
             return node.text(strip=True) if node else ""
 
+        def get_attr(selector, attr):
+            if not selector:
+                return ""
+            node = container.css_first(selector)
+            return node.attributes.get(attr, "") if node else ""
+
         title = get(selectors.get("title", ""))
         price_raw = get(selectors.get("price", ""))
         stock_raw = get(selectors.get("stock", ""))
-        images_raw = get(selectors.get("images", ""))
+        images_raw = get_attr(selectors.get("images", ""), "data-src") or get_attr(selectors.get("images", ""), "src")
+
+        # Determine stock from CSS classes (instock/outofstock) as fallback
+        stock = self._parse_stock(stock_raw)
+        if stock == 0 and not any(k in stock_raw.lower() for k in ["out of stock", "épuisé", "non disponible", "rupture", "indisponible"]):
+            container_classes = container.attributes.get("class", "").lower()
+            if "outofstock" in container_classes:
+                stock = 0
+            elif "instock" in container_classes:
+                stock = max(stock, 1)
 
         return {
             "title": title,
             "price": normalize_tunisian_price(price_raw),
             "price_raw": price_raw,
-            "stock": self._parse_stock(stock_raw),
+            "stock": stock,
             "images": images_raw,
         }
 
     @staticmethod
     def _parse_stock(raw):
-        text = str(raw).lower()
-        if any(k in text for k in ["out of stock", "épuisé", "non disponible", "rupture", "indisponible"]):
+        """Parse stock quantity from raw text.
+
+        Avoids matching '0' inside prices like '81,000 DT'.
+        Only treats explicit out-of-stock keywords as zero stock.
+        """
+        text = str(raw).strip()
+        if not text:
+            return 1
+        text_lower = text.lower()
+        if any(k in text_lower for k in ["out of stock", "épuisé", "non disponible", "rupture", "indisponible"]):
             return 0
+        # Extract the first meaningful number (not part of a price)
         digits = "".join(ch for ch in text if ch.isdigit())
         return int(digits) if digits else 1
 
@@ -100,24 +124,48 @@ class PlaywrightEngine(BaseEngine):
             node = container.css_first(selector)
             return node.text(strip=True) if node else ""
 
+        def get_attr(selector, attr):
+            if not selector:
+                return ""
+            node = container.css_first(selector)
+            return node.attributes.get(attr, "") if node else ""
+
         title = get(selectors.get("title", ""))
         price_raw = get(selectors.get("price", ""))
         stock_raw = get(selectors.get("stock", ""))
-        images_raw = get(selectors.get("images", ""))
+        images_raw = get_attr(selectors.get("images", ""), "data-src") or get_attr(selectors.get("images", ""), "src")
+
+        # Determine stock from CSS classes (instock/outofstock) as fallback
+        stock = self._parse_stock(stock_raw)
+        if stock == 0 and not any(k in stock_raw.lower() for k in ["out of stock", "épuisé", "non disponible", "rupture", "indisponible"]):
+            container_classes = container.attributes.get("class", "").lower()
+            if "outofstock" in container_classes:
+                stock = 0
+            elif "instock" in container_classes:
+                stock = max(stock, 1)
 
         return {
             "title": title,
             "price": normalize_tunisian_price(price_raw),
             "price_raw": price_raw,
-            "stock": self._parse_stock(stock_raw),
+            "stock": stock,
             "images": images_raw,
         }
 
     @staticmethod
     def _parse_stock(raw):
-        text = str(raw).lower()
-        if any(k in text for k in ["out of stock", "épuisé", "non disponible", "rupture", "indisponible"]):
+        """Parse stock quantity from raw text.
+
+        Avoids matching '0' inside prices like '81,000 DT'.
+        Only treats explicit out-of-stock keywords as zero stock.
+        """
+        text = str(raw).strip()
+        if not text:
+            return 1
+        text_lower = text.lower()
+        if any(k in text_lower for k in ["out of stock", "épuisé", "non disponible", "rupture", "indisponible"]):
             return 0
+        # Extract the first meaningful number (not part of a price)
         digits = "".join(ch for ch in text if ch.isdigit())
         return int(digits) if digits else 1
 

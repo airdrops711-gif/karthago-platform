@@ -12,7 +12,7 @@ class ProductListView(ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = Product.objects.filter(is_active=True, stock__gt=0).select_related("category")
+        queryset = Product.objects.all().select_related("category")
         category_slug = self.request.GET.get("category")
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)
@@ -33,7 +33,7 @@ class ProductDetailView(DetailView):
     slug_url_kwarg = "product_id"
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True, stock__gt=0).select_related("category")
+        return Product.objects.all().select_related("category")
 
 
 def product_search(request):
@@ -42,9 +42,7 @@ def product_search(request):
     products = Product.objects.none()
     if query:
         products = Product.objects.filter(
-            Q(title__icontains=query) | Q(description__icontains=query),
-            is_active=True,
-            stock__gt=0,
+            Q(title__icontains=query) | Q(description__icontains=query)
         ).select_related("category")[:8]
     return render(request, "storefront/partials/_search_results.html", {"products": products, "query": query})
 

@@ -48,6 +48,8 @@ def sync_source(self, source_id):
     updated = 0
     for item in results:
         found += 1
+        # Cap stock to a reasonable max to avoid integer overflow
+        stock_val = min(item["stock"], 999999)
         obj, created = Product.objects.update_or_create(
             source=source.base_url,
             title=item["title"],
@@ -58,9 +60,9 @@ def sync_source(self, source_id):
                 "raw_cost": item["price"],
                 "markup_percent": margin_rule.markup_percent,
                 "fixed_margin_fee": margin_rule.fixed_margin_fee,
-                "stock": item["stock"],
+                "stock": stock_val,
                 "description": item.get("price_raw", ""),
-                "is_active": item["stock"] > 0,
+                "is_active": stock_val > 0,
             },
         )
         # Save product images
