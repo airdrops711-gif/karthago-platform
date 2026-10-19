@@ -22,4 +22,4 @@ class ProductDetailView(DetailView):
     slug_url_kwarg = "product_id"
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True)
+        return Product.objects.filter(is_active=True, stock__gt=0)

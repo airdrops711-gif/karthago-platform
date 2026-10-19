@@ -104,4 +104,5 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.retail_price:
             self.retail_price = self.compute_retail_price()
+        self.is_active = self.stock > 0
         super().save(*args, **kwargs)
