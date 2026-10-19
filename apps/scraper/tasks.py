@@ -36,7 +36,7 @@ def sync_source(self, source_id):
     engine = get_engine(source.engine)
     results, error = _asyncio_run(engine.scrape(source, selectors))
 
-    from apps.catalog.models import Product, Supplier, MarginRule, Category
+    from apps.catalog.models import Product, Supplier, MarginRule, Category, ProductImage
 
     supplier, _ = Supplier.objects.get_or_create(name=source.name)
     category, _ = Category.objects.get_or_create(name="General", defaults={"slug": "general"})
@@ -63,6 +63,20 @@ def sync_source(self, source_id):
                 "is_active": item["stock"] > 0,
             },
         )
+        # Save product images
+        images_raw = item.get("images", "")
+        if images_raw:
+            # Clear existing images and re-add
+            obj.images.all().delete()
+            img_list = [img.strip() for img in images_raw.split(",") if img.strip()]
+            for idx, img_url in enumerate(img_list[:5]):  # Limit to 5 images
+                ProductImage.objects.create(
+                    product=obj,
+                    image=img_url,
+                    alt_text=obj.title,
+                    is_primary=(idx == 0),
+                    order=idx,
+                )
         if not created:
             updated += 1
 

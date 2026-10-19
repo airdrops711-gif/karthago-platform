@@ -62,7 +62,7 @@ class HTTPEngine(BaseEngine):
     @staticmethod
     def _parse_stock(raw):
         text = str(raw).lower()
-        if any(k in text for k in ["out of stock", "épuisé", "non disponible", "0"]):
+        if any(k in text for k in ["out of stock", "épuisé", "non disponible", "rupture", "indisponible"]):
             return 0
         digits = "".join(ch for ch in text if ch.isdigit())
         return int(digits) if digits else 1
@@ -116,7 +116,7 @@ class PlaywrightEngine(BaseEngine):
     @staticmethod
     def _parse_stock(raw):
         text = str(raw).lower()
-        if any(k in text for k in ["out of stock", "épuisé", "non disponible", "0"]):
+        if any(k in text for k in ["out of stock", "épuisé", "non disponible", "rupture", "indisponible"]):
             return 0
         digits = "".join(ch for ch in text if ch.isdigit())
         return int(digits) if digits else 1

@@ -106,3 +106,25 @@ class Product(models.Model):
             self.retail_price = self.compute_retail_price()
         self.is_active = self.stock > 0
         super().save(*args, **kwargs)
+
+
+class ProductImage(models.Model):
+    """Product images for gallery/carousel display."""
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="images"
+    )
+    image = models.URLField(blank=True, help_text="Image URL.")
+    alt_text = models.CharField(max_length=255, blank=True)
+    is_primary = models.BooleanField(default=False)
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order", "created_at"]
+
+    def __str__(self):
+        return f"Image for {self.product.title}"
+
+    @property
+    def url(self):
+        return self.image or ""
