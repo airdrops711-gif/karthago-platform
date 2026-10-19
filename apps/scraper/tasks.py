@@ -61,7 +61,7 @@ def sync_source(self, source_id):
                 "markup_percent": margin_rule.markup_percent,
                 "fixed_margin_fee": margin_rule.fixed_margin_fee,
                 "stock": stock_val,
-                "description": item.get("price_raw", ""),
+                "description": item.get("title", "")[:200],
                 "is_active": stock_val > 0,
             },
         )
