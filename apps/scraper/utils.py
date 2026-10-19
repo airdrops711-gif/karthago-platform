@@ -1,6 +1,34 @@
 """Currency and text normalizers for Tunisian prices."""
 import re
 from decimal import Decimal, InvalidOperation
+from urllib.parse import urlsplit
+
+
+# Zero-width / non-breaking spaces used as thousands separators by French and
+# Arabic storefronts. U+202F (narrow no-break space) is what PrestaShop emits
+# between the thousands and the decimal part ("1<NBSP>169,000 DT"), and it is
+# NOT removed by str.replace(" ", "") because it is a different codepoint.
+# Leaving it in the digit string makes Decimal() raise InvalidOperation and
+# the whole price silently collapses to 0.
+UNICODE_SPACES = (
+    "\u00a0"  # no-break space
+    "\u202f"  # narrow no-break space
+    "\u2007"  # figure space
+    "\u2009"  # thin space
+    "\u2028"  # line separator
+    "\u2029"  # paragraph separator
+    "\ufeff"  # zero width no-break space
+    "\u200b"  # zero width space
+)
+
+
+def strip_unicode_spaces(text):
+    """Remove every exotic space codepoint plus regular spaces."""
+    if not text:
+        return text
+    for sp in UNICODE_SPACES:
+        text = text.replace(sp, " ")
+    return text.replace(" ", "")
 
 
 TND_PATTERNS = [
@@ -56,7 +84,9 @@ def normalize_tunisian_price(raw):
     """
     if raw is None:
         return Decimal("0.000")
-    text = str(raw).strip()
+    # Normalise exotic spaces BEFORE any parsing so that "1<NBSP>169,000 DT"
+    # is seen as "1169000 DT" and not as a number with a stray separator.
+    text = strip_unicode_spaces(str(raw)).strip()
     if not text:
         return Decimal("0.000")
 
@@ -68,7 +98,7 @@ def normalize_tunisian_price(raw):
     for pattern in TND_PATTERNS:
         match = pattern.search(text)
         if match:
-            number_str = match.group(1).replace(" ", "")
+            number_str = strip_unicode_spaces(match.group(1))
             if not number_str:
                 continue
 
@@ -183,6 +213,17 @@ PRODUCT_PATH_MARKERS = (
     "/dp/",
 )
 
+# PrestaShop (tunisianet, twenty) and Magento (wamia) end every product
+# detail URL with ".html" while their category URLs never do:
+#   category: https://www.tunisianet.com.tn/301-pc-portable-tunisie
+#   product : https://www.tunisianet.com.tn/pc-portable-tunisie/98008-pc-....html
+# The ".html" suffix is therefore the most reliable product signal.
+PRODUCT_URL_SUFFIX = ".html"
+
+# Category landing pages of the PrestaShop shops: "/<id>-<slug>" with no
+# product id and no ".html" suffix.
+_CATEGORY_ONLY_PATH = re.compile(r"^/\d+-[a-z0-9\-]*$")
+
 
 def is_product_url(url):
     """True when the URL looks like a product detail page.
@@ -195,7 +236,16 @@ def is_product_url(url):
     low = url.lower()
     if any(marker in low for marker in PRODUCT_PATH_MARKERS):
         return True
-    return not any(marker in low for marker in NON_PRODUCT_PATH_MARKERS)
+    path = urlsplit(low).path
+    # A ".html" URL that is not a category landing page is a product page.
+    if path.endswith(PRODUCT_URL_SUFFIX) and not _CATEGORY_ONLY_PATH.match(path):
+        return True
+    if any(marker in low for marker in NON_PRODUCT_PATH_MARKERS):
+        return False
+    # "/<id>-<slug>" is a category page on the PrestaShop shops.
+    if _CATEGORY_ONLY_PATH.match(path):
+        return False
+    return True
 
 
 def _is_tracking_key(key):
@@ -204,6 +254,118 @@ def _is_tracking_key(key):
     if low in TRACKING_QUERY_KEYS:
         return True
     return any(marker in low for marker in TRACKING_QUERY_MARKERS)
+
+
+# --------------------------------------------------------------------------
+# Department names published by the suppliers.
+#
+# A supplier labels a product with its own wording ("Pantalons", "Sweat à
+# capuche", "Cargo pants"). The storefront needs one clean name per
+# department, otherwise the catalogue ends up with a dozen categories holding
+# a single product each.
+# --------------------------------------------------------------------------
+DEPARTMENT_ALIASES = {
+    # Clothing
+    "pantalons": "Pantalons",
+    "cargo pants": "Pantalons",
+    "jogging": "Pantalons",
+    "leggings": "Pantalons",
+    "jupe": "Jupes",
+    "ensemble": "Ensembles",
+    "robes": "Robes",
+    "robe": "Robes",
+    "t-shirts": "T-Shirts",
+    "t-shirt": "T-Shirts",
+    "tshirt": "T-Shirts",
+    "shirt": "Chemises",
+    "shirts": "Chemises",
+    "chemise": "Chemises",
+    "chemises": "Chemises",
+    "polo": "Polos",
+    "polos": "Polos",
+    "sweat à capuche": "Sweats",
+    "sweat a capuche": "Sweats",
+    "sweatshirt": "Sweats",
+    "sweats": "Sweats",
+    "manteau": "Manteaux",
+    "manteaux": "Manteaux",
+    "veste": "Vestes",
+    "vestes": "Vestes",
+    "active wear": "Sportswear",
+    "activewear": "Sportswear",
+    "chaussures": "Chaussures",
+    "sacs": "Sacs",
+    "bijoux": "Bijoux",
+    "bijoux femme": "Bijoux",
+    "accessoires de mode": "Accessoires Mode",
+    "chaussure": "Chaussures",
+    "sac": "Sacs",
+    # Home
+    "maison": "Maison",
+    "maison & bureau": "Maison",
+    "décoration": "Décoration",
+    "deco": "Décoration",
+    "literie": "Literie",
+    "linge de maison": "Literie",
+    "cuisine": "Cuisine",
+    "vaisselle": "Cuisine",
+    "rangement": "Rangement",
+    "éclairage": "Éclairage",
+    "eclairage": "Éclairage",
+    "mobilier": "Mobilier",
+    # Electronics
+    "informatique": "Informatique",
+    "ordinateur": "Informatique",
+    "ordinateurs": "Informatique",
+    "accessoires": "Accessoires",
+    "câbles": "Câbles & Adaptateurs",
+    "cables": "Câbles & Adaptateurs",
+    "adaptateurs": "Câbles & Adaptateurs",
+    "électroménager": "Électroménager",
+    "electromenager": "Électroménager",
+    "téléphones": "Téléphones",
+    "telephones": "Téléphones",
+    "smartphones": "Smartphones",
+    "smartphone": "Smartphones",
+    "tv": "TV & Audio",
+    "audio": "TV & Audio",
+    "photo": "Photo & Caméras",
+    # Fashion accessories / misc
+    "bijoux & accessoires": "Bijoux",
+    "parfums": "Parfums",
+    "beauté": "Beauté",
+    "beaute": "Beauté",
+    "sport": "Sport",
+    "sports": "Sport",
+    "enfants": "Enfants",
+    "jouets": "Jouets",
+    "jeux": "Jouets",
+}
+
+# Product types that are not real departments.
+_IGNORED_DEPARTMENTS = {"", "free_gift", "gift", "default", "none"}
+
+
+def normalize_department(raw, max_length=100):
+    """Map a supplier department label to a clean storefront category name.
+
+    Returns an empty string when the label is not a usable department, so
+    the caller can fall back to the source-level category.
+    """
+    if not raw:
+        return ""
+    text = str(raw).strip()
+    if not text or text.lower() in _IGNORED_DEPARTMENTS:
+        return ""
+    if text in DEPARTMENT_ALIASES.values():
+        return text[:max_length]
+    key = text.lower().strip()
+    if key in DEPARTMENT_ALIASES:
+        return DEPARTMENT_ALIASES[key][:max_length]
+    # Unknown label: keep the supplier wording but title-case it so the
+    # storefront stays consistent.
+    cleaned = " ".join(word.capitalize() for word in text.split())
+    return cleaned[:max_length]
 
 
 def normalize_product_url(raw, max_length=500):

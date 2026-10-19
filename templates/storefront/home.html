@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load static catalog_tags %}
+{% block title %}Karthago &mdash; Dropshipping Tunisia{% endblock %}
+{% block content %}
+
+<!-- ================= HERO ================= -->
+<section class="relative overflow-hidden bg-gradient-to-br from-amber-600 via-amber-500 to-orange-500 text-white">
+    <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(circle at 20% 30%, #fff 0, transparent 45%), radial-gradient(circle at 80% 70%, #fff 0, transparent 40%);"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
+        <div class="grid lg:grid-cols-2 gap-10 items-center">
+            <div>
+                <span class="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold mb-5">
+                    🚚 Livraison partout en Tunisie
+                </span>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
+                    Le e-commerce<br>tunisien, <span class="text-amber-50">sans boutique.</span>
+                </h1>
+                <p class="mt-5 text-lg text-amber-50/90 max-w-lg leading-relaxed">
+                    Plus de {{ total_products }} produits réels, importés directement
+                    des meilleurs magasins tunisiens. Paiement à la livraison,
+                    envoi sous 24 à 48&nbsp;heures.
+                </p>
+                <div class="mt-8 flex flex-wrap gap-3">
+                    <a href="{% url 'catalog:product_list' %}"
+                       class="bg-white text-amber-700 hover:bg-amber-50 px-7 py-3.5 rounded-xl font-bold shadow-lg transition">
+                        Découvrir le catalogue →
+                    </a>
+                    <a href="{% url 'catalog:product_list' %}?on_sale=1&sort_by=discount"
+                       class="bg-white/15 hover:bg-white/25 backdrop-blur text-white px-7 py-3.5 rounded-xl font-semibold transition">
+                        🔥 Voir les promotions
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero stats -->
+            <div class="grid grid-cols-2 gap-4">
+                {% for stat in hero_stats %}
+                <div class="bg-white/15 backdrop-blur border border-white/25 rounded-2xl p-5">
+                    <div class="text-3xl font-black">{{ stat.value }}</div>
+                    <div class="text-sm text-amber-50/90 mt-1">{{ stat.label }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= TRUST BADGES ================= -->
+<section class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            {% for badge in trust_badges %}
+            <div class="flex flex-col items-center gap-1.5">
+                <span class="text-2xl">{{ badge.icon }}</span>
+                <span class="font-semibold text-gray-800 text-sm">{{ badge.title }}</span>
+                <span class="text-xs text-gray-500">{{ badge.text }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- ================= CATEGORY SHOWCASE ================= -->
+{% if showcase_categories %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex items-end justify-between mb-6">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">Nos catégories</h2>
+            <p class="text-gray-500 mt-1 text-sm">Trouvez ce qu'il vous faut, par univers.</p>
+        </div>
+        <a href="{% url 'catalog:product_list' %}" class="text-amber-600 hover:text-amber-700 text-sm font-medium shrink-0">
+            Tout voir →
+        </a>
+    </div>
+    <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+        {% for category in showcase_categories %}
+        <a href="{% url 'catalog:category_detail' category.slug %}"
+           class="group bg-white rounded-xl border border-gray-100 hover:border-amber-300 hover:shadow-md p-4 text-center transition">
+            <div class="text-2xl mb-2">{{ category.icon|default:"📦" }}</div>
+            <div class="text-sm font-semibold text-gray-800 group-hover:text-amber-700 leading-tight line-clamp-2">
+                {{ category.name }}
+            </div>
+            <div class="text-xs text-gray-400 mt-1">{{ category.n }} produits</div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ================= FLASH DEALS ================= -->
+{% if flash_deals %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white">
+            <h2 class="font-bold flex items-center gap-2">🔥 Offres du moment</h2>
+            <a href="{% url 'catalog:product_list' %}?on_sale=1&sort_by=discount" class="text-sm font-semibold hover:underline">
+                Toutes les offres →
+            </a>
+        </div>
+        <div class="p-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {% for product in flash_deals %}
+            {% include "storefront/partials/_product_card.html" with product=product %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ================= NEW ARRIVALS ================= -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+    <div class="flex items-end justify-between mb-6">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">Nouveautés</h2>
+            <p class="text-gray-500 mt-1 text-sm">Les derniers produits ajoutés au catalogue.</p>
+        </div>
+        <a href="{% url 'catalog:product_list' %}?sort_by=-created_at" class="text-amber-600 hover:text-amber-700 text-sm font-medium shrink-0">
+            Tout voir →
+        </a>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        {% for product in new_arrivals %}
+        {% include "storefront/partials/_product_card.html" with product=product %}
+        {% empty %}
+        <div class="col-span-full text-center py-10 text-gray-400 text-sm">
+            Le catalogue se remplit — revenez dans un instant.
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ================= CTA BANNER ================= -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
+    <div class="bg-gray-900 rounded-2xl px-6 sm:px-10 py-10 text-center text-white">
+        <h2 class="text-2xl sm:text-3xl font-bold">Une question sur un produit&nbsp;?</h2>
+        <p class="text-gray-300 mt-2 max-w-xl mx-auto text-sm">
+            Notre équipe est disponible 7j/7 pour vous conseiller et confirmer la disponibilité.
+        </p>
+        <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <a href="{% url 'orders:cart' %}" class="bg-amber-500 hover:bg-amber-400 text-gray-900 px-6 py-3 rounded-xl font-bold text-sm transition">
+                Voir mon panier
+            </a>
+            <a href="{% url 'catalog:product_list' %}" class="bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl font-semibold text-sm transition">
+                Continuer mes achats
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

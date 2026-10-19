@@ -13,6 +13,10 @@ from .engines import get_engine
 DOMAIN_DELAY_SECONDS = 3.0
 DOMAIN_DELAY_JITTER = 2.0
 
+# Profit margin applied to every scraped product:
+#   retail_price = raw_cost * 1.10
+DEFAULT_MARKUP_PERCENT = Decimal("10.00")
+
 
 def _asyncio_run(coro):
     try:
@@ -61,6 +65,11 @@ def sync_source(self, source_id):
         "title": source.title_selector,
         "price": source.price_selector,
         "price_fallbacks": getattr(source, "price_fallbacks", None) or [],
+        "price_strategy": getattr(source, "price_strategy", "first") or "first",
+        "price_text_mode": getattr(source, "price_text_mode", "deep") or "deep",
+        "compare_at_price": getattr(source, "compare_at_price_selector", "") or "",
+        "pagination_next": getattr(source, "pagination_next_selector", "") or "",
+        "api_path": getattr(source, "api_path", "") or "",
         "stock": source.stock_selector,
         "images": source.images_selector,
         "brand": getattr(source, "brand_selector", ""),
@@ -72,6 +81,7 @@ def sync_source(self, source_id):
     results, error = _asyncio_run(engine.scrape(source, selectors))
 
     from apps.catalog.models import Product, Supplier, MarginRule, Category, ProductImage
+    from apps.catalog.category_icons import icon_for
     from django.utils.text import slugify
 
     supplier, _ = Supplier.objects.get_or_create(name=source.name)
@@ -79,12 +89,37 @@ def sync_source(self, source_id):
     cat_name = (source.category_name or "General").strip() or "General"
     category, _ = Category.objects.get_or_create(
         name=cat_name,
-        defaults={"slug": slugify(cat_name)[:100] or "general"},
+        defaults={
+            "slug": slugify(cat_name)[:100] or "general",
+            "icon": icon_for(cat_name),
+            "source_hint": getattr(source, "source_hint", "") or "",
+        },
     )
+    # Keep the presentation fields in sync when a source is re-seeded with a
+    # new icon or department label.
+    cat_updates = {}
+    icon = icon_for(cat_name)
+    hint = getattr(source, "source_hint", "") or ""
+    if icon and category.icon != icon:
+        cat_updates["icon"] = icon
+    if hint and category.source_hint != hint:
+        cat_updates["source_hint"] = hint
+    if cat_updates:
+        Category.objects.filter(pk=category.pk).update(**cat_updates)
+        for key, value in cat_updates.items():
+            setattr(category, key, value)
     margin_rule, _ = MarginRule.objects.get_or_create(
         name="Default",
-        defaults={"markup_percent": Decimal("30"), "fixed_margin_fee": Decimal("5.000")},
+        defaults={"markup_percent": DEFAULT_MARKUP_PERCENT, "fixed_margin_fee": Decimal("0.000")},
     )
+    # The "Default" rule is the flat 10% margin on every product. When the
+    # rule already exists (e.g. left over from an older seed), update its
+    # values so the reset applies to the whole catalogue in one pass.
+    if margin_rule.markup_percent != DEFAULT_MARKUP_PERCENT or \
+            margin_rule.fixed_margin_fee != Decimal("0.000"):
+        margin_rule.markup_percent = DEFAULT_MARKUP_PERCENT
+        margin_rule.fixed_margin_fee = Decimal("0.000")
+        margin_rule.save()
 
     found = 0
     updated = 0
@@ -112,6 +147,32 @@ def sync_source(self, source_id):
             skipped_no_price += 1
             continue
         try:
+            # The reference price (struck-through amount) drives the discount
+            # badge on the product card. It is read from its own selector;
+            # when that yields nothing, the highest price candidate is used
+            # as a fallback (the supplier may expose both amounts in the
+            # same node).
+            compare_at = item.get("compare_at") or Decimal("0.000")
+            if compare_at <= 0:
+                for candidate in item.get("price_candidates", []) or []:
+                    if candidate > compare_at:
+                        compare_at = candidate
+            if compare_at <= item["price"]:
+                compare_at = Decimal("0.000")
+            # A supplier can expose a finer department than the source-level
+            # category (Shopify's product type, for instance). When it does,
+            # the product is filed under that department instead.
+            item_category = category
+            item_cat_name = (item.get("category") or "").strip()[:100]
+            if item_cat_name and item_cat_name != cat_name:
+                item_category, _ = Category.objects.get_or_create(
+                    name=item_cat_name,
+                    defaults={
+                        "slug": slugify(item_cat_name)[:100] or "general",
+                        "icon": icon_for(item_cat_name),
+                        "source_hint": getattr(source, "source_hint", "") or "",
+                    },
+                )
             # Key on the normalised URL only. Two distinct products can share a
             # title, and the same product can appear in several category pages.
             obj, created = Product.objects.update_or_create(
@@ -119,9 +180,10 @@ def sync_source(self, source_id):
                 defaults={
                     "title": title,
                     "supplier": supplier,
-                    "category": category,
+                    "category": item_category,
                     "margin_rule": margin_rule,
                     "raw_cost": item["price"],
+                    "compare_at_price": compare_at,
                     "currency": source.currency or "TND",
                     "currency_rate": source.currency_rate or Decimal("1"),
                     "markup_percent": margin_rule.markup_percent,
@@ -187,7 +249,7 @@ def sync_all_sources(self):
     results = []
     last_domain = ""
     last_time = 0.0
-    for source in ScrapedSource.objects.all().order_by("name"):
+    for source in ScrapedSource.objects.filter(is_active=True).order_by("name"):
         last_domain, last_time = polite_delay(
             source.base_url, last_domain, last_time
         )

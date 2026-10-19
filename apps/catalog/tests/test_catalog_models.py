@@ -106,7 +106,14 @@ class ProductModelTest(TestCase):
             )
             product.full_clean()
 
-    def test_product_inactive_when_out_of_stock(self):
+    def test_product_stays_active_when_out_of_stock(self):
+        """Stock and visibility are independent.
+
+        A supplier that does not publish a stock figure still has a live
+        product, so the scraper keeps it visible and the storefront shows a
+        "Rupture" badge instead of hiding it. Only the scraper decides
+        visibility, through the explicit is_active flag.
+        """
         product = Product.objects.create(
             category=self.category,
             supplier=self.supplier,
@@ -115,4 +122,4 @@ class ProductModelTest(TestCase):
             raw_cost=Decimal("50.000"),
             stock=0,
         )
-        self.assertFalse(product.is_active)
+        self.assertTrue(product.is_active)

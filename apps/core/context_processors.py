@@ -1,11 +1,29 @@
 """Global context processors for Karthago Platform."""
-from django.db.models import Sum
+from django.db.models import Sum, Count, Q
 from apps.orders.constants import TUNISIAN_GOVERNORATES
 
 
 def tunisian_governorates(request):
     """Make the 24 Tunisian governorates available in every template."""
     return {"governorates": TUNISIAN_GOVERNORATES}
+
+
+def nav_categories(request):
+    """Make the category list (with product counts) available in the nav.
+
+    The navigation shows the categories on every page, so the list is
+    provided by a context processor instead of being added by hand in each
+    view.
+    """
+    try:
+        from apps.catalog.models import Category
+
+        categories = Category.objects.annotate(
+            n=Count("products", filter=Q(products__is_active=True))
+        ).order_by("-n", "name")
+        return {"nav_categories": categories}
+    except Exception:
+        return {"nav_categories": []}
 
 
 def cart_item_count(request):

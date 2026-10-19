@@ -3,9 +3,12 @@
     <!-- Desktop navbar -->
     <div class="hidden md:flex items-center justify-between px-6 py-3">
         <div class="flex items-center gap-3">
-            <a href="{% url 'catalog:product_list' %}" class="flex items-center gap-2">
+            <a href="{% url 'catalog:home' %}" class="flex items-center gap-2">
                 <div class="w-8 h-8 bg-amber-600 rounded flex items-center justify-center text-white font-bold text-lg">K</div>
                 <span class="font-bold text-xl text-amber-700 tracking-tight">Karthago</span>
+            </a>
+            <a href="{% url 'catalog:product_list' %}" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">
+                Catalogue
             </a>
         </div>
 
@@ -32,7 +35,7 @@
     <!-- Mobile drawer trigger (hamburger only visible on mobile) -->
     <div class="md:hidden px-4 py-3 flex justify-between items-center border-b">
         <div class="flex items-center gap-2">
-            <a href="{% url 'catalog:product_list' %}" class="flex items-center gap-2">
+            <a href="{% url 'catalog:home' %}" class="flex items-center gap-2">
                 <div class="w-7 h-7 bg-amber-600 rounded flex items-center justify-center text-white font-bold text-lg">K</div>
                 <span class="font-bold text-lg text-amber-700 tracking-tight">Karthago</span>
             </a>
@@ -72,9 +75,17 @@
                 <div>
                     <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Catégories</h3>
                     <ul class="space-y-1">
-                        {% for category in categories %}
                         <li>
-                            <a href="{% url 'catalog:product_list' %}?category={{ category.slug }}" class="block py-2 px-3 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">{{ category.name }}</a>
+                            <a href="{% url 'catalog:product_list' %}" class="block py-2 px-3 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">
+                                Tous les produits
+                            </a>
+                        </li>
+                        {% for category in nav_categories %}
+                        <li>
+                            <a href="{% url 'catalog:category_detail' category.slug %}" class="block py-2 px-3 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">
+                                {{ category.name }}
+                                <span class="text-xs text-gray-400 ml-1">({{ category.n|default:0 }})</span>
+                            </a>
                         </li>
                         {% empty %}
                         <li class="text-gray-400 text-sm">Aucune catégorie.</li>

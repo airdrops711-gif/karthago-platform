@@ -30,13 +30,64 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             {% block content %}{% endblock %}
         </div>
+
+        {% block extra_body %}{% endblock %}
     </main>
 
     {% include "storefront/checkout_modal.html" with governorates=governorates %}
 
-    <footer class="bg-white border-t py-8">
-        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
-            &copy; 2026 Karthago Commerce &mdash; Dropshipping Tunisia
+    <footer class="bg-white border-t mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="col-span-2 md:col-span-1">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-8 h-8 bg-amber-600 rounded flex items-center justify-center text-white font-bold text-lg">K</div>
+                        <span class="font-bold text-lg text-amber-700 tracking-tight">Karthago</span>
+                    </div>
+                    <p class="text-sm text-gray-500 leading-relaxed">
+                        Dropshipping tunisien. Nous importons des produits réels
+                        chez les meilleurs fournisseurs locaux et locaux vous facturons.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Boutique</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{% url 'catalog:product_list' %}" class="text-gray-600 hover:text-amber-600">Tout le catalogue</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}?on_sale=1&sort_by=discount" class="text-gray-600 hover:text-amber-600">Promotions</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}?in_stock=1" class="text-gray-600 hover:text-amber-600">En stock</a></li>
+                        <li><a href="{% url 'orders:cart' %}" class="text-gray-600 hover:text-amber-600">Mon panier</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Catégories</h4>
+                    <ul class="space-y-2 text-sm">
+                        {% for category in nav_categories|slice:":5" %}
+                        <li>
+                            <a href="{% url 'catalog:category_detail' category.slug %}" class="text-gray-600 hover:text-amber-600">
+                                {{ category.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Livraison</h4>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li>Paiement à la livraison</li>
+                        <li>Livraison 24-48h</li>
+                        <li>Retour sous 30 jours</li>
+                        <li class="text-gray-500" dir="rtl">توصيل إلى كامل تراب الجمهورية</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p class="text-xs text-gray-400">
+                    &copy; 2026 Karthago Commerce &mdash; Dropshipping Tunisia
+                </p>
+                <p class="text-xs text-gray-400">
+                    Catalogue synchronisé depuis les fournisseurs tunisiens
+                </p>
+            </div>
         </div>
     </footer>
 </body>

@@ -7,6 +7,16 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
+    # The supplier department this category mirrors (e.g. "Informatique",
+    # "Homme"). Used by the storefront to group sources on the landing page.
+    source_hint = models.CharField(
+        max_length=100, blank=True,
+        help_text="Supplier department this category mirrors.",
+    )
+    icon = models.CharField(
+        max_length=8, blank=True,
+        help_text="Emoji shown on the category showcase tiles.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -15,6 +25,11 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def product_count(self):
+        """Number of active, in-stock products in this category."""
+        return self.products.filter(is_active=True).count()
 
 
 class Supplier(models.Model):
@@ -83,6 +98,11 @@ class Product(models.Model):
         validators=[MinValueValidator(0)],
         help_text="Computed retail price in TND.",
     )
+    compare_at_price = models.DecimalField(
+        max_digits=10, decimal_places=3, default=0,
+        validators=[MinValueValidator(0)],
+        help_text="Supplier reference price before discount (0 = no reference).",
+    )
     currency = models.CharField(
         max_length=8, default="TND",
         help_text="Source currency of raw_cost (TND, EUR, USD...).",
@@ -125,9 +145,28 @@ class Product(models.Model):
         return result.quantize(Decimal("0.001"))
 
     def save(self, *args, **kwargs):
-        if not self.retail_price:
-            self.retail_price = self.compute_retail_price()
+        # The retail price is always derived from the cost and the margin
+        # rule, so it must be recomputed on every write. Keeping the old
+        # value when the supplier cost changes would silently sell at the
+        # wrong margin.
+        self.retail_price = self.compute_retail_price()
+        # update_or_create() narrows the write to the changed columns. The
+        # recomputed price is not part of that set, so it has to be added
+        # explicitly or the new margin would never reach the database.
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None:
+            kwargs["update_fields"] = set(update_fields) | {"retail_price"}
         super().save(*args, **kwargs)
+
+    @property
+    def discount_percent(self):
+        """Supplier discount in percent (0 when the item is not reduced)."""
+        reference = self.compare_at_price or 0
+        if reference <= 0 or self.raw_cost <= 0:
+            return 0
+        if self.raw_cost >= reference:
+            return 0
+        return round(((reference - self.raw_cost) / reference) * 100)
 
 
 class ProductImage(models.Model):

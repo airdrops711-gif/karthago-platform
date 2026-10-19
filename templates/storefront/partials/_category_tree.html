@@ -1,12 +1,79 @@
-<h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Catégories</h3>
-<ul class="space-y-1">
-    {% for category in categories %}
-    <li>
-        <a href="{% url 'catalog:product_list' %}?category={{ category.slug }}" class="block py-2 px-3 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition text-sm">
-            {{ category.name }}
+{% load catalog_tags %}
+{% comment %}
+Category filter sidebar. Every link preserves the other active filters
+(search query, price range, stock, sort) so changing one facet never
+discards the others.
+{% endcomment %}
+<div class="space-y-5">
+    <div>
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Catégories</h3>
+        <ul class="space-y-0.5 max-h-[26rem] overflow-y-auto pr-1">
+            <li>
+                <a href="{% category_url '' %}"
+                   class="flex items-center justify-between py-2 px-3 rounded-lg text-sm transition
+                          {% if not selected_category %}bg-amber-50 text-amber-700 font-semibold{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                    <span>Tous les produits</span>
+                </a>
+            </li>
+            {% for category in categories %}
+            <li>
+                <a href="{% category_url category.slug %}"
+                   class="flex items-center justify-between py-2 px-3 rounded-lg text-sm transition
+                          {% if selected_category == category.slug %}bg-amber-50 text-amber-700 font-semibold{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                    <span class="truncate">{{ category.name }}</span>
+                    <span class="ml-2 shrink-0 text-xs px-1.5 py-0.5 rounded-full
+                                 {% if selected_category == category.slug %}bg-amber-600 text-white{% else %}bg-gray-100 text-gray-500{% endif %}">
+                        {{ category.n|default:0 }}
+                    </span>
+                </a>
+            </li>
+            {% empty %}
+            <li class="text-gray-400 text-sm px-3">Aucune catégorie.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="border-t pt-4">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Prix</h3>
+        <ul class="space-y-0.5">
+            {% for lo, hi, label in price_buckets %}
+            <li>
+                <a href="{% filter_url min_price=lo max_price=hi %}"
+                   class="block py-2 px-3 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition">
+                    {{ label }}
+                </a>
+            </li>
+            {% endfor %}
+            {% if min_price or max_price %}
+            <li>
+                <a href="{% filter_url min_price=None max_price=None %}"
+                   class="block py-2 px-3 rounded-lg text-sm text-amber-700 hover:bg-amber-50 transition">
+                    ✕ Réinitialiser le prix
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="border-t pt-4">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Options</h3>
+        <a href="{% filter_url in_stock='1' %}"
+           class="flex items-center gap-2 py-2 px-3 rounded-lg text-sm transition
+                  {% if in_stock == '1' %}bg-amber-50 text-amber-700 font-semibold{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+            <span class="w-4 h-4 rounded border flex items-center justify-center
+                         {% if in_stock == '1' %}bg-amber-600 border-amber-600 text-white{% else %}border-gray-300{% endif %}">
+                {% if in_stock == '1' %}✓{% endif %}
+            </span>
+            En stock uniquement
         </a>
-    </li>
-    {% empty %}
-    <li class="text-gray-400 text-sm">Aucune catégorie.</li>
-    {% endfor %}
-</ul>
+        <a href="{% filter_url on_sale='1' %}"
+           class="flex items-center gap-2 py-2 px-3 rounded-lg text-sm transition
+                  {% if on_sale == '1' %}bg-amber-50 text-amber-700 font-semibold{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+            <span class="w-4 h-4 rounded border flex items-center justify-center
+                         {% if on_sale == '1' %}bg-amber-600 border-amber-600 text-white{% else %}border-gray-300{% endif %}">
+                {% if on_sale == '1' %}✓{% endif %}
+            </span>
+            En promotion
+        </a>
+    </div>
+</div>

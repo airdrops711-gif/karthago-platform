@@ -68,3 +68,61 @@ class ProductDetailViewTest(TestCase):
         self.product.save()
         response = self.client.get(reverse("catalog:product_detail", args=[self.product.id]))
         self.assertEqual(response.status_code, 404)
+
+
+class StorefrontRoutesTest(TestCase):
+    """The home page, the catalogue and the category pages must all render."""
+
+    def setUp(self):
+        self.category = Category.objects.create(name="Electronics", slug="electronics")
+        self.supplier = Supplier.objects.create(name="Tech Supplier")
+        self.margin_rule = MarginRule.objects.create(
+            name="Default", markup_percent=Decimal("10.00"), fixed_margin_fee=Decimal("0.000")
+        )
+        self.product = Product.objects.create(
+            category=self.category,
+            supplier=self.supplier,
+            margin_rule=self.margin_rule,
+            title="Produit de test",
+            raw_cost=Decimal("100.000"),
+            stock=5,
+        )
+
+    def test_home_page_renders(self):
+        response = self.client.get(reverse("catalog:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Produit de test")
+
+    def test_catalogue_renders(self):
+        response = self.client.get(reverse("catalog:product_list"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Produit de test")
+
+    def test_category_page_renders(self):
+        response = self.client.get(
+            reverse("catalog:category_detail", args=[self.category.slug])
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Produit de test")
+
+    def test_category_page_unknown_slug_404(self):
+        response = self.client.get(
+            reverse("catalog:category_detail", args=["does-not-exist"])
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_search_only_returns_active_products(self):
+        inactive = Product.objects.create(
+            category=self.category,
+            supplier=self.supplier,
+            margin_rule=self.margin_rule,
+            title="Produit masque",
+            raw_cost=Decimal("50.000"),
+            stock=3,
+            is_active=False,
+        )
+        response = self.client.get(reverse("catalog:search"), {"q": "Produit"})
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Produit masque")
+        self.assertContains(response, "Produit de test")
+        self.assertIsNotNone(inactive.pk)

@@ -20,6 +20,39 @@ class ScrapedSource(models.Model):
         default=list, blank=True,
         help_text="Extra price selectors tried when the primary one yields nothing.",
     )
+    price_strategy = models.CharField(
+        max_length=10, default="first",
+        choices=[
+            ("first", "First match (regular price)"),
+            ("last", "Last match (sale price)"),
+            ("min", "Lowest match"),
+            ("max", "Highest match"),
+        ],
+        help_text="How to pick the price when a container exposes several amounts.",
+    )
+    compare_at_price_selector = models.CharField(
+        max_length=255, blank=True,
+        help_text="Selector of the struck-through reference price, if any.",
+    )
+    price_text_mode = models.CharField(
+        max_length=10, default="deep",
+        choices=[
+            ("deep", "Deep text (all descendants)"),
+            ("shallow", "Direct text only"),
+        ],
+        help_text=(
+            "How the price node text is read. Shopify mixes the original "
+            "price into the deep text of the sale price node."
+        ),
+    )
+    pagination_next_selector = models.CharField(
+        max_length=255, blank=True,
+        help_text="Selector of the 'next page' link, if the shop paginates.",
+    )
+    api_path = models.CharField(
+        max_length=100, blank=True,
+        help_text="Optional JSON catalogue endpoint (e.g. /products.json).",
+    )
     stock_selector = models.CharField(max_length=255, blank=True)
     images_selector = models.CharField(max_length=255, blank=True)
     brand_selector = models.CharField(max_length=255, blank=True)
@@ -33,6 +66,14 @@ class ScrapedSource(models.Model):
     category_name = models.CharField(
         max_length=100, blank=True,
         help_text="Category assigned to scraped products.",
+    )
+    category_icon = models.CharField(
+        max_length=8, blank=True,
+        help_text="Emoji shown on the storefront category tiles.",
+    )
+    source_hint = models.CharField(
+        max_length=100, blank=True,
+        help_text="Supplier department this source mirrors (e.g. Mode Femme).",
     )
     sync_frequency_hours = models.PositiveIntegerField(default=4, help_text="Sync every N hours.")
     is_active = models.BooleanField(default=True)

@@ -55,6 +55,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "apps.core.context_processors.tunisian_governorates",
                 "apps.core.context_processors.cart_item_count",
+                "apps.core.context_processors.nav_categories",
             ],
         },
     },
