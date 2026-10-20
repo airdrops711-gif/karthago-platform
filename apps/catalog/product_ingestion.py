@@ -17,6 +17,7 @@ from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.utils.decorators import method_decorator
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -145,11 +146,18 @@ def split_image_urls(raw):
 # ---------------------------------------------------------------------------
 # Single product
 # ---------------------------------------------------------------------------
+#: The vendor product views are staff-only. The decorators are applied
+#: to the class with ``method_decorator``: applied to a method, the
+#: ``login_required`` wrapper would receive the view instance instead of
+#: the request and every call would raise ``AttributeError: 'X' object
+#: has no attribute 'user'``.
+staff_only = method_decorator([login_required, staff_required], name="dispatch")
+
+
+@staff_only
 class ProductCreateView(View):
     """Create one product in the vendor's own store."""
 
-    @login_required
-    @staff_required
     def get(self, request):
         store = getattr(request.user, "store", None)
         context = {
@@ -161,8 +169,6 @@ class ProductCreateView(View):
         }
         return render(request, "dashboard/products.html", context)
 
-    @login_required
-    @staff_required
     def post(self, request):
         store = getattr(request.user, "store", None)
         if store is None:
@@ -223,11 +229,10 @@ class ProductCreateView(View):
         return redirect("dashboard:product_create")
 
 
+@staff_only
 class ProductUpdateView(View):
     """Edit or unpublish one product of the vendor's store."""
 
-    @login_required
-    @staff_required
     def post(self, request, product_id):
         store = getattr(request.user, "store", None)
         product = get_object_or_404(StoreProduct, pk=product_id, store=store)
@@ -250,11 +255,10 @@ class ProductUpdateView(View):
         return redirect("dashboard:product_create")
 
 
+@staff_only
 class ProductDeleteView(View):
     """Delete one product of the vendor's store."""
 
-    @login_required
-    @staff_required
     def post(self, request, product_id):
         store = getattr(request.user, "store", None)
         product = get_object_or_404(StoreProduct, pk=product_id, store=store)
@@ -372,11 +376,10 @@ def import_bulk_rows(store, header, rows):
     return imported, errors
 
 
+@staff_only
 class BulkImportView(View):
     """Bulk ingestion from a CSV or an XLSX file."""
 
-    @login_required
-    @staff_required
     def get(self, request):
         store = getattr(request.user, "store", None)
         context = {
@@ -385,8 +388,6 @@ class BulkImportView(View):
         }
         return render(request, "dashboard/products_bulk.html", context)
 
-    @login_required
-    @staff_required
     def post(self, request):
         store = getattr(request.user, "store", None)
         if store is None:
@@ -440,11 +441,10 @@ class BulkImportView(View):
 # ---------------------------------------------------------------------------
 # Import from the central scraped pool
 # ---------------------------------------------------------------------------
+@staff_only
 class ImportFromPoolView(View):
     """Clone products of the central scraped pool into the vendor's store."""
 
-    @login_required
-    @staff_required
     def get(self, request):
         from apps.catalog.tenancy import central_pool
 
@@ -457,8 +457,6 @@ class ImportFromPoolView(View):
         }
         return render(request, "dashboard/products_import.html", context)
 
-    @login_required
-    @staff_required
     def post(self, request):
         store = getattr(request.user, "store", None)
         if store is None:

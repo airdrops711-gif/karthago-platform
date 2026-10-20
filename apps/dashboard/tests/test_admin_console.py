@@ -278,6 +278,72 @@ class TenantManagementTests(ConsoleTestCase):
         self.assertTrue(self.flagship.is_active)
 
 
+class VendorProductRoutesTests(ConsoleTestCase):
+    """The vendor product management routes of the dashboard.
+
+    They answered 500 in production: the ``login_required`` decorator
+    was applied to the view *methods*, so its wrapper received the view
+    instance instead of the request and raised
+    ``AttributeError: 'X' object has no attribute 'user'``.
+    """
+
+    def setUp(self):
+        self.login_staff()
+
+    def test_every_vendor_product_route_answers_200(self):
+        routes = [
+            reverse("dashboard:product_create"),
+            reverse("dashboard:product_bulk"),
+            reverse("dashboard:product_import"),
+        ]
+        for route in routes:
+            with self.subTest(route=route):
+                response = self.client.get(route)
+                self.assertEqual(response.status_code, 200)
+
+    def test_the_vendor_product_routes_need_a_staff_account(self):
+        self.client.force_login(self.plain)
+        for route in [
+            reverse("dashboard:product_create"),
+            reverse("dashboard:product_bulk"),
+            reverse("dashboard:product_import"),
+        ]:
+            with self.subTest(route=route):
+                response = self.client.get(route)
+                self.assertEqual(response.status_code, 302)
+
+
+class ScraperControlPlaneTests(ConsoleTestCase):
+    """The scraper control plane is a staff-only area.
+
+    It was fully public: an anonymous visitor could read the supplier
+    registry and trigger a scrape.
+    """
+
+    def setUp(self):
+        self.login_staff()
+
+    def test_the_scraper_dashboard_answers_200_for_a_staff_account(self):
+        response = self.client.get(reverse("scraper:scraper_dashboard"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_the_scraper_dashboard_is_closed_to_anonymous_visitors(self):
+        self.client.logout()
+        response = self.client.get(reverse("scraper:scraper_dashboard"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/admin/login/", response["Location"])
+
+    def test_the_scraper_dashboard_is_closed_to_non_staff_accounts(self):
+        self.client.force_login(self.plain)
+        response = self.client.get(reverse("scraper:scraper_dashboard"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_an_anonymous_visitor_cannot_trigger_a_scrape(self):
+        self.client.logout()
+        response = self.client.post(reverse("scraper:run", args=[1]))
+        self.assertEqual(response.status_code, 302)
+
+
 class DjangoAdminTests(ConsoleTestCase):
     """The Django admin registers the models of the platform.
 
