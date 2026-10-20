@@ -10,7 +10,7 @@
         <nav class="text-xs text-gray-400 mb-1 flex items-center gap-1">
             <a href="{% url 'catalog:product_list' %}" class="hover:text-amber-600">Accueil</a>
             <span>/</span>
-            <span class="text-gray-600">{{ category.name }}</span>
+            <span class="text-gray-600">{{ category.category }}</span>
         </nav>
         {% endif %}
         <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ page_title }}</h1>
@@ -71,14 +71,14 @@
             <span class="text-gray-400">Filtre :</span>
             <a href="{% category_url '' %}"
                class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-xs font-medium hover:bg-amber-200">
-                {{ category.name|default:selected_category }} ✕
+                {{ category_name|default:selected_category }} ✕
             </a>
         </div>
         {% endif %}
 
         <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {% for product in products %}
-            {% include "storefront/partials/_product_card.html" with product=product %}
+            {% include "storefront/partials/_store_product_card.html" with product=product store=store %}
             {% empty %}
             <div class="col-span-full text-center py-16 text-gray-500">
                 <p class="text-lg mb-2">Aucun produit disponible.</p>

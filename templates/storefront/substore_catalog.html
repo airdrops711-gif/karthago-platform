@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Catalogue &mdash; {{ store.name }}{% endblock %}
+{% block meta_description %}Tous les produits de {{ store.name }}. Paiement à la livraison, livraison 24-48h en Tunisie.{% endblock %}
+{% block content %}
+
+<div class="mb-6">
+    <nav class="text-xs text-gray-400 mb-1 flex items-center gap-1">
+        <a href="{% url 'catalog:home' %}" class="hover:text-amber-600">Accueil</a>
+        <span>/</span>
+        <a href="{% url 'catalog:substore_home' store.slug %}" class="hover:text-amber-600">{{ store.name }}</a>
+        <span>/</span>
+        <span class="text-gray-600">Catalogue</span>
+    </nav>
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-3">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ store.name }}</h1>
+            <p class="text-gray-500 mt-1 text-sm">
+                <span class="font-semibold text-gray-900">{{ total_count }}</span>
+                produit{{ total_count|pluralize }} disponible{{ total_count|pluralize }}.
+            </p>
+        </div>
+        <label for="sort-select" class="sr-only">Trier</label>
+        <select id="sort-select" name="sort_by"
+                onchange="window.location.href=this.value"
+                class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+            {% for value, label in sort_options.items %}
+            <option value="{{ value }}" {% if sort_by == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+{% if q %}
+<div class="mb-4 flex items-center justify-between bg-amber-50 border border-amber-100 rounded-lg px-4 py-2.5">
+    <span class="text-sm text-amber-800">Résultats pour <span class="font-semibold">« {{ q }} »</span></span>
+    <a href="?" class="text-sm text-amber-700 hover:underline">Effacer</a>
+</div>
+{% endif %}
+
+{% if selected_category %}
+<div class="mb-4 flex items-center gap-2 text-sm text-gray-600">
+    <span class="text-gray-400">Filtre :</span>
+    <a href="?" class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-xs font-medium hover:bg-amber-200">
+        {{ selected_category }} ✕
+    </a>
+</div>
+{% endif %}
+
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Category sidebar -->
+    <aside class="hidden lg:col-span-3 lg:block">
+        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm sticky top-24">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Catégories</h2>
+            <ul class="space-y-1">
+                <li>
+                    <a href="{% url 'catalog:substore_catalog' store.slug %}"
+                       class="block py-2 px-3 rounded-lg text-sm {% if not selected_category %}bg-amber-50 text-amber-700 font-medium{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                        Tous les produits
+                    </a>
+                </li>
+                {% for category in categories %}
+                <li>
+                    <a href="?category={{ category.category|urlencode }}"
+                       class="block py-2 px-3 rounded-lg text-sm {% if selected_category == category.category %}bg-amber-50 text-amber-700 font-medium{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                        {{ category.category }}
+                        <span class="text-xs text-gray-400 ml-1">({{ category.n }})</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Product grid -->
+    <div class="lg:col-span-9">
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {% for product in products %}
+            {% include "storefront/partials/_store_product_card.html" with product=product store=store is_sub_store=True %}
+            {% empty %}
+            <div class="col-span-full text-center py-16 text-gray-500">
+                <p class="text-lg mb-2">Aucun produit disponible.</p>
+                <p class="text-sm text-gray-400">Cette boutique n'a pas encore de produits publiés.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <nav class="mt-8 flex items-center justify-center gap-2" aria-label="Pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if selected_category %}&category={{ selected_category|urlencode }}{% endif %}"
+               class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Précédente</a>
+            {% endif %}
+            <span class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 bg-gray-50">
+                Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+            </span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if selected_category %}&category={{ selected_category|urlencode }}{% endif %}"
+               class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Suivante</a>
+            {% endif %}
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

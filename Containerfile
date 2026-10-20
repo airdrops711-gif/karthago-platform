@@ -24,6 +24,11 @@ ENV PATH="/opt/venv/bin:$PATH" \
     HOME=/opt/app-root/src
 WORKDIR /opt/app-root/src
 COPY . .
+# Collect the static files at build time: the runtime image stays
+# read-only for the application code.
+RUN DJANGO_SETTINGS_MODULE=config.settings.production \
+    SECRET_KEY=build-only-not-used-at-runtime \
+    python manage.py collectstatic --noinput
 # Grant write access to GID 0 (root group) across runtime paths
 RUN mkdir -p /opt/app-root/src/static \
              /opt/app-root/src/media \

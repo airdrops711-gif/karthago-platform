@@ -1,15 +1,24 @@
-{% load static %}
+{% load static catalog_tags %}
 <nav class="bg-white border-b sticky top-0 z-40 shadow-sm">
     <!-- ================= Desktop navbar ================= -->
     <div class="hidden md:flex items-center justify-between px-6 py-3 gap-4">
         <div class="flex items-center gap-3 shrink-0">
-            <a href="{% url 'catalog:home' %}" class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-amber-600 rounded flex items-center justify-center text-white font-bold text-lg">K</div>
-                <span class="font-bold text-xl text-amber-700 tracking-tight">Karthago</span>
+            <a href="{% if is_sub_store %}{% url 'catalog:substore_home' tenant_store.slug %}{% else %}{% url 'catalog:home' %}{% endif %}" class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-amber-600 rounded flex items-center justify-center text-white font-bold text-lg">
+                    {% if is_sub_store %}{{ tenant_store.name|slice:":1"|upper }}{% else %}K{% endif %}
+                </div>
+                <span class="font-bold text-xl text-amber-700 tracking-tight">
+                    {% if is_sub_store %}{{ tenant_store.name }}{% else %}Karthago{% endif %}
+                </span>
             </a>
-            <a href="{% url 'catalog:product_list' %}" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">
+            <a href="{% if is_sub_store %}{% url 'catalog:substore_catalog' tenant_store.slug %}{% else %}{% url 'catalog:product_list' %}{% endif %}" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">
                 Catalogue
             </a>
+            {% if not is_sub_store %}
+            <a href="{% url 'admin_dashboard:overview' %}" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">
+                Superadmin
+            </a>
+            {% endif %}
         </div>
 
         <!-- Desktop search -->
@@ -39,9 +48,13 @@
 
     <!-- ================= Mobile bar ================= -->
     <div class="md:hidden px-4 py-3 flex items-center justify-between">
-        <a href="{% url 'catalog:home' %}" class="flex items-center gap-2">
-            <div class="w-7 h-7 bg-amber-600 rounded flex items-center justify-center text-white font-bold text-lg">K</div>
-            <span class="font-bold text-lg text-amber-700 tracking-tight">Karthago</span>
+        <a href="{% if is_sub_store %}{% url 'catalog:substore_home' tenant_store.slug %}{% else %}{% url 'catalog:home' %}{% endif %}" class="flex items-center gap-2">
+            <div class="w-7 h-7 bg-amber-600 rounded flex items-center justify-center text-white font-bold text-lg">
+                {% if is_sub_store %}{{ tenant_store.name|slice:":1"|upper }}{% else %}K{% endif %}
+            </div>
+            <span class="font-bold text-lg text-amber-700 tracking-tight">
+                {% if is_sub_store %}{{ tenant_store.name }}{% else %}Karthago{% endif %}
+            </span>
         </a>
         <div class="flex items-center gap-3">
             <!-- Single cart entry on mobile too: icon + badge. -->
@@ -85,8 +98,8 @@
                         </li>
                         {% for category in nav_categories %}
                         <li>
-                            <a href="{% url 'catalog:category_detail' category.slug %}" class="block py-2 px-3 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">
-                                {{ category.name }}
+                            <a href="{% category_url category.category %}" class="block py-2 px-3 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">
+                                {{ category.category }}
                                 <span class="text-xs text-gray-400 ml-1">({{ category.n|default:0 }})</span>
                             </a>
                         </li>

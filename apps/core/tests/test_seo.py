@@ -3,13 +3,16 @@
 1. The cart must appear ONCE per page (the nav was rendered twice on the
    order page, and the navbar carried two overlapping cart badges).
 2. The SEO endpoints must serve valid robots.txt and sitemap.xml.
+
+The catalogue is the tenant one since the multi-tenant migration, so the
+fixtures build a flagship store and its ``StoreProduct`` rows.
 """
 from decimal import Decimal
 
 from django.test import TestCase
 from django.urls import reverse
 
-from apps.catalog.models import Category, Product, Supplier
+from apps.catalog.tests.factories import make_flagship, make_store_product
 from apps.orders.models import Customer, Order
 
 
@@ -17,21 +20,19 @@ class SingleCartPerPageTest(TestCase):
     """The nav (and its cart badge) must be rendered exactly once."""
 
     def setUp(self):
-        self.category = Category.objects.create(name="TV", slug="tv")
-        self.supplier = Supplier.objects.create(name="Twenty")
-        self.product = Product.objects.create(
-            category=self.category,
-            supplier=self.supplier,
+        self.flagship = make_flagship()
+        self.product = make_store_product(
+            self.flagship,
             title="Television",
-            raw_cost=Decimal("100.000"),
-            markup_percent=Decimal("10.00"),
-            stock=3,
+            cost="100.000",
+            category="TV",
         )
         self.customer = Customer.objects.create(
-            full_name="Ahmed", phone="20123456", governorate="Tunis", address="Tunis"
+            full_name="Ahmed", phone="20123456", governorate="Tunis", address="Tunis",
+            store=self.flagship,
         )
         self.order = Order.objects.create(
-            customer=self.customer, total_amount=Decimal("110.000")
+            customer=self.customer, store=self.flagship, total_amount=Decimal("110.000")
         )
 
     def test_order_detail_renders_the_nav_once(self):
@@ -71,6 +72,9 @@ class SingleCartPerPageTest(TestCase):
 
 
 class SeoEndpointTest(TestCase):
+    def setUp(self):
+        self.flagship = make_flagship()
+
     def test_robots_txt(self):
         response = self.client.get(reverse("seo:robots"))
         self.assertEqual(response.status_code, 200)
@@ -89,14 +93,8 @@ class SeoEndpointTest(TestCase):
         self.assertIn("<loc>", body)
 
     def test_sitemap_lists_the_catalogue(self):
-        category = Category.objects.create(name="TV", slug="tv")
-        supplier = Supplier.objects.create(name="Twenty")
-        Product.objects.create(
-            category=category,
-            supplier=supplier,
-            title="Television",
-            raw_cost=Decimal("100.000"),
-            stock=3,
+        make_store_product(
+            self.flagship, title="Television", cost="100.000", category="TV"
         )
         response = self.client.get(reverse("seo:sitemap"))
         body = response.content.decode()
@@ -104,15 +102,11 @@ class SeoEndpointTest(TestCase):
         self.assertIn("/category/tv/", body)
 
     def test_product_page_has_product_jsonld(self):
-        category = Category.objects.create(name="TV", slug="tv")
-        supplier = Supplier.objects.create(name="Twenty")
-        product = Product.objects.create(
-            category=category,
-            supplier=supplier,
+        product = make_store_product(
+            self.flagship,
             title="Television 50 pouces",
-            raw_cost=Decimal("100.000"),
-            markup_percent=Decimal("10.00"),
-            stock=3,
+            cost="100.000",
+            category="TV",
         )
         response = self.client.get(
             reverse("catalog:product_detail", args=[product.id])

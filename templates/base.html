@@ -1,4 +1,4 @@
-{% load static %}
+{% load static catalog_tags %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -81,8 +81,8 @@
                     <ul class="space-y-2 text-sm">
                         {% for category in nav_categories|slice:":5" %}
                         <li>
-                            <a href="{% url 'catalog:category_detail' category.slug %}" class="text-gray-600 hover:text-amber-600">
-                                {{ category.name }}
+                            <a href="{% category_url category.category %}" class="text-gray-600 hover:text-amber-600">
+                                {{ category.category }}
                             </a>
                         </li>
                         {% endfor %}

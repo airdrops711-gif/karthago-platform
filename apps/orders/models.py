@@ -14,7 +14,7 @@ SUPPLIER_BRANDS = {
     "noonclo": "Noonclo",
     "wamia": "Wamia",
 }
-from apps.catalog.models import Product
+from apps.catalog.models import Product, Store, StoreProduct
 
 
 class Customer(models.Model):
@@ -23,6 +23,12 @@ class Customer(models.Model):
     email = models.EmailField(blank=True)
     governorate = models.CharField(max_length=50, choices=TUNISIAN_GOVERNORATES)
     address = models.TextField()
+    # The store the customer bought from. Null for the legacy rows that
+    # predate the multi-tenant model; the data migration backfills them.
+    store = models.ForeignKey(
+        Store, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="customers",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -47,6 +53,13 @@ class Order(models.Model):
     ]
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="orders")
+    # The store that owns the order. Null for the legacy rows that predate
+    # the multi-tenant model; the data migration backfills them with the
+    # flagship.
+    store = models.ForeignKey(
+        Store, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="orders",
+    )
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default=STATUS_PENDING_CONFIRMATION)
     total_amount = models.DecimalField(
         max_digits=10, decimal_places=3, default=0, validators=[MinValueValidator(0)],
@@ -96,10 +109,12 @@ class OrderItem(models.Model):
     """
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    # Kept nullable: the catalogue is reset regularly and a product may be
-    # deleted. The snapshot below is what the dashboard displays.
+    # The tenant product that was bought. Kept nullable: a catalogue is
+    # reset regularly and a product may be deleted. The snapshot below is
+    # what the dashboard displays.
     product = models.ForeignKey(
-        Product, on_delete=models.SET_NULL, null=True, blank=True, related_name="order_items"
+        StoreProduct, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="order_items",
     )
     product_title = models.CharField(max_length=255)
     quantity = models.PositiveIntegerField(default=1)
@@ -203,7 +218,15 @@ class Delivery(models.Model):
 
 class Cart(models.Model):
     session_key = models.CharField(max_length=40, db_index=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    # The tenant product in the cart. A visitor never buys a product that
+    # belongs to another store.
+    product = models.ForeignKey(StoreProduct, on_delete=models.CASCADE)
+    # The store the cart belongs to, so a sub-store cart never mixes with
+    # the flagship catalogue.
+    store = models.ForeignKey(
+        Store, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="carts",
+    )
     quantity = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

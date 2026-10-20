@@ -3,6 +3,25 @@ from django.db.models import Sum, Count, Q
 from apps.orders.constants import TUNISIAN_GOVERNORATES
 
 
+def tenant_context(request):
+    """Expose the resolved tenant to every template.
+
+    The navbar shows the store name and links to the store's own
+    catalogue, so the templates need to know whether the visitor is on
+    the flagship or on a vendor sub-store.
+    """
+    store = getattr(request, "tenant_store", None)
+    is_sub_store = bool(
+        getattr(request, "tenant_slug", "")
+        and store is not None
+        and not store.is_platform_default
+    )
+    return {
+        "tenant_store": store,
+        "is_sub_store": is_sub_store,
+    }
+
+
 def tunisian_governorates(request):
     """Make the 24 Tunisian governorates available in every template."""
     return {"governorates": TUNISIAN_GOVERNORATES}
@@ -13,15 +32,16 @@ def nav_categories(request):
 
     The navigation shows the categories on every page, so the list is
     provided by a context processor instead of being added by hand in each
-    view.
+    view. The categories are the ones of the tenant catalogue: a
+    sub-store never shows the flagship's taxonomy.
     """
     try:
-        from apps.catalog.models import Category
+        from apps.catalog.tenancy import store_category_counts
 
-        categories = Category.objects.annotate(
-            n=Count("products", filter=Q(products__is_active=True))
-        ).order_by("-n", "name")
-        return {"nav_categories": categories}
+        store = getattr(request, "tenant_store", None)
+        if store is None:
+            return {"nav_categories": []}
+        return {"nav_categories": store_category_counts(store)}
     except Exception:
         return {"nav_categories": []}
 

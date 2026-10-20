@@ -1,0 +1,63 @@
+{% comment %}
+Product card of a tenant catalogue (StoreProduct).
+
+The flagship and the sub-stores share the same component: only the
+detail URL differs, so the card is rendered with the store it belongs to.
+{% endcomment %}
+<div class="product-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full group">
+    <a href="{% if is_sub_store %}{% url 'catalog:substore_product' store.slug product.id %}{% else %}{% url 'catalog:product_detail' product.id %}{% endif %}"
+       class="relative h-44 sm:h-48 overflow-hidden bg-gray-50 block">
+        {% if product.image_url %}
+        <img src="{{ product.image_url }}" alt="{{ product.title }}"
+             loading="lazy"
+             class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+        {% else %}
+        <div class="w-full h-full flex items-center justify-center text-gray-300 text-3xl">📦</div>
+        {% endif %}
+        <span class="absolute top-2 right-2 bg-white/90 backdrop-blur text-[11px] font-medium px-2 py-1 rounded border border-gray-200">
+            {% if product.in_stock %}En stock{% else %}Rupture{% endif %}
+        </span>
+        {% if product.is_featured_on_main %}
+        <span class="absolute top-2 left-2 bg-amber-600 text-white text-[10px] font-bold px-2 py-1 rounded">
+            ✨ Sélection
+        </span>
+        {% elif product.is_store_native %}
+        <span class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded">
+            Boutique
+        </span>
+        {% endif %}
+    </a>
+    <div class="p-3 sm:p-4 flex-1 flex flex-col">
+        {% if product.category %}
+        <span class="text-[11px] font-medium text-amber-600 mb-1.5 truncate">
+            {{ product.category }}
+        </span>
+        {% endif %}
+        <h3 class="text-sm sm:text-base font-bold text-gray-900 leading-snug line-clamp-2">
+            <a href="{% if is_sub_store %}{% url 'catalog:substore_product' store.slug product.id %}{% else %}{% url 'catalog:product_detail' product.id %}{% endif %}"
+               class="hover:text-amber-700 transition">
+                {{ product.title }}
+            </a>
+        </h3>
+        <div class="mt-auto pt-3 flex items-end justify-between gap-2">
+            <div>
+                <div class="text-base sm:text-lg font-bold text-amber-700 leading-tight">
+                    {{ product.selling_price }} <span class="text-xs font-semibold">DT</span>
+                </div>
+                {% if product.margin_amount %}
+                <div class="text-[11px] text-gray-400">marge {{ product.margin_percent }}%</div>
+                {% endif %}
+            </div>
+            <form hx-post="{% url 'orders:add_to_cart' product.id %}" hx-target="this" hx-swap="innerHTML" class="shrink-0">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" {% if not product.in_stock %}disabled{% endif %}
+                        class="px-3 py-1.5 rounded-lg text-xs font-semibold transition
+                               {% if not product.in_stock %}bg-gray-100 text-gray-400 cursor-not-allowed
+                               {% else %}bg-amber-600 hover:bg-amber-700 text-white{% endif %}">
+                    {% if not product.in_stock %}Rupture{% else %}+ Panier{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

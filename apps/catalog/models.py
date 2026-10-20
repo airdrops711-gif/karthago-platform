@@ -1,6 +1,21 @@
-"""Catalog models for Karthago Platform."""
-from django.db import models
+"""Catalog models for Karthago Platform.
+
+Three layers live here and must not be mixed up:
+
+* ``Product`` — the *central scraped pool*. One global row per supplier
+  item, shared by every store. The Celery scraper owns these rows.
+* ``StoreProduct`` — the *tenant catalogue*. Every store has its own
+  rows, either native (created by the vendor) or imported from the
+  central pool. This is what the storefronts display.
+* ``Store`` — the tenant itself: the platform flagship or a vendor
+  sub-store.
+"""
+from decimal import Decimal
+
+from django.conf import settings
 from django.core.validators import MinValueValidator
+from django.db import models
+from django.utils.text import slugify
 
 
 class Category(models.Model):
@@ -189,3 +204,223 @@ class ProductImage(models.Model):
     @property
     def url(self):
         return self.image or ""
+class Store(models.Model):
+    """A tenant: the platform flagship or a vendor sub-store.
+
+    Exactly one store carries ``is_platform_default=True`` — the
+    flagship, which owns the root of the site (``/``) and the central
+    scraped pool. Every other store is served under ``/s/<slug>/``.
+    """
+
+    owner = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="store",
+        null=True,
+        blank=True,
+        help_text="Vendor account owning this store.",
+    )
+    name = models.CharField(max_length=150)
+    slug = models.SlugField(max_length=180, unique=True)
+    is_platform_default = models.BooleanField(
+        default=False, help_text="True for the main flagship store."
+    )
+    tagline = models.CharField(max_length=200, blank=True)
+    description = models.TextField(blank=True)
+    logo_url = models.URLField(max_length=500, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
+    whatsapp_number = models.CharField(max_length=20, blank=True)
+    address = models.CharField(max_length=300, blank=True)
+    default_markup_percentage = models.DecimalField(
+        max_digits=5, decimal_places=2, default=Decimal("25.00"),
+        validators=[MinValueValidator(0)],
+        help_text="Default markup applied to the vendor's own products.",
+    )
+    fixed_margin = models.DecimalField(
+        max_digits=10, decimal_places=3, default=Decimal("0.000"),
+        validators=[MinValueValidator(0)],
+        help_text="Fixed margin added to every sale, in TND.",
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return f"{self.name} {'(Flagship)' if self.is_platform_default else ''}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    @property
+    def storefront_url(self):
+        """Public URL of the store.
+
+        The flagship lives at the root of the site; a sub-store lives
+        under ``/s/<slug>/``.
+        """
+        if self.is_platform_default:
+            return "/"
+        return f"/s/{self.slug}/"
+
+    def price_from_cost(self, cost, markup=None):
+        """Selling price of a product costing ``cost`` TND.
+
+        ``markup`` overrides the store default when the vendor set a
+        custom markup on the product.
+        """
+        cost = Decimal(str(cost or 0))
+        rate = Decimal(str(markup)) if markup is not None else self.default_markup_percentage
+        return ((cost * (1 + rate / Decimal("100"))) + self.fixed_margin).quantize(
+            Decimal("0.001")
+        )
+
+
+class StoreProduct(models.Model):
+    """A product as sold by one store.
+
+    A store-native product (created by the vendor, manually or by bulk
+    import) has no link to the central pool. An imported one keeps a
+    link to the scraped ``Product`` it was cloned from, so the origin
+    stays traceable.
+    """
+
+    store = models.ForeignKey(Store, on_delete=models.CASCADE, related_name="store_products")
+    # Optional link to the central scraped pool (null when the product
+    # was created manually by the vendor).
+    scraped_source_product = models.ForeignKey(
+        "Product", on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="store_instances",
+    )
+    title = models.CharField(max_length=300)
+    slug = models.SlugField(max_length=350)
+    description = models.TextField(blank=True)
+
+    # Financial fields (Tunisian millimes: 3 decimal places).
+    source_cost = models.DecimalField(
+        max_digits=10, decimal_places=3, default=Decimal("0.000"),
+        validators=[MinValueValidator(0)],
+    )
+    custom_markup = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True,
+        validators=[MinValueValidator(0)],
+        help_text="Overrides the store default markup when set.",
+    )
+    selling_price = models.DecimalField(
+        max_digits=10, decimal_places=3, default=Decimal("0.000"),
+        validators=[MinValueValidator(0)],
+    )
+    image_url = models.URLField(max_length=500, blank=True)
+    image_urls = models.JSONField(
+        default=list, blank=True,
+        help_text="Extra image URLs, as imported from the scraped pool.",
+    )
+    category = models.CharField(
+        max_length=150, blank=True,
+        help_text="Free-text category, kept per store to avoid a global taxonomy.",
+    )
+    external_url = models.URLField(max_length=500, blank=True)
+    in_stock = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=True)
+    is_store_native = models.BooleanField(
+        default=False, help_text="True if created manually/bulk by the vendor."
+    )
+    # Persisted display tier, so the flagship listing can be ordered by the
+    # tenant tiers straight from the database: 0 = curated on the main
+    # platform, 1 = native inventory, 2 = imported from the central pool.
+    display_rank = models.PositiveSmallIntegerField(
+        default=2, editable=False,
+        help_text="0 = curated on main, 1 = native, 2 = imported.",
+    )
+
+    # --- Cross-store curation fields for the main platform ---
+    is_featured_on_main = models.BooleanField(
+        default=False,
+        help_text="Flagged by the superadmin to feature on the main platform homepage.",
+    )
+    featured_priority = models.PositiveIntegerField(
+        default=0,
+        help_text="Weight order for the featured placement (higher = higher position).",
+    )
+    featured_curated_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("store", "slug")
+        ordering = ["-featured_priority", "-created_at"]
+        indexes = [
+            models.Index(fields=["store", "is_published"]),
+            models.Index(fields=["is_featured_on_main", "featured_priority"]),
+        ]
+
+    def __str__(self):
+        return f"{self.title} ({self.store.name})"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.title)[:340] or "produit"
+            slug = base
+            index = 2
+            while (
+                StoreProduct.objects.filter(store=self.store, slug=slug)
+                .exclude(pk=self.pk)
+                .exists()
+            ):
+                slug = f"{base}-{index}"
+                index += 1
+            self.slug = slug
+        if not self.selling_price:
+            self.selling_price = self.calculate_price()
+        self.display_rank = self.compute_display_rank()
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None:
+            kwargs["update_fields"] = set(update_fields) | {"display_rank"}
+        super().save(*args, **kwargs)
+
+    def compute_display_rank(self):
+        """The tenant display tier of this product.
+
+        0 — curated by the superadmin for the main platform.
+        1 — native inventory of the store.
+        2 — imported from the central scraped pool.
+        """
+        if self.is_featured_on_main:
+            return 0
+        if self.is_store_native:
+            return 1
+        return 2
+
+    def calculate_price(self):
+        """Selling price computed from the source cost and the markup."""
+        return self.store.price_from_cost(self.source_cost, self.custom_markup)
+
+    @property
+    def margin_amount(self):
+        """Gross margin of the product, in TND."""
+        return (self.selling_price or Decimal("0")) - (self.source_cost or Decimal("0"))
+
+    @property
+    def margin_percent(self):
+        """Gross margin of the product, in percent of the selling price."""
+        if not self.selling_price:
+            return 0
+        return round((self.margin_amount / self.selling_price) * 100, 2)
+
+    @property
+    def tier_rank(self):
+        """Display tier used by the priority ranking.
+
+        1 = store-native inventory, 2 = imported from the central pool.
+        """
+        return 1 if self.is_store_native else 2
+
+    @property
+    def vendor_badge(self):
+        """Name of the store selling this product."""
+        return self.store.name

@@ -31,9 +31,9 @@
                        class="bg-white text-amber-700 hover:bg-amber-50 px-7 py-3.5 rounded-xl font-bold shadow-lg transition">
                         Découvrir le catalogue →
                     </a>
-                    <a href="{% url 'catalog:product_list' %}?on_sale=1&sort_by=discount"
+                    <a href="{% url 'catalog:product_list' %}?in_stock=1&sort_by=featured"
                        class="bg-white/15 hover:bg-white/25 backdrop-blur text-white px-7 py-3.5 rounded-xl font-semibold transition">
-                        🔥 Voir les promotions
+                        🔥 Voir les Sélections
                     </a>
                 </div>
             </div>
@@ -66,6 +66,27 @@
     </div>
 </section>
 
+<!-- ================= CURATED SHOWCASE ================= -->
+{% if showcase %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex items-end justify-between mb-6">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">✨ Sélection de la plateforme</h2>
+            <p class="text-gray-500 mt-1 text-sm">Les produits choisis par notre équipe.</p>
+        </div>
+        <a href="{% url 'catalog:product_list' %}?sort_by=featured"
+           class="text-amber-600 hover:text-amber-700 text-sm font-medium shrink-0">
+            Tout voir →
+        </a>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        {% for product in showcase %}
+        {% include "storefront/partials/_store_product_card.html" with product=product store=store %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
 <!-- ================= CATEGORY SHOWCASE ================= -->
 {% if showcase_categories %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -80,34 +101,15 @@
     </div>
     <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
         {% for category in showcase_categories %}
-        <a href="{% url 'catalog:category_detail' category.slug %}"
+        <a href="{% url 'catalog:product_list' %}?category={{ category.category|urlencode }}"
            class="group bg-white rounded-xl border border-gray-100 hover:border-amber-300 hover:shadow-md p-4 text-center transition">
-            <div class="text-2xl mb-2">{{ category.icon|default:"📦" }}</div>
+            <div class="text-2xl mb-2">📦</div>
             <div class="text-sm font-semibold text-gray-800 group-hover:text-amber-700 leading-tight line-clamp-2">
-                {{ category.name }}
+                {{ category.category }}
             </div>
             <div class="text-xs text-gray-400 mt-1">{{ category.n }} produits</div>
         </a>
         {% endfor %}
-    </div>
-</section>
-{% endif %}
-
-<!-- ================= FLASH DEALS ================= -->
-{% if flash_deals %}
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-red-500 to-orange-500 text-white">
-            <h2 class="font-bold flex items-center gap-2">🔥 Offres du moment</h2>
-            <a href="{% url 'catalog:product_list' %}?on_sale=1&sort_by=discount" class="text-sm font-semibold hover:underline">
-                Toutes les offres →
-            </a>
-        </div>
-        <div class="p-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {% for product in flash_deals %}
-            {% include "storefront/partials/_product_card.html" with product=product %}
-            {% endfor %}
-        </div>
     </div>
 </section>
 {% endif %}
@@ -125,7 +127,7 @@
     </div>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {% for product in new_arrivals %}
-        {% include "storefront/partials/_product_card.html" with product=product %}
+        {% include "storefront/partials/_store_product_card.html" with product=product store=store %}
         {% empty %}
         <div class="col-span-full text-center py-10 text-gray-400 text-sm">
             Le catalogue se remplit — revenez dans un instant.

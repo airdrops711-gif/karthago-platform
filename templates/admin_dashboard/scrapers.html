@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Scrapers &mdash; Superadmin Karthago{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        <div>
+            <a href="{% url 'admin_dashboard:overview' %}" class="text-xs text-gray-400 hover:text-amber-600">&larr; Retour au pilotage</a>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">Scrapers de la plateforme</h1>
+            <p class="text-gray-500 mt-1 text-sm">
+                Registre des sites fournisseurs collect&eacute;s et journaux de synchronisation.
+            </p>
+        </div>
+        <a href="{% url 'admin_dashboard:selector_sandbox' %}"
+           class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800">
+            Bac &agrave; sable des s&eacute;lecteurs
+        </a>
+    </div>
+
+    <!-- Target registry -->
+    <h2 class="text-sm font-bold text-gray-900 mb-3">Registre des sources</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        {% for source in sources %}
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <div class="flex justify-between items-start gap-2 mb-3">
+                <div class="min-w-0">
+                    <h3 class="font-bold text-gray-900 truncate">{{ source.name }}</h3>
+                    <p class="text-xs text-gray-400 truncate">{{ source.base_url }}</p>
+                </div>
+                <span class="shrink-0 px-2 py-1 rounded-full text-[10px] font-bold
+                             {% if source.engine == 'DYNAMIC' %}bg-purple-100 text-purple-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                    {{ source.get_engine_display }}
+                </span>
+            </div>
+
+            <dl class="space-y-1.5 text-xs mb-3">
+                <div class="flex items-center justify-between gap-2">
+                    <dt class="text-gray-500">Conteneur</dt>
+                    <dd class="font-mono text-gray-400 truncate max-w-[12rem]">{{ source.product_container_selector }}</dd>
+                </div>
+                <div class="flex items-center justify-between gap-2">
+                    <dt class="text-gray-500">Titre</dt>
+                    <dd class="font-mono text-gray-400 truncate max-w-[12rem]">{{ source.title_selector }}</dd>
+                </div>
+                <div class="flex items-center justify-between gap-2">
+                    <dt class="text-gray-500">Prix</dt>
+                    <dd class="font-mono text-gray-400 truncate max-w-[12rem]">{{ source.price_selector }}</dd>
+                </div>
+                <div class="flex items-center justify-between gap-2">
+                    <dt class="text-gray-500">Fr&eacute;quence</dt>
+                    <dd class="font-medium text-gray-700">{{ source.sync_frequency_hours }}h</dd>
+                </div>
+            </dl>
+
+            <div class="flex items-center gap-2 pt-3 border-t">
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-bold
+                             {% if source.is_active %}bg-emerald-100 text-emerald-700{% else %}bg-red-100 text-red-600{% endif %}">
+                    {% if source.is_active %}&#9679; Actif{% else %}&#9679; Inactif{% endif %}
+                </span>
+                {% if source.category_name %}
+                <span class="text-[10px] text-gray-400 truncate">{{ source.category_name }}</span>
+                {% endif %}
+                <button type="button"
+                        class="ml-auto px-2.5 py-1 rounded text-[10px] font-bold bg-gray-900 text-white hover:bg-gray-800"
+                        hx-post="{% url 'admin_dashboard:scraper_run' source.id %}"
+                        hx-target="#scraper-run-{{ source.id }}"
+                        hx-swap="outerHTML">
+                    Collecter
+                </button>
+            </div>
+            <div id="scraper-run-{{ source.id }}"></div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12 text-gray-500">
+            Aucune source de scraping configur&eacute;e.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Sync logs -->
+    <h2 class="text-sm font-bold text-gray-900 mb-3">Journaux de synchronisation</h2>
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                    <tr>
+                        <th class="px-4 py-3 font-medium">Source</th>
+                        <th class="px-4 py-3 font-medium">Statut</th>
+                        <th class="px-4 py-3 font-medium text-right">Trouv&eacute;s</th>
+                        <th class="px-4 py-3 font-medium text-right">M.A.J</th>
+                        <th class="px-4 py-3 font-medium">D&eacute;but</th>
+                        <th class="px-4 py-3 font-medium">Fin</th>
+                        <th class="px-4 py-3 font-medium">Erreur</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for log in logs %}
+                    <tr class="hover:bg-gray-50/60">
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ log.source.name }}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 rounded-full text-[10px] font-bold
+                                 {% if log.status == 'success' %}bg-emerald-100 text-emerald-700
+                                 {% elif log.status == 'error' %}bg-red-100 text-red-600
+                                 {% else %}bg-amber-100 text-amber-700{% endif %}">
+                                {{ log.status }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-right">{{ log.products_found }}</td>
+                        <td class="px-4 py-3 text-right">{{ log.products_updated }}</td>
+                        <td class="px-4 py-3 text-xs text-gray-500">{{ log.started_at|date:"d/m H:i" }}</td>
+                        <td class="px-4 py-3 text-xs text-gray-500">
+                            {% if log.finished_at %}{{ log.finished_at|date:"d/m H:i" }}{% else %}&mdash;{% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-xs text-red-500 max-w-[16rem] truncate">
+                            {{ log.errors|default:"" }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-4 py-12 text-center text-gray-400">Aucun journal.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

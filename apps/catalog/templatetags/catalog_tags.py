@@ -6,6 +6,7 @@ prone, so the `filter_url` tag does it from the current request.
 """
 from django import template
 from django.utils.http import urlencode
+from django.utils.text import slugify
 
 register = template.Library()
 
@@ -49,6 +50,9 @@ def category_url(context, slug):
 
     An empty slug returns the catalogue home, so the "Tous les produits"
     entry is a normal link and not a broken /category// path.
+
+    The tenant categories are free text ("TV & Audio"), so the name is
+    slugified to build a clean URL.
     """
     request = context.get("request")
     params = {}
@@ -60,7 +64,7 @@ def category_url(context, slug):
         }
     ordered = sorted(params.items())
     query = urlencode(ordered)
-    base = f"/category/{slug}/" if slug else "/"
+    base = f"/category/{slugify(str(slug))}/" if slug else "/"
     return f"{base}?{query}" if query else base
 
 

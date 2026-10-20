@@ -2,13 +2,16 @@
 
 The critical rule: the order total is always computed by the server from
 the cart rows. A tampered POST must not change the price.
+
+The cart holds ``StoreProduct`` rows since the multi-tenant migration,
+so the fixture builds a flagship store and one product in it.
 """
 from decimal import Decimal
 
 from django.test import TestCase
 from django.urls import reverse
 
-from apps.catalog.models import Category, Product, Supplier
+from apps.catalog.tests.factories import make_flagship, make_store_product
 from apps.orders.models import Cart, Order, OrderEvent, OrderItem
 from apps.orders.services import (
     cart_total,
@@ -19,26 +22,24 @@ from apps.orders.services import (
 
 class OrderServiceTest(TestCase):
     def setUp(self):
-        self.category = Category.objects.create(name="Informatique", slug="informatique")
-        self.supplier = Supplier.objects.create(name="Tunisianet")
-        self.product = Product.objects.create(
-            category=self.category,
-            supplier=self.supplier,
+        self.store = make_flagship()
+        self.product = make_store_product(
+            self.store,
             title="Ordinateur portable",
-            raw_cost=Decimal("100.000"),
-            markup_percent=Decimal("10.00"),
-            fixed_margin_fee=Decimal("0.000"),
-            currency="TND",
-            currency_rate=Decimal("1"),
-            source="https://www.tunisianet.com.tn/produit/1",
-            stock=5,
+            cost="100.000",
+            category="Informatique",
+            source=None,
         )
+        self.product.source_cost = Decimal("100.000")
+        self.product.selling_price = Decimal("110.000")
+        self.product.save()
         self.session_key = "test-session-key"
 
     def _add_to_cart(self, quantity=1, product=None):
         Cart.objects.create(
             session_key=self.session_key,
             product=product or self.product,
+            store=self.store,
             quantity=quantity,
         )
 
@@ -72,12 +73,11 @@ class OrderServiceTest(TestCase):
             governorate="Tunis",
         )
         item = items[0]
-        self.assertEqual(item.supplier_name, "Tunisianet")
-        self.assertEqual(item.source_url, "https://www.tunisianet.com.tn/produit/1")
         self.assertEqual(item.unit_cost, Decimal("100.000"))
-        # The item is linked to the product for live data, but the snapshot
-        # survives a catalogue reset.
-        self.assertEqual(item.product_id, self.product.id)
+        self.assertEqual(item.product_title, "Ordinateur portable")
+        # The order belongs to the store that sold it.
+        self.assertEqual(order.store_id, self.store.id)
+        self.assertEqual(order.customer.store_id, self.store.id)
 
     def test_create_order_empties_the_cart(self):
         self._add_to_cart()
@@ -98,8 +98,8 @@ class OrderServiceTest(TestCase):
                 governorate="Tunis",
             )
 
-    def test_inactive_product_is_not_orderable(self):
-        self.product.is_active = False
+    def test_unpublished_product_is_not_orderable(self):
+        self.product.is_published = False
         self.product.save()
         self._add_to_cart()
         with self.assertRaises(ValueError):
@@ -126,19 +126,21 @@ class OrderStatusTest(TestCase):
     def setUp(self):
         from apps.orders.models import Customer
 
+        self.store = make_flagship()
         self.customer = Customer.objects.create(
             full_name="Ahmed Ben Ali",
             phone="20123456",
             governorate="Tunis",
             address="Tunis",
+            store=self.store,
         )
         self.order = Order.objects.create(
-            customer=self.customer, total_amount=Decimal("110.000")
+            customer=self.customer, store=self.store, total_amount=Decimal("110.000")
         )
 
     def test_change_status_records_the_event(self):
         change_order_status(
-            self.order, Order.STATUS_CONFIRMED, note="Client confirm&eacute;."
+            self.order, Order.STATUS_CONFIRMED, note="Client confirmé."
         )
         self.order.refresh_from_db()
         self.assertEqual(self.order.status, Order.STATUS_CONFIRMED)
@@ -156,24 +158,30 @@ class CheckoutViewSecurityTest(TestCase):
     """The posted total must never decide the price of the order."""
 
     def setUp(self):
-        self.category = Category.objects.create(name="TV", slug="tv")
-        self.supplier = Supplier.objects.create(name="Twenty")
-        self.product = Product.objects.create(
-            category=self.category,
-            supplier=self.supplier,
+        self.store = make_flagship()
+        self.product = make_store_product(
+            self.store,
             title="Television 50 pouces",
-            raw_cost=Decimal("400.000"),
-            markup_percent=Decimal("10.00"),
-            fixed_margin_fee=Decimal("0.000"),
-            stock=3,
+            cost="400.000",
+            category="TV",
         )
+        self.product.source_cost = Decimal("400.000")
+        self.product.selling_price = Decimal("440.000")
+        self.product.save()
 
-    def test_tampered_total_is_ignored(self):
+    def _fill_cart(self, quantity=1):
         session = self.client.session
         session_key = session.session_key
         Cart.objects.create(
-            session_key=session_key, product=self.product, quantity=1
+            session_key=session_key,
+            product=self.product,
+            store=self.store,
+            quantity=quantity,
         )
+        return session_key
+
+    def test_tampered_total_is_ignored(self):
+        self._fill_cart()
         response = self.client.post(
             reverse("orders:checkout"),
             {
@@ -192,10 +200,7 @@ class CheckoutViewSecurityTest(TestCase):
         self.assertEqual(order.total_amount, Decimal("440.000"))
 
     def test_invalid_phone_is_rejected(self):
-        session = self.client.session
-        Cart.objects.create(
-            session_key=session.session_key, product=self.product, quantity=1
-        )
+        self._fill_cart()
         response = self.client.post(
             reverse("orders:checkout"),
             {
@@ -210,10 +215,7 @@ class CheckoutViewSecurityTest(TestCase):
         self.assertEqual(Order.objects.count(), 0)
 
     def test_checkout_creates_the_order_items(self):
-        session = self.client.session
-        Cart.objects.create(
-            session_key=session.session_key, product=self.product, quantity=2
-        )
+        self._fill_cart(quantity=2)
         self.client.post(
             reverse("orders:checkout"),
             {
@@ -229,14 +231,10 @@ class CheckoutViewSecurityTest(TestCase):
         self.assertEqual(items.count(), 1)
         item = items.first()
         self.assertEqual(item.quantity, 2)
-        self.assertEqual(item.supplier_name, "Twenty")
         self.assertEqual(item.unit_price, Decimal("440.000"))
 
     def test_checkout_clears_the_cart(self):
-        session = self.client.session
-        Cart.objects.create(
-            session_key=session.session_key, product=self.product, quantity=1
-        )
+        self._fill_cart()
         self.client.post(
             reverse("orders:checkout"),
             {
@@ -250,10 +248,7 @@ class CheckoutViewSecurityTest(TestCase):
         self.assertEqual(Cart.objects.count(), 0)
 
     def test_checkout_page_renders_with_a_cart(self):
-        session = self.client.session
-        Cart.objects.create(
-            session_key=session.session_key, product=self.product, quantity=2
-        )
+        self._fill_cart(quantity=2)
         response = self.client.get(reverse("orders:checkout"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Television 50 pouces")

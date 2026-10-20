@@ -214,6 +214,16 @@ def sync_source(self, source_id):
                     )
                 except Exception as exc:
                     errors.append(f"image {img_url[:40]!r}: {type(exc).__name__}: {str(exc)[:100]}")
+        # The flagship catalogue is what the platform sells: keep its row
+        # in sync with the source product just scraped.
+        try:
+            from apps.catalog.tenancy import sync_flagship_product
+
+            sync_flagship_product(obj)
+        except Exception as exc:
+            errors.append(
+                f"flagship {title[:40]!r}: {type(exc).__name__}: {str(exc)[:100]}"
+            )
         if not created:
             updated += 1
 

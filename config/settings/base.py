@@ -39,6 +39,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Tenant resolution: runs after the session and the authentication,
+    # because the vendor dashboard needs request.user to find the store.
+    "apps.core.middleware.TenantMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -53,6 +56,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.core.context_processors.tenant_context",
                 "apps.core.context_processors.tunisian_governorates",
                 "apps.core.context_processors.cart_item_count",
                 "apps.core.context_processors.nav_categories",

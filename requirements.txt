@@ -10,3 +10,4 @@ redis>=5.0.0
 # meilisearch-python removed - using raw HTTP client for Meilisearch integration
 python-dotenv>=1.0.0
 Pillow>=10.0.0
+openpyxl>=3.1.0

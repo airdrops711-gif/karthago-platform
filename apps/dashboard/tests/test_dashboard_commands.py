@@ -2,6 +2,9 @@
 
 The dashboard must show, for each order: the client name and phone, the
 supplier of every product, the original cost and the tracking trail.
+
+The order lines now point to a ``StoreProduct`` (the tenant catalogue),
+so the fixture builds a flagship store and one product in it.
 """
 from decimal import Decimal
 
@@ -9,7 +12,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from apps.catalog.models import Category, Product, Supplier
+from apps.catalog.tests.factories import make_flagship, make_store_product
 from apps.orders.models import Customer, Order, OrderEvent, OrderItem
 
 
@@ -20,28 +23,23 @@ class DashboardCommandCentreTest(TestCase):
         )
         self.client.login(username="admin", password="admin123")
 
-        self.category = Category.objects.create(name="Informatique", slug="informatique")
-        self.supplier = Supplier.objects.create(name="Tunisianet")
-        self.product = Product.objects.create(
-            category=self.category,
-            supplier=self.supplier,
+        self.flagship = make_flagship()
+        self.product = make_store_product(
+            self.flagship,
             title="Ordinateur portable X",
-            raw_cost=Decimal("100.000"),
-            markup_percent=Decimal("10.00"),
-            fixed_margin_fee=Decimal("0.000"),
-            currency="TND",
-            currency_rate=Decimal("1"),
-            source="https://www.tunisianet.com.tn/produit/42",
-            stock=7,
+            cost="100.000",
+            category="Informatique",
         )
         self.customer = Customer.objects.create(
             full_name="Ahmed Ben Ali",
             phone="20123456",
             governorate="Tunis",
             address="Tunis, 10 Rue de Carthage",
+            store=self.flagship,
         )
         self.order = Order.objects.create(
             customer=self.customer,
+            store=self.flagship,
             total_amount=Decimal("110.000"),
             total_cost=Decimal("100.000"),
         )

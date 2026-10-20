@@ -1,4 +1,9 @@
-"""Dashboard views: executive analytics + order command centre."""
+"""Dashboard views: executive analytics + order command centre.
+
+The dashboard is the vendor control panel: it shows the data of the
+tenant resolved by the middleware. A staff account without a store of
+its own operates on the flagship.
+"""
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
@@ -8,7 +13,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from datetime import timedelta
 
-from apps.catalog.models import Product
+from apps.catalog.models import StoreProduct
 from apps.orders.models import Order, OrderItem, Delivery, OrderEvent
 from apps.scraper.models import ScraperLog
 from apps.dashboard.services import financial_unit_economics, delivery_kpis
@@ -23,6 +28,23 @@ def _is_staff(user):
 staff_required = user_passes_test(_is_staff)
 
 
+def _tenant_store(request):
+    """The store the dashboard belongs to (the flagship by default)."""
+    return getattr(request, "tenant_store", None)
+
+
+def _scoped(queryset, request, field="store"):
+    """Restrict a queryset to the tenant of the request.
+
+    A vendor only ever sees its own rows. A staff account working on the
+    flagship sees the whole platform.
+    """
+    store = _tenant_store(request)
+    if store is None or store.is_platform_default:
+        return queryset
+    return queryset.filter(**{field: store})
+
+
 @login_required
 @staff_required
 def overview(request):
@@ -31,28 +53,33 @@ def overview(request):
     week_ago = today - timedelta(days=7)
     month_ago = today - timedelta(days=30)
 
-    # KPI Cards
-    total_products = Product.objects.count()
-    active_products = Product.objects.filter(is_active=True).count()
-    total_orders = Order.objects.count()
+    store = _tenant_store(request)
+
+    # KPI Cards: the catalogue of the tenant, not the central pool.
+    products = _scoped(StoreProduct.objects.all(), request)
+    total_products = products.count()
+    active_products = products.filter(is_published=True, in_stock=True).count()
+
+    orders = _scoped(Order.objects.all(), request)
+    total_orders = orders.count()
 
     # Financial KPIs
-    gmv_today = Order.objects.filter(created_at__date=today).aggregate(total=Sum("total_amount"))["total"] or 0
-    gmv_7d = Order.objects.filter(created_at__date__gte=week_ago).aggregate(total=Sum("total_amount"))["total"] or 0
-    gmv_mtd = Order.objects.filter(created_at__date__gte=month_ago).aggregate(total=Sum("total_amount"))["total"] or 0
+    gmv_today = orders.filter(created_at__date=today).aggregate(total=Sum("total_amount"))["total"] or 0
+    gmv_7d = orders.filter(created_at__date__gte=week_ago).aggregate(total=Sum("total_amount"))["total"] or 0
+    gmv_mtd = orders.filter(created_at__date__gte=month_ago).aggregate(total=Sum("total_amount"))["total"] or 0
 
     # Delivery KPIs
     deliv = delivery_kpis()
 
     # Pending confirmations (action items)
-    pending_confirmations = Order.objects.filter(status=Order.STATUS_PENDING_CONFIRMATION).count()
+    pending_confirmations = orders.filter(status=Order.STATUS_PENDING_CONFIRMATION).count()
 
     # Recent scraper logs
     recent_logs = ScraperLog.objects.order_by("-started_at")[:5]
 
     # Chart data: GMV by day (last 7 days)
     gmv_by_day = (
-        Order.objects.filter(created_at__date__gte=week_ago)
+        orders.filter(created_at__date__gte=week_ago)
         .annotate(day=TruncDay("created_at"))
         .values("day")
         .annotate(total=Sum("total_amount"), count=Count("id"))
@@ -61,32 +88,33 @@ def overview(request):
 
     # Chart data: orders by status
     orders_by_status = (
-        Order.objects.values("status")
+        orders.values("status")
         .annotate(count=Count("id"), revenue=Sum("total_amount"))
         .order_by("-count")
     )
 
     # Top products by revenue
     top_products = (
-        Product.objects.filter(is_active=True)
-        .order_by("-retail_price")[:5]
+        products.filter(is_published=True)
+        .order_by("-selling_price")[:5]
     )
 
     # Command centre: the orders waiting for a phone confirmation.
     action_orders = (
-        Order.objects.filter(status=Order.STATUS_PENDING_CONFIRMATION)
+        orders.filter(status=Order.STATUS_PENDING_CONFIRMATION)
         .select_related("customer")
         .prefetch_related("items")[:10]
     )
 
     # Margin snapshot: what the business actually earns per order.
-    margin_stats = Order.objects.aggregate(
+    margin_stats = orders.aggregate(
         revenue=Sum("total_amount"),
         cost=Sum("total_cost"),
         avg_margin=Avg("total_amount"),
     )
 
     return render(request, "dashboard/overview.html", {
+        "store": store,
         "total_products": total_products,
         "active_products": active_products,
         "total_orders": total_orders,
@@ -123,7 +151,9 @@ def orders_list(request):
     status = (request.GET.get("status") or "").strip()
     query = (request.GET.get("q") or "").strip()
 
-    orders = Order.objects.select_related("customer").prefetch_related("items")
+    orders = _scoped(
+        Order.objects.select_related("customer").prefetch_related("items"), request
+    )
 
     if status:
         orders = orders.filter(status=status)
@@ -139,7 +169,9 @@ def orders_list(request):
     # Counts per status, for the filter pills.
     counts = {
         row["status"]: row["count"]
-        for row in Order.objects.values("status").annotate(count=Count("id"))
+        for row in _scoped(Order.objects.all(), request)
+        .values("status")
+        .annotate(count=Count("id"))
     }
     counts["ALL"] = sum(counts.values())
 
@@ -166,7 +198,12 @@ def order_detail(request, order_id):
     trail of the status changes.
     """
     order = get_object_or_404(
-        Order.objects.select_related("customer").prefetch_related("items", "events"),
+        _scoped(
+            Order.objects.select_related("customer").prefetch_related(
+                "items", "events"
+            ),
+            request,
+        ),
         pk=order_id,
     )
     items = list(order.items.all())
@@ -194,7 +231,7 @@ def order_detail(request, order_id):
 @staff_required
 def order_update_status(request, order_id):
     """Move an order to a new status (HTMX, from the command sheet)."""
-    order = get_object_or_404(Order, pk=order_id)
+    order = get_object_or_404(_scoped(Order.objects.all(), request), pk=order_id)
     new_status = (request.POST.get("status") or "").strip()
     note = (request.POST.get("note") or "").strip()
 
@@ -212,7 +249,7 @@ def order_update_status(request, order_id):
 @staff_required
 def order_note(request, order_id):
     """Append an internal note to an order (HTMX)."""
-    order = get_object_or_404(Order, pk=order_id)
+    order = get_object_or_404(_scoped(Order.objects.all(), request), pk=order_id)
     note = (request.POST.get("note") or "").strip()
     if note:
         OrderEvent.objects.create(
@@ -234,7 +271,7 @@ def order_call(request, order_id):
     Records that the operator called the client, without changing the
     order status: the status is changed explicitly from the command sheet.
     """
-    order = get_object_or_404(Order, pk=order_id)
+    order = get_object_or_404(_scoped(Order.objects.all(), request), pk=order_id)
     outcome = (request.POST.get("outcome") or "Appel effectué").strip()
     OrderEvent.objects.create(
         order=order,

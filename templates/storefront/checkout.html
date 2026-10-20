@@ -16,7 +16,7 @@
                     {{ item.quantity }} &times; {{ item.product.title }}
                 </span>
                 <span class="font-medium text-gray-900 whitespace-nowrap">
-                    {{ item.product.retail_price|mul:item.quantity }} DT
+                    {{ item.product.selling_price|mul:item.quantity }} DT
                 </span>
             </li>
             {% endfor %}

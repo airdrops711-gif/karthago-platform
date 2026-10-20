@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ product.title }} &mdash; Vue fournisseur | Karthago{% endblock %}
+{% block meta_description %}Fiche fournisseur de {{ product.title }} — {{ product.retail_price }} DT.{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 flex items-start gap-3">
+        <span class="text-lg">🔎</span>
+        <div>
+            <p class="text-sm font-semibold text-amber-900">Fiche fournisseur — pas une page de vente</p>
+            <p class="text-xs text-amber-700 mt-0.5">
+                Ce produit appartient au pool central de la plateforme. Un boutique
+                partenaire peut l'importer dans son propre catalogue depuis son tableau de bord.
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="h-64 bg-gray-50">
+                {% if product_images %}
+                <img src="{{ product_images.0 }}" alt="{{ product.title }}" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center text-gray-300 text-3xl">📦</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+            <span class="text-xs font-bold text-amber-700 uppercase tracking-wider">
+                {{ product.category.name|default:"Produit" }}
+            </span>
+            <h1 class="text-2xl font-bold text-gray-900 mt-1 mb-3">{{ product.title }}</h1>
+            {% if product.description %}
+            <p class="text-gray-600 text-sm mb-5">{{ product.description|truncatechars:400 }}</p>
+            {% endif %}
+
+            <dl class="space-y-2 text-sm border-t border-gray-100 pt-4">
+                <div class="flex justify-between">
+                    <dt class="text-gray-500">Coût fournisseur</dt>
+                    <dd class="font-semibold text-gray-900">{{ product.raw_cost }} {{ product.currency }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-gray-500">Prix plateforme</dt>
+                    <dd class="font-semibold text-amber-700">{{ product.retail_price }} DT</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-gray-500">Fournisseur</dt>
+                    <dd class="font-semibold text-gray-900">{{ product.supplier.name|default:"—" }}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-gray-500">Stock</dt>
+                    <dd class="font-semibold text-gray-900">{{ product.stock }}</dd>
+                </div>
+            </dl>
+
+            {% if product.source %}
+            <a href="{{ product.source }}" target="_blank" rel="noopener"
+               class="mt-5 block text-center text-sm text-amber-700 font-medium hover:underline">
+                Ouvrir la page du fournisseur →
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

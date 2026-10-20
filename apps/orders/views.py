@@ -1,15 +1,20 @@
-"""Order views: 1-step checkout and COD confirmation."""
+"""Order views: 1-step checkout and COD confirmation.
+
+The cart and the checkout are scoped to a tenant: the store resolved by
+the middleware owns the cart rows, and the order is attached to it.
+"""
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.http import HttpResponse
 from django.db.models import Sum
 
+from apps.catalog.models import StoreProduct
 from .models import Customer, Order, OrderItem, Cart
-from apps.catalog.models import Product
 from .services import (
     cart_lines,
     cart_total,
+    cart_store,
     create_order_from_cart,
     change_order_status,
 )
@@ -28,19 +33,29 @@ def _session_key(request):
     return key
 
 
+def _tenant_store(request):
+    """The store of the current request (the flagship by default)."""
+    store = getattr(request, "tenant_store", None)
+    if store is not None:
+        return store
+    return cart_store(_session_key(request))
+
+
 class CheckoutView(View):
     """One-step checkout with COD, priced from the server-side cart."""
 
     def get(self, request):
         session_key = _session_key(request)
-        items = list(cart_lines(session_key))
+        store = _tenant_store(request)
+        items = list(cart_lines(session_key, store))
         return render(
             request,
             "storefront/checkout.html",
             {
                 "governorates": TUNISIAN_GOVERNORATES,
                 "cart_items": items,
-                "total": cart_total(session_key),
+                "total": cart_total(session_key, store),
+                "store": store,
             },
         )
 
@@ -62,6 +77,7 @@ class CheckoutView(View):
             error = "L'adresse est obligatoire."
 
         session_key = _session_key(request)
+        store = _tenant_store(request)
 
         if error is None:
             try:
@@ -74,6 +90,7 @@ class CheckoutView(View):
                     delegation=delegation,
                     address=address,
                     notes=notes,
+                    store=store,
                 )
             except ValueError:
                 error = "Votre panier est vide."
@@ -114,7 +131,9 @@ class OrderDetailView(View):
 
     def get(self, request, order_id):
         order = get_object_or_404(
-            Order.objects.select_related("customer").prefetch_related("items", "events"),
+            Order.objects.select_related("customer", "store").prefetch_related(
+                "items", "events"
+            ),
             pk=order_id,
         )
         return render(request, "storefront/order_detail.html", {"order": order})
@@ -125,13 +144,15 @@ class CartView(View):
 
     def get(self, request):
         session_key = _session_key(request)
-        items = list(cart_lines(session_key))
+        store = _tenant_store(request)
+        items = list(cart_lines(session_key, store))
         return render(
             request,
             "storefront/cart.html",
             {
                 "cart_items": items,
-                "total": cart_total(session_key),
+                "total": cart_total(session_key, store),
+                "store": store,
             },
         )
 
@@ -140,7 +161,13 @@ class AddToCartView(View):
     """Add a product to the cart via HTMX."""
 
     def post(self, request, product_id):
-        product = get_object_or_404(Product, pk=product_id)
+        store = _tenant_store(request)
+        # The product must belong to the store of the request: a visitor
+        # on a sub-store cannot add a flagship product.
+        product = get_object_or_404(
+            StoreProduct.objects.filter(store=store, is_published=True),
+            pk=product_id,
+        )
         session_key = _session_key(request)
 
         quantity = int(request.POST.get("quantity", 1) or 1)
@@ -148,7 +175,7 @@ class AddToCartView(View):
         cart_item, created = Cart.objects.get_or_create(
             session_key=session_key,
             product=product,
-            defaults={"quantity": quantity},
+            defaults={"quantity": quantity, "store": store},
         )
         if not created:
             cart_item.quantity += quantity
@@ -181,7 +208,7 @@ class UpdateCartQuantityView(View):
             cart_item.quantity = quantity
             cart_item.save()
 
-        total = cart_total(session_key)
+        total = cart_total(session_key, cart_item.store)
         cart_count = Cart.objects.filter(session_key=session_key).aggregate(
             total=Sum("quantity")
         )["total"] or 0

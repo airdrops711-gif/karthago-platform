@@ -24,25 +24,23 @@
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
-                            {% if item.product.images.first %}
-                            <img src="{{ item.product.images.first.url }}" alt="{{ item.product.title }}" class="w-12 h-12 object-cover rounded" loading="lazy">
+                            {% if item.product.image_url %}
+                            <img src="{{ item.product.image_url }}" alt="{{ item.product.title }}" class="w-12 h-12 object-cover rounded" loading="lazy">
                             {% else %}
                             <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">&#128230;</div>
                             {% endif %}
                             <div class="min-w-0">
-                                <a href="{% url 'catalog:product_detail' item.product.id %}"
+                                <a href="{% if is_sub_store %}{% url 'catalog:substore_product' store.slug item.product.id %}{% else %}{% url 'catalog:product_detail' item.product.id %}{% endif %}"
                                    class="text-sm font-medium text-gray-900 hover:text-amber-700 line-clamp-2">{{ item.product.title }}</a>
-                                {% if item.product.supplier %}
-                                <p class="text-xs text-gray-500 mt-0.5">{{ item.product.supplier.name }}</p>
-                                {% endif %}
+                                <p class="text-xs text-gray-500 mt-0.5">{{ item.product.vendor_badge }}</p>
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-900 text-right whitespace-nowrap">{{ item.product.retail_price }} DT</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 text-right whitespace-nowrap">{{ item.product.selling_price }} DT</td>
                     <td class="px-6 py-4 text-center">
                         <span class="text-sm font-medium text-gray-900">{{ item.quantity }}</span>
                     </td>
-                    <td class="px-6 py-4 text-sm font-medium text-gray-900 text-right whitespace-nowrap">{{ item.product.retail_price|mul:item.quantity }} DT</td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900 text-right whitespace-nowrap">{{ item.product.selling_price|mul:item.quantity }} DT</td>
                     <td class="px-6 py-4 text-right">
                         <form hx-post="{% url 'orders:remove_from_cart' item.id %}" hx-target="this" hx-swap="outerHTML" class="inline">
                             {% csrf_token %}
@@ -60,19 +58,19 @@
         {% for item in cart_items %}
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
             <div class="flex gap-3">
-                {% if item.product.images.first %}
-                <img src="{{ item.product.images.first.url }}" alt="{{ item.product.title }}" class="w-16 h-16 object-cover rounded shrink-0" loading="lazy">
+                {% if item.product.image_url %}
+                <img src="{{ item.product.image_url }}" alt="{{ item.product.title }}" class="w-16 h-16 object-cover rounded shrink-0" loading="lazy">
                 {% else %}
                 <div class="w-16 h-16 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs shrink-0">&#128230;</div>
                 {% endif %}
                 <div class="min-w-0 flex-1">
-                    <a href="{% url 'catalog:product_detail' item.product.id %}"
+                    <a href="{% if is_sub_store %}{% url 'catalog:substore_product' store.slug item.product.id %}{% else %}{% url 'catalog:product_detail' item.product.id %}{% endif %}"
                        class="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-amber-700">{{ item.product.title }}</a>
                     <p class="text-sm text-gray-500 mt-1">
-                        {{ item.product.retail_price }} DT &times; {{ item.quantity }}
+                        {{ item.product.selling_price }} DT &times; {{ item.quantity }}
                     </p>
                     <p class="text-base font-bold text-amber-700 mt-1">
-                        {{ item.product.retail_price|mul:item.quantity }} DT
+                        {{ item.product.selling_price|mul:item.quantity }} DT
                     </p>
                 </div>
             </div>
