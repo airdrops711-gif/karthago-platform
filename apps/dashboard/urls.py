@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import store_settings
 from apps.catalog import product_ingestion
 
 app_name = "dashboard"
@@ -8,6 +9,7 @@ urlpatterns = [
     path("", views.overview, name="overview"),
     path("finances/", views.finances, name="finances"),
     path("scrapers/", views.scrapers, name="scrapers"),
+    path("store/", store_settings.store_settings, name="store_settings"),
     path("orders/", views.orders_list, name="orders"),
     path("orders/<int:order_id>/", views.order_detail, name="order_detail"),
     path("orders/<int:order_id>/status/", views.order_update_status, name="order_update_status"),

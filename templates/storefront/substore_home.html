@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% load static %}
-{% block title %}{{ store.name }} &mdash; Karthago Commerce{% endblock %}
-{% block meta_description %}{{ store.tagline|default:store.description|default:"Boutique partenaire Karthago" }} — {{ store.name }}. Paiement à la livraison partout en Tunisie.{% endblock %}
+{% load static i18n %}
+{% block title %}{{ store.name }} {% trans '&mdash; Karthago Commerce' %}{% endblock %}
+{% block meta_description %}{{ store.tagline|default:store.description|default:"Boutique partenaire Karthago" }} — {{ store.name }}{% trans '. Paiement à la livraison partout en Tunisie.' %}{% endblock %}
 {% block content %}
 
 <!-- ================= STORE HEADER ================= -->
@@ -17,7 +17,7 @@
             {% endif %}
             <div>
                 <span class="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur px-2.5 py-1 rounded-full text-[11px] font-semibold mb-2">
-                    🏪 Boutique partenaire
+                    {% trans '🏪 Boutique partenaire' %}
                 </span>
                 <h1 class="text-2xl sm:text-3xl font-black tracking-tight">{{ store.name }}</h1>
                 {% if store.tagline %}
@@ -27,19 +27,16 @@
         </div>
 
         <div class="mt-6 flex flex-wrap gap-3">
-            <a href="{% url 'catalog:substore_catalog' store.slug %}"
-               class="bg-amber-500 hover:bg-amber-400 text-gray-900 px-6 py-2.5 rounded-xl font-bold text-sm transition">
-                Voir le catalogue →
+            <a href="{% url 'catalog:substore_catalog' store.slug %}" class="bg-amber-500 hover:bg-amber-400 text-gray-900 px-6 py-2.5 rounded-xl font-bold text-sm transition">
+                {% trans 'Voir le catalogue →' %}
             </a>
             {% if store.whatsapp_number %}
-            <a href="https://wa.me/216{{ store.whatsapp_number }}"
-               class="bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition">
-                WhatsApp
+            <a href="https://wa.me/216{{ store.whatsapp_number }}" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition">
+                {% trans 'WhatsApp' %}
             </a>
             {% endif %}
             {% if store.phone_number %}
-            <a href="tel:{{ store.phone_number }}"
-               class="bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition">
+            <a href="tel:{{ store.phone_number }}" class="bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition">
                 📞 {{ store.phone_number }}
             </a>
             {% endif %}
@@ -47,20 +44,20 @@
 
         <dl class="mt-6 flex flex-wrap gap-6 text-sm">
             <div>
-                <dt class="text-gray-400 text-xs uppercase tracking-wider">Produits</dt>
+                <dt class="text-gray-400 text-xs uppercase tracking-wider">{% trans 'Produits' %}</dt>
                 <dd class="font-bold text-lg">{{ total_products }}</dd>
             </div>
             <div>
-                <dt class="text-gray-400 text-xs uppercase tracking-wider">Catégories</dt>
+                <dt class="text-gray-400 text-xs uppercase tracking-wider">{% trans 'Catégories' %}</dt>
                 <dd class="font-bold text-lg">{{ categories|length }}</dd>
             </div>
             <div>
-                <dt class="text-gray-400 text-xs uppercase tracking-wider">Livraison</dt>
-                <dd class="font-bold text-lg">24-48h</dd>
+                <dt class="text-gray-400 text-xs uppercase tracking-wider">{% trans 'Livraison' %}</dt>
+                <dd class="font-bold text-lg">{% trans '24-48h' %}</dd>
             </div>
             <div>
-                <dt class="text-gray-400 text-xs uppercase tracking-wider">Paiement</dt>
-                <dd class="font-bold text-lg">À la livraison</dd>
+                <dt class="text-gray-400 text-xs uppercase tracking-wider">{% trans 'Paiement' %}</dt>
+                <dd class="font-bold text-lg">{% trans 'À la livraison' %}</dd>
             </div>
         </dl>
     </div>
@@ -69,11 +66,10 @@
 <!-- ================= CATEGORIES ================= -->
 {% if categories %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h2 class="text-lg font-bold text-gray-900 mb-4">Catégories</h2>
+    <h2 class="text-lg font-bold text-gray-900 mb-4">{% trans 'Catégories' %}</h2>
     <div class="flex flex-wrap gap-2">
         {% for category in categories %}
-        <a href="{% url 'catalog:substore_catalog' store.slug %}?category={{ category.category|urlencode }}"
-           class="px-3 py-1.5 rounded-full text-sm font-medium bg-white border border-gray-200 text-gray-700 hover:border-amber-300 hover:text-amber-700 transition">
+        <a href="{% url 'catalog:substore_catalog' store.slug %}?category={{ category.category|urlencode }}" class="px-3 py-1.5 rounded-full text-sm font-medium bg-white border border-gray-200 text-gray-700 hover:border-amber-300 hover:text-amber-700 transition">
             {{ category.category }}
             <span class="text-gray-400 ml-1">({{ category.n }})</span>
         </a>
@@ -85,16 +81,15 @@
 <!-- ================= PRODUCTS ================= -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
     <div class="flex items-end justify-between mb-5">
-        <h2 class="text-xl font-bold text-gray-900">Nos produits</h2>
-        <a href="{% url 'catalog:substore_catalog' store.slug %}"
-           class="text-amber-600 hover:text-amber-700 text-sm font-medium">Tout voir →</a>
+        <h2 class="text-xl font-bold text-gray-900">{% trans 'Nos produits' %}</h2>
+        <a href="{% url 'catalog:substore_catalog' store.slug %}" class="text-amber-600 hover:text-amber-700 text-sm font-medium">{% trans 'Tout voir →' %}</a>
     </div>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {% for product in products %}
         {% include "storefront/partials/_store_product_card.html" with product=product store=store %}
         {% empty %}
         <div class="col-span-full text-center py-10 text-gray-400 text-sm">
-            Cette boutique n'a pas encore de produits publiés.
+            {% trans 'Cette boutique n\'a pas encore de produits publiés.' %}
         </div>
         {% endfor %}
     </div>

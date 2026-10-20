@@ -1,0 +1,23 @@
+{% load i18n %}
+{% comment %}
+Language switcher (FR / AR).
+
+The choice is posted to ``/i18n/setlang/``, which stores it in a cookie
+and sends the visitor back to the page they came from.
+{% endcomment %}
+<div class="flex items-center gap-0.5 rounded-lg border border-gray-200 bg-white overflow-hidden" role="group" aria-label="{% trans 'Langue' %}">
+    {% for code, name in LANGUAGES %}
+    <form method="post" action="{% url 'set_language' %}" class="contents">
+        {% csrf_token %}
+        <input type="hidden" name="language" value="{{ code }}">
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit"
+                class="px-2.5 py-1 text-xs font-semibold transition
+                       {% if LANGUAGE_CODE == code %}bg-amber-600 text-white{% else %}text-gray-500 hover:text-amber-700 hover:bg-amber-50{% endif %}"
+                title="{{ name }}"
+                {% if LANGUAGE_CODE == code %}aria-current="true"{% endif %}>
+            {% if code == 'ar' %}ع{% else %}FR{% endif %}
+        </button>
+    </form>
+    {% endfor %}
+</div>

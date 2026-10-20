@@ -104,3 +104,56 @@ th, td {
 tr:hover {
     background: #f9fafb;
 }
+
+/* ================= Bilingual (FR / AR) ================= */
+/* The Arabic pages are written from right to left. Tailwind's logical
+   utilities (ms-*, me-*, text-start, text-end) handle most of the
+   mirroring, but the few hardcoded left/right offsets of the layout
+   are corrected here. */
+
+html[dir="rtl"] body {
+    text-align: right;
+}
+
+/* The absolute icons of the search inputs follow the writing
+   direction. */
+html[dir="rtl"] .search-icon-left {
+    left: auto;
+    right: 0.75rem;
+}
+html[dir="rtl"] .search-input-left {
+    padding-left: 1rem;
+    padding-right: 2.5rem;
+}
+
+/* The badges pinned to a corner of a card. */
+html[dir="rtl"] .badge-top-left {
+    left: auto;
+    right: 0.5rem;
+}
+html[dir="rtl"] .badge-top-right {
+    right: auto;
+    left: 0.5rem;
+}
+
+/* The Arabic numerals stay in the Latin form for the prices, which
+   is what the Tunisian shoppers read. */
+html[dir="rtl"] .price,
+html[dir="rtl"] .tabular {
+    direction: ltr;
+    display: inline-block;
+    text-align: left;
+}
+
+/* The arrows of the "next / previous" links point the other way. */
+html[dir="rtl"] .rtl-flip {
+    transform: scaleX(-1);
+    display: inline-block;
+}
+
+/* The tables keep their numbers aligned to the right in both
+   directions. */
+html[dir="rtl"] table th,
+html[dir="rtl"] table td {
+    text-align: right;
+}

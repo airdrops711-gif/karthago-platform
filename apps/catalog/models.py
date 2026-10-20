@@ -425,6 +425,33 @@ class ActiveStoreProductManager(models.Manager):
         )
 
 
+class StoreLogo(models.Model):
+    """The logo of a store, stored in the database.
+
+    The web pods are ephemeral: a file written in the container
+    filesystem disappears with the pod, and the ``/media/`` directory
+    is not served in production. The logo is therefore kept in the
+    database and served by a dedicated view, so a vendor can upload it
+    once and it survives every rollout.
+    """
+
+    store = models.OneToOneField(
+        Store, on_delete=models.CASCADE, related_name="logo"
+    )
+    image = models.BinaryField(verbose_name="image du logo")
+    content_type = models.CharField(max_length=50, default="image/png")
+    width = models.PositiveIntegerField(default=0)
+    height = models.PositiveIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Logo de boutique"
+        verbose_name_plural = "Logos de boutique"
+
+    def __str__(self):
+        return f"Logo de {self.store.name}"
+
+
 class StoreProduct(models.Model):
     """A product as sold by one store.
 

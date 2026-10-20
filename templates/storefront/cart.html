@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 {% load cart_tags %}
-{% block title %}Panier &mdash; Karthago Commerce{% endblock %}
+{% block title %}{% trans 'Panier &mdash; Karthago Commerce' %}{% endblock %}
 {% block content %}
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Votre Panier</h1>
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">{% trans 'Votre Panier' %}</h1>
 
     {% if cart_items %}
     <!-- Desktop table -->
@@ -12,11 +12,11 @@
         <table class="w-full text-left">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-sm font-medium text-gray-500">Produit</th>
-                    <th class="px-6 py-3 text-sm font-medium text-gray-500 text-right">Prix unitaire</th>
-                    <th class="px-6 py-3 text-sm font-medium text-gray-500 text-center">Quantit&eacute;</th>
-                    <th class="px-6 py-3 text-sm font-medium text-gray-500 text-right">Total</th>
-                    <th class="px-6 py-3 text-sm font-medium text-gray-500 text-right">Action</th>
+                    <th class="px-6 py-3 text-sm font-medium text-gray-500">{% trans 'Produit' %}</th>
+                    <th class="px-6 py-3 text-sm font-medium text-gray-500 text-right">{% trans 'Prix unitaire' %}</th>
+                    <th class="px-6 py-3 text-sm font-medium text-gray-500 text-center">{% trans 'Quantit&eacute;' %}</th>
+                    <th class="px-6 py-3 text-sm font-medium text-gray-500 text-right">{% trans 'Total' %}</th>
+                    <th class="px-6 py-3 text-sm font-medium text-gray-500 text-right">{% trans 'Action' %}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -30,21 +30,20 @@
                             <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">&#128230;</div>
                             {% endif %}
                             <div class="min-w-0">
-                                <a href="{% if is_sub_store %}{% url 'catalog:substore_product' store.slug item.product.id %}{% else %}{% url 'catalog:product_detail' item.product.id %}{% endif %}"
-                                   class="text-sm font-medium text-gray-900 hover:text-amber-700 line-clamp-2">{{ item.product.title }}</a>
+                                <a href="{% if is_sub_store %}{% url 'catalog:substore_product' store.slug item.product.id %}{% else %}{% url 'catalog:product_detail' item.product.id %}{% endif %}" class="text-sm font-medium text-gray-900 hover:text-amber-700 line-clamp-2">{{ item.product.title }}</a>
                                 <p class="text-xs text-gray-500 mt-0.5">{{ item.product.vendor_badge }}</p>
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-900 text-right whitespace-nowrap">{{ item.product.selling_price }} DT</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 text-right whitespace-nowrap">{{ item.product.selling_price }} {% trans 'DT' %}</td>
                     <td class="px-6 py-4 text-center">
                         <span class="text-sm font-medium text-gray-900">{{ item.quantity }}</span>
                     </td>
-                    <td class="px-6 py-4 text-sm font-medium text-gray-900 text-right whitespace-nowrap">{{ item.product.selling_price|mul:item.quantity }} DT</td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900 text-right whitespace-nowrap">{{ item.product.selling_price|mul:item.quantity }} {% trans 'DT' %}</td>
                     <td class="px-6 py-4 text-right">
                         <form hx-post="{% url 'orders:remove_from_cart' item.id %}" hx-target="this" hx-swap="outerHTML" class="inline">
                             {% csrf_token %}
-                            <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-medium">Supprimer</button>
+                            <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-medium">{% trans 'Supprimer' %}</button>
                         </form>
                     </td>
                 </tr>
@@ -64,20 +63,19 @@
                 <div class="w-16 h-16 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs shrink-0">&#128230;</div>
                 {% endif %}
                 <div class="min-w-0 flex-1">
-                    <a href="{% if is_sub_store %}{% url 'catalog:substore_product' store.slug item.product.id %}{% else %}{% url 'catalog:product_detail' item.product.id %}{% endif %}"
-                       class="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-amber-700">{{ item.product.title }}</a>
+                    <a href="{% if is_sub_store %}{% url 'catalog:substore_product' store.slug item.product.id %}{% else %}{% url 'catalog:product_detail' item.product.id %}{% endif %}" class="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-amber-700">{{ item.product.title }}</a>
                     <p class="text-sm text-gray-500 mt-1">
-                        {{ item.product.selling_price }} DT &times; {{ item.quantity }}
+                        {{ item.product.selling_price }} {% trans 'DT &times;' %} {{ item.quantity }}
                     </p>
                     <p class="text-base font-bold text-amber-700 mt-1">
-                        {{ item.product.selling_price|mul:item.quantity }} DT
+                        {{ item.product.selling_price|mul:item.quantity }} {% trans 'DT' %}
                     </p>
                 </div>
             </div>
             <form hx-post="{% url 'orders:remove_from_cart' item.id %}" hx-target="this" hx-swap="outerHTML" class="mt-3">
                 {% csrf_token %}
                 <button type="submit" class="w-full border border-red-200 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-medium">
-                    Supprimer
+                    {% trans 'Supprimer' %}
                 </button>
             </form>
         </div>
@@ -86,11 +84,10 @@
 
     <div class="mt-8 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
         <div class="text-lg font-bold text-gray-900">
-            Total: <span id="cart-total">{{ total }} DT</span>
+            {% trans 'Total:' %} <span id="cart-total">{{ total }} {% trans 'DT' %}</span>
         </div>
-        <a href="{% url 'orders:checkout' %}"
-           class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-medium shadow-lg transition text-center">
-            Passer la commande &rarr;
+        <a href="{% url 'orders:checkout' %}" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-medium shadow-lg transition text-center">
+            {% trans 'Passer la commande &rarr;' %}
         </a>
     </div>
     {% else %}
@@ -98,10 +95,10 @@
         <div class="bg-gray-100 rounded-xl p-8 inline-block mb-6">
             <span class="text-4xl" aria-hidden="true">&#128722;</span>
         </div>
-        <h2 class="text-2xl font-bold text-gray-900 mb-2">Votre panier est vide</h2>
-        <p class="text-gray-600 mb-6">Ajoutez des produits pour commencer vos achats.</p>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">{% trans 'Votre panier est vide' %}</h2>
+        <p class="text-gray-600 mb-6">{% trans 'Ajoutez des produits pour commencer vos achats.' %}</p>
         <a href="{% url 'catalog:product_list' %}" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-medium">
-            D&eacute;couvrir les produits &rarr;
+            {% trans 'D&eacute;couvrir les produits &rarr;' %}
         </a>
     </div>
     {% endif %}

@@ -1,0 +1,2956 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Karthago Commerce\n"
+"Last-Translator: Karthago\n"
+"Language-Team: Karthago\n"
+"Language: Arabic\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+
+#: base.html:9 base.html:17
+msgid "Karthago — Dropshipping Tunisia"
+msgstr "كَرْتاغو — دروبشيبينغ تونس"
+
+#: base.html:10
+msgid ""
+"Karthago importe des produits réels depuis les meilleurs fournisseurs "
+"tunisiens. Paiement à la livraison dans toute la Tunisie, expédition sous 24"
+" à 48 heures."
+msgstr ""
+"كَرْتاغو تستورد منتجات حقيقية من أفضل المورّدين التونسيين. الدفع عند "
+"الاستلام في كامل تونس، والشحن خلال 24 إلى 48 ساعة."
+
+#: base.html:18
+msgid ""
+"Produits réels importés des fournisseurs tunisiens, paiement à la livraison "
+"partout en Tunisie."
+msgstr ""
+"منتجات حقيقية مستوردة من المورّدين التونسيين، مع الدفع عند الاستلام في كل "
+"تونس."
+
+#: base.html:66
+msgid ""
+"Dropshipping tunisien. Nous importons des produits réels chez les meilleurs "
+"fournisseurs locaux et locaux vous facturons."
+msgstr ""
+"دروبشيبينغ تونسي. نستورد منتجات حقيقية من أفضل المورّدين المحليين ونبيعها لك"
+" دون أن تتحمّل المخزون."
+
+#: admin_dashboard/analytics.html:124 admin_dashboard/curation.html:25
+#: admin_dashboard/curation.html:49 admin_dashboard/financials.html:35
+#: admin_dashboard/financials.html:82 admin_dashboard/financials.html:131
+#: admin_dashboard/orders.html:45 admin_dashboard/overview.html:145
+#: base.html:70 storefront/partials/_store_product_card.html:24
+msgid "Boutique"
+msgstr "المتجر"
+
+#: base.html:72
+msgid "Tout le catalogue"
+msgstr "كل الكتالوج"
+
+#: base.html:73
+msgid "Promotions"
+msgstr "التخفيضات"
+
+#: base.html:74 dashboard/products.html:63
+#: storefront/partials/_search_results.html:21
+#: storefront/partials/_store_product_card.html:16
+#: storefront/product_detail.html:83
+msgid "En stock"
+msgstr "متوفّر"
+
+#: base.html:75
+msgid "Mon panier"
+msgstr "سلّتي"
+
+#: base.html:79 storefront/nav.html:106
+#: storefront/partials/_category_tree.html:9
+#: storefront/substore_catalog.html:52 storefront/substore_home.html:51
+#: storefront/substore_home.html:69
+msgid "Catégories"
+msgstr "الأقسام"
+
+#: base.html:91 storefront/nav.html:128 storefront/substore_home.html:55
+msgid "Livraison"
+msgstr "التوصيل"
+
+#: base.html:93 storefront/nav.html:129
+msgid "Paiement à la livraison"
+msgstr "الدفع عند الاستلام"
+
+#: base.html:94
+msgid "Livraison 24-48h"
+msgstr "التوصيل خلال 24–48 ساعة"
+
+#: base.html:95
+msgid "Retour sous 30 jours"
+msgstr "إرجاع خلال 30 يومًا"
+
+#: base.html:102
+msgid "Dropshipping Tunisia"
+msgstr "دروبشيبينغ تونس"
+
+#: base.html:105
+msgid "Catalogue synchronisé depuis les fournisseurs tunisiens"
+msgstr "كتالوج مُزامَن مع المورّدين التونسيين"
+
+#: storefront/nav.html:19 storefront/product_detail.html:22
+#: storefront/substore_catalog.html:13 apps/core/tests/test_i18n.py:130
+msgid "Catalogue"
+msgstr "الكتالوج"
+
+#: storefront/nav.html:26
+msgid "Superadmin"
+msgstr "الإدارة العليا"
+
+#: storefront/nav.html:34
+msgid "Rechercher des produits…"
+msgstr "ابحث عن منتجات…"
+
+#: dashboard/finances.html:34 dashboard/orders.html:12
+#: dashboard/overview.html:11 dashboard/products.html:17
+#: storefront/nav.html:43
+msgid "Tableau de bord"
+msgstr "لوحة التحكّم"
+
+#: storefront/nav.html:50 storefront/nav.html:52 storefront/nav.html:75
+#: storefront/nav.html:142 apps/core/tests/test_i18n.py:147
+msgid "Panier"
+msgstr "السلة"
+
+#: storefront/nav.html:80
+msgid "Menu"
+msgstr "القائمة"
+
+#: storefront/checkout_modal.html:8 storefront/nav.html:91
+msgid "Fermer"
+msgstr "إغلاق"
+
+#: storefront/nav.html:98
+msgid "Rechercher…"
+msgstr "بحث…"
+
+#: storefront/nav.html:110 storefront/partials/_category_tree.html:14
+#: storefront/substore_catalog.html:56
+msgid "Tous les produits"
+msgstr "كل المنتجات"
+
+#: storefront/nav.html:121 storefront/partials/_category_tree.html:29
+msgid "Aucune catégorie."
+msgstr "لا توجد أقسام."
+
+#: storefront/nav.html:140
+msgid "Tableau de bord admin"
+msgstr "لوحة تحكّم الإدارة"
+
+#: storefront/partials/_language_switcher.html:8
+msgid "Langue"
+msgstr "اللغة"
+
+#: 404.html:4
+msgid "Page introuvable &mdash; Karthago"
+msgstr "الصفحة غير موجودة — كَرْتاغو"
+
+#: 404.html:9
+msgid "Page introuvable"
+msgstr "الصفحة غير موجودة"
+
+#: 404.html:12
+msgid "La boutique demand&eacute;e n'existe pas ou n'est plus active."
+msgstr "المتجر المطلوب غير موجود أو لم يعد نشطًا."
+
+#: 404.html:14
+msgid ""
+"La page que vous cherchez n'existe pas ou a &eacute;t&eacute; "
+"d&eacute;plac&eacute;e."
+msgstr "الصفحة التي تبحث عنها غير موجودة أو تمّ نقلها."
+
+#: 404.html:18
+msgid "Retour &agrave; la boutique"
+msgstr "العودة إلى المتجر"
+
+#: admin/base_site.html:4
+msgid "| Karthago Commerce"
+msgstr "| كَرْتاغو كوميرس"
+
+#: admin/base_site.html:8
+msgid "Karthago Commerce"
+msgstr "كَرْتاغو كوميرس"
+
+#: admin/base_site.html:10
+msgid ""
+"# The Django admin holds the raw models; the day-to-day platform operations "
+"(tenants, curation, scrapers) live in the superadmin console. The link is "
+"right here because this is where the owner logs in. #}"
+msgstr ""
+"# لوحة تحكّم Django تحتوي على النماذج الخام؛ أما عمليات المنصّة اليومية "
+"(المتاجر، الانتقاء، المجمّعات) فتوجد في وحدة الإدارة العليا. الرابط هنا لأن "
+"المالك يسجّل الدخول من هذا المكان. #}"
+
+#: admin/base_site.html:17
+msgid "Console plateforme &rarr;"
+msgstr "وحدة تحكّم المنصّة ←"
+
+#: admin_dashboard/central_pool.html:3
+msgid "Pool central &mdash; Superadmin Karthago"
+msgstr "المخزون المركزي — الإدارة العليا كَرْتاغو"
+
+#: admin_dashboard/central_pool.html:9 admin_dashboard/curation.html:9
+#: admin_dashboard/financials.html:9 admin_dashboard/orders.html:9
+#: admin_dashboard/scrapers.html:9 admin_dashboard/stores.html:9
+msgid "&larr; Retour au pilotage"
+msgstr "← العودة إلى لوحة القيادة"
+
+#: admin_dashboard/analytics.html:72 admin_dashboard/central_pool.html:10
+#: admin_dashboard/overview.html:26 dashboard/products.html:16
+#: dashboard/products_import.html:9
+msgid "Pool central"
+msgstr "المخزون المركزي"
+
+#: admin_dashboard/central_pool.html:12
+msgid ""
+"Le catalogue brut collect&eacute; chez les fournisseurs. Chaque boutique y "
+"importe ses propres produits depuis son tableau de bord."
+msgstr ""
+"الكتالوج الخام المجمّع لدى المورّدين. كل متجر يستورد منه منتجاته الخاصة من "
+"لوحته."
+
+#: admin_dashboard/central_pool.html:17
+msgid "Importer dans ma boutique"
+msgstr "استيراد إلى متجري"
+
+#: admin_dashboard/central_pool.html:22 admin_dashboard/curation.html:22
+msgid "Titre ou description"
+msgstr "العنوان أو الوصف"
+
+#: admin_dashboard/central_pool.html:23 admin_dashboard/orders.html:32
+#: dashboard/orders.html:35 dashboard/products_import.html:17
+msgid "Rechercher"
+msgstr "بحث"
+
+#: admin_dashboard/central_pool.html:25 admin_dashboard/curation.html:39
+#: admin_dashboard/orders.html:34 dashboard/orders.html:37
+#: dashboard/products_import.html:19 storefront/catalog_base.html:61
+#: storefront/substore_catalog.html:35
+msgid "Effacer"
+msgstr "مسح"
+
+#: admin_dashboard/central_pool.html:34 admin_dashboard/curation.html:48
+#: dashboard/order_detail.html:122 dashboard/products.html:85
+#: dashboard/products_import.html:28 storefront/cart.html:15
+#: storefront/order_detail.html:33
+msgid "Produit"
+msgstr "المنتج"
+
+#: admin_dashboard/central_pool.html:35 dashboard/order_detail.html:123
+#: dashboard/products_import.html:29 storefront/pool_product.html:48
+msgid "Fournisseur"
+msgstr "المورّد"
+
+#: admin_dashboard/central_pool.html:36 admin_dashboard/curation.html:50
+#: dashboard/products.html:48 dashboard/products_import.html:30
+msgid "Cat&eacute;gorie"
+msgstr "القسم"
+
+#: admin_dashboard/central_pool.html:37
+msgid "Co&ucirc;t"
+msgstr "التكلفة"
+
+#: admin_dashboard/central_pool.html:38 dashboard/products_import.html:32
+#: storefront/pool_product.html:44
+msgid "Prix plateforme"
+msgstr "سعر المنصّة"
+
+#: admin_dashboard/central_pool.html:39 dashboard/products.html:125
+#: dashboard/products_import.html:33 storefront/pool_product.html:52
+msgid "Stock"
+msgstr "المخزون"
+
+#: admin_dashboard/central_pool.html:71
+msgid "Le pool central est vide. Lancez une synchronisation des scrapers."
+msgstr "المخزون المركزي فارغ. شغّل مزامنة المجمّعات."
+
+#: admin_dashboard/curation.html:3
+msgid "Curation &mdash; Superadmin Karthago"
+msgstr "الانتقاء — الإدارة العليا كَرْتاغو"
+
+#: admin_dashboard/curation.html:10
+msgid "Curation de la plateforme"
+msgstr "انتقاء المنصّة"
+
+#: admin_dashboard/curation.html:12
+msgid ""
+"S&eacute;lectionnez les produits mis en avant sur la page d'accueil du "
+"flagship."
+msgstr "اختر المنتجات التي تُعرض في الصفحة الرئيسية للمتجر الأساسي."
+
+#: admin_dashboard/curation.html:21
+msgid "Recherche"
+msgstr "بحث"
+
+#: admin_dashboard/curation.html:27
+msgid "Toutes les boutiques"
+msgstr "كل المتاجر"
+
+#: admin_dashboard/curation.html:35
+msgid "En s&eacute;lection uniquement"
+msgstr "المختارة فقط"
+
+#: admin_dashboard/curation.html:37 admin_dashboard/financials.html:44
+msgid "Filtrer"
+msgstr "تصفية"
+
+#: admin_dashboard/curation.html:51 admin_dashboard/scrapers.html:46
+#: dashboard/products.html:86 dashboard/products_bulk.html:90
+#: dashboard/scrapers.html:40 storefront/partials/_category_tree.html:35
+msgid "Prix"
+msgstr "السعر"
+
+#: admin_dashboard/curation.html:52 admin_dashboard/orders.html:49
+#: admin_dashboard/overview.html:149 dashboard/order_detail.html:126
+#: dashboard/order_detail.html:203 dashboard/orders.html:77
+#: dashboard/products.html:87 storefront/product_detail.html:74
+msgid "Marge"
+msgstr "الهامش"
+
+#: admin_dashboard/curation.html:53
+msgid "S&eacute;lection"
+msgstr "مختارات"
+
+#: admin_dashboard/curation.html:69
+msgid "Inventaire propre"
+msgstr "مخزون خاص"
+
+#: admin_dashboard/curation.html:70
+msgid "Import&eacute; du pool"
+msgstr "مستورد من المخزون"
+
+#: admin_dashboard/curation.html:71 admin_dashboard/orders.html:62
+#: admin_dashboard/scrapers.html:108 dashboard/orders.html:47
+msgid "&mdash;"
+msgstr "—"
+
+#: admin_dashboard/curation.html:72
+msgid "&middot; Rupture"
+msgstr "· نفد"
+
+#: admin_dashboard/curation.html:88
+msgid "Aucun produit ne correspond &agrave; cette recherche."
+msgstr "لا يوجد منتج مطابق لهذا البحث."
+
+#: admin_dashboard/curation.html:98
+msgid ""
+"Le num&eacute;ro de priorit&eacute; d&eacute;termine l'ordre d'affichage "
+"dans la s&eacute;lection : le plus grand nombre passe en premier."
+msgstr "رقم الأولوية يحدّد ترتيب العرض في المختارات: الرقم الأكبر يظهر أولًا."
+
+#: admin_dashboard/financials.html:3
+msgid "Ledger financier &mdash; Superadmin Karthago"
+msgstr "السجلّ المالي — الإدارة العليا كَرْتاغو"
+
+#: admin_dashboard/financials.html:10
+msgid "Ledger financier de la plateforme"
+msgstr "السجلّ المالي للمنصّة"
+
+#: admin_dashboard/financials.html:12
+msgid ""
+"La commission n'est r&eacute;alis&eacute;e que sur les commandes "
+"livr&eacute;es et pay&eacute;es. En paiement &agrave; la livraison, l'argent"
+" est encaiss&eacute; par le livreur : le solde non r&eacute;gl&eacute; est "
+"le risque que la plateforme porte encore."
+msgstr ""
+"العمولة لا تتحقّق إلا على الطلبات المُسلَّمة والمدفوعة. في حالة الدفع عند "
+"الاستلام، يُحصّل المبلغ من طرف سائق التوصيل: الرصيد غير المسدَّد هو المخاطرة"
+" التي تتحمّلها المنصّة."
+
+#: admin_dashboard/analytics.html:22 admin_dashboard/financials.html:19
+#: admin_dashboard/overview.html:22
+msgid "Boutiques"
+msgstr "المتاجر"
+
+#: admin_dashboard/analytics.html:90 admin_dashboard/analytics.html:126
+#: admin_dashboard/financials.html:20 admin_dashboard/financials.html:83
+#: admin_dashboard/overview.html:24 dashboard/finances.html:35
+#: dashboard/finances.html:114 dashboard/orders.html:8
+#: dashboard/overview.html:15
+msgid "Commandes"
+msgstr "الطلبات"
+
+#: admin_dashboard/financials.html:27
+msgid "Du"
+msgstr "من"
+
+#: admin_dashboard/financials.html:31
+msgid "Au"
+msgstr "إلى"
+
+#: admin_dashboard/financials.html:37
+msgid "Toute la plateforme"
+msgstr "كل المنصّة"
+
+#: admin_dashboard/financials.html:47
+msgid "Exporter en CSV"
+msgstr "تصدير CSV"
+
+#: admin_dashboard/financials.html:54
+msgid "Commission r&eacute;alis&eacute;e"
+msgstr "العمولة المحقّقة"
+
+#: admin_dashboard/analytics.html:32 admin_dashboard/analytics.html:33
+#: admin_dashboard/analytics.html:37 admin_dashboard/analytics.html:42
+#: admin_dashboard/analytics.html:47 admin_dashboard/analytics.html:197
+#: admin_dashboard/analytics.html:212 admin_dashboard/financials.html:55
+#: admin_dashboard/financials.html:60 admin_dashboard/financials.html:65
+#: admin_dashboard/financials.html:70 admin_dashboard/financials.html:171
+#: admin_dashboard/financials.html:172 admin_dashboard/financials.html:173
+#: admin_dashboard/financials.html:174 admin_dashboard/financials.html:175
+#: admin_dashboard/overview.html:35 admin_dashboard/overview.html:36
+#: admin_dashboard/overview.html:40 admin_dashboard/overview.html:88
+#: admin_dashboard/overview.html:128 dashboard/finances.html:43
+#: dashboard/finances.html:48 dashboard/finances.html:53
+#: dashboard/finances.html:58 dashboard/finances.html:69
+#: dashboard/finances.html:70 dashboard/finances.html:71
+#: dashboard/finances.html:72 dashboard/finances.html:73
+#: dashboard/finances.html:88 dashboard/finances.html:126
+#: dashboard/order_detail.html:159 dashboard/order_detail.html:162
+#: dashboard/order_detail.html:163 dashboard/order_detail.html:165
+#: dashboard/order_detail.html:200 dashboard/order_detail.html:204
+#: dashboard/order_detail.html:208 dashboard/order_detail.html:233
+#: dashboard/orders.html:57 dashboard/orders.html:97
+#: dashboard/overview.html:28 dashboard/overview.html:38
+#: dashboard/overview.html:48 dashboard/overview.html:137
+#: storefront/cart.html:38 storefront/cart.html:42 storefront/cart.html:71
+#: storefront/cart.html:87 storefront/checkout.html:19
+#: storefront/checkout.html:26 storefront/checkout.html:72
+#: storefront/order_detail.html:23 storefront/order_detail.html:49
+#: storefront/order_detail.html:50 storefront/partials/_search_results.html:18
+#: storefront/partials/_store_product_card.html:42
+#: storefront/pool_product.html:45 storefront/product_detail.html:69
+msgid "DT"
+msgstr "د.ت"
+
+#: admin_dashboard/financials.html:59
+msgid "Solde non r&eacute;gl&eacute;"
+msgstr "الرصيد غير المسدَّد"
+
+#: admin_dashboard/financials.html:64
+msgid "Commission moyenne"
+msgstr "متوسّط العمولة"
+
+#: admin_dashboard/financials.html:66
+msgid "par commande livr&eacute;e"
+msgstr "لكل طلب مُسلَّم"
+
+#: admin_dashboard/financials.html:69
+msgid "En route (COD)"
+msgstr "في الطريق (الدفع عند الاستلام)"
+
+#: admin_dashboard/financials.html:77
+msgid "D&eacute;composition par boutique"
+msgstr "التفصيل حسب المتجر"
+
+#: admin_dashboard/financials.html:84
+#: admin_dashboard/partials/_store_card.html:53
+msgid "Livr&eacute;es"
+msgstr "مُسلَّمة"
+
+#: admin_dashboard/financials.html:85
+msgid "CA livr&eacute;"
+msgstr "رقم المعاملات المُسلَّم"
+
+#: admin_dashboard/financials.html:86
+#: admin_dashboard/partials/_store_card.html:57
+#: admin_dashboard/partials/_store_card.html:73
+msgid "Commission"
+msgstr "العمولة"
+
+#: admin_dashboard/financials.html:87
+msgid "Taux"
+msgstr "النسبة"
+
+#: admin_dashboard/financials.html:88
+msgid "Net vendeur"
+msgstr "صافي البائع"
+
+#: admin_dashboard/financials.html:89
+msgid "R&eacute;conciliation"
+msgstr "المطابقة"
+
+#: admin_dashboard/financials.html:97 admin_dashboard/overview.html:162
+msgid "/s/"
+msgstr "/s/"
+
+#: admin_dashboard/financials.html:109
+msgid "G&eacute;n&eacute;rer le lot"
+msgstr "توليد الدفعة"
+
+#: admin_dashboard/financials.html:115
+msgid "Aucune commande sur la p&eacute;riode."
+msgstr "لا توجد طلبات في هذه الفترة."
+
+#: admin_dashboard/financials.html:125
+msgid "Lots de paiement"
+msgstr "دفعات الأداء"
+
+#: admin_dashboard/financials.html:130 dashboard/finances.html:111
+msgid "R&eacute;f&eacute;rence"
+msgstr "المرجع"
+
+#: admin_dashboard/financials.html:132
+msgid "Cmd."
+msgstr "طلب."
+
+#: admin_dashboard/financials.html:133
+msgid "Net &agrave; verser"
+msgstr "الصافي المستحق"
+
+#: admin_dashboard/analytics.html:229 admin_dashboard/financials.html:134
+#: admin_dashboard/orders.html:47 admin_dashboard/overview.html:150
+#: admin_dashboard/scrapers.html:84 dashboard/finances.html:116
+#: dashboard/order_detail.html:78 dashboard/orders.html:75
+#: dashboard/overview.html:165 dashboard/scrapers.html:78
+msgid "Statut"
+msgstr "الحالة"
+
+#: admin_dashboard/financials.html:146 dashboard/finances.html:129
+msgid "Pay&eacute;"
+msgstr "مدفوع"
+
+#: admin_dashboard/financials.html:151
+msgid "Marquer pay&eacute;"
+msgstr "تحديد كمدفوع"
+
+#: admin_dashboard/financials.html:158
+msgid "Aucun lot de paiement."
+msgstr "لا توجد دفعة أداء."
+
+#: admin_dashboard/financials.html:168
+msgid "D&eacute;tail —"
+msgstr "التفصيل —"
+
+#: admin_dashboard/financials.html:171 dashboard/finances.html:42
+msgid "CA brut livr&eacute;"
+msgstr "رقم المعاملات الخام المُسلَّم"
+
+#: admin_dashboard/financials.html:172 dashboard/finances.html:70
+msgid "Co&ucirc;t fournisseur"
+msgstr "تكلفة المورّد"
+
+#: admin_dashboard/financials.html:173 dashboard/finances.html:47
+#: dashboard/finances.html:71
+msgid "Frais de livraison"
+msgstr "أجور التوصيل"
+
+#: admin_dashboard/financials.html:174 dashboard/finances.html:52
+#: dashboard/finances.html:72
+msgid "Frais de plateforme"
+msgstr "أجور المنصّة"
+
+#: admin_dashboard/financials.html:175 dashboard/finances.html:57
+msgid "Net &agrave; percevoir"
+msgstr "الصافي المستحق"
+
+#: admin_dashboard/financials.html:176
+msgid "En attente de r&egrave;glement"
+msgstr "في انتظار الأداء"
+
+#: admin_dashboard/financials.html:176
+msgid "commandes"
+msgstr "طلبات"
+
+#: admin_dashboard/financials.html:179
+msgid "D&eacute;tail d'une boutique"
+msgstr "تفصيل متجر"
+
+#: admin_dashboard/financials.html:181
+msgid ""
+"S&eacute;lectionnez une boutique dans le filtre ci-dessus pour voir son "
+"d&eacute;tail financier."
+msgstr "اختر متجرًا من الفلتر أعلاه لعرض تفاصيله المالية."
+
+#: admin_dashboard/orders.html:3
+msgid "Commandes &mdash; Superadmin Karthago"
+msgstr "الطلبات — الإدارة العليا كَرْتاغو"
+
+#: admin_dashboard/orders.html:10
+msgid "Commandes de la plateforme"
+msgstr "طلبات المنصّة"
+
+#: admin_dashboard/orders.html:11
+msgid "Toutes les commandes, tous tenants confondus."
+msgstr "كل الطلبات، بكل المتاجر مجتمعة."
+
+#: admin_dashboard/orders.html:19 dashboard/orders.html:21
+msgid "Toutes"
+msgstr "الكل"
+
+#: admin_dashboard/orders.html:31
+msgid "Nom ou t&eacute;l&eacute;phone du client"
+msgstr "اسم العميل أو رقم هاتفه"
+
+#: admin_dashboard/orders.html:43
+msgid "N&deg;"
+msgstr "رقم"
+
+#: admin_dashboard/orders.html:44 dashboard/order_detail.html:32
+#: dashboard/orders.html:71 dashboard/overview.html:119
+#: storefront/order_detail.html:15
+msgid "Client"
+msgstr "العميل"
+
+#: admin_dashboard/orders.html:46 dashboard/order_detail.html:44
+#: dashboard/orders.html:73 storefront/checkout.html:50
+#: storefront/checkout_modal.html:27
+msgid "Gouvernorat"
+msgstr "الولاية"
+
+#: admin_dashboard/orders.html:48
+msgid "Montant"
+msgstr "المبلغ"
+
+#: admin_dashboard/orders.html:50 dashboard/finances.html:112
+#: dashboard/orders.html:78
+msgid "Date"
+msgstr "التاريخ"
+
+#: admin_dashboard/analytics.html:201 admin_dashboard/orders.html:74
+#: dashboard/finances.html:95 dashboard/orders.html:61
+#: dashboard/orders.html:101
+msgid "Aucune commande."
+msgstr "لا توجد طلبات."
+
+#: admin_dashboard/overview.html:3
+msgid "Superadmin &mdash; Karthago Commerce"
+msgstr "الإدارة العليا — كَرْتاغو كوميرس"
+
+#: admin_dashboard/overview.html:11
+msgid "🛡️ Superadmin plateforme"
+msgstr "🛡️ الإدارة العليا للمنصّة"
+
+#: admin_dashboard/overview.html:13
+msgid "Pilotage de la plateforme"
+msgstr "قيادة المنصّة"
+
+#: admin_dashboard/overview.html:23
+msgid "Curation"
+msgstr "الانتقاء"
+
+#: admin_dashboard/overview.html:25 dashboard/orders.html:13
+#: dashboard/overview.html:17
+msgid "Scrapers"
+msgstr "المجمّعات"
+
+#: admin_dashboard/analytics.html:23 admin_dashboard/overview.html:27
+#: dashboard/overview.html:16
+msgid "Finances"
+msgstr "المالية"
+
+#: admin_dashboard/overview.html:34
+msgid "GMV aujourd'hui"
+msgstr "رقم المعاملات اليوم"
+
+#: admin_dashboard/overview.html:36
+msgid "30 jours :"
+msgstr "30 يومًا:"
+
+#: admin_dashboard/analytics.html:36 admin_dashboard/overview.html:39
+#: dashboard/order_detail.html:228
+msgid "Marge brute"
+msgstr "الهامش الإجمالي"
+
+#: admin_dashboard/analytics.html:38 admin_dashboard/overview.html:41
+msgid "% du CA"
+msgstr "% من رقم المعاملات"
+
+#: admin_dashboard/analytics.html:57 admin_dashboard/overview.html:44
+#: dashboard/overview.html:69
+msgid "Taux de livraison"
+msgstr "نسبة التسليم"
+
+#: admin_dashboard/overview.html:46
+msgid "commandes livrées"
+msgstr "طلبات مُسلَّمة"
+
+#: admin_dashboard/analytics.html:62 admin_dashboard/overview.html:49
+#: dashboard/overview.html:76
+msgid "Taux de retour"
+msgstr "نسبة الإرجاع"
+
+#: admin_dashboard/overview.html:58
+msgid "CA vs coût fournisseur (14 jours)"
+msgstr "رقم المعاملات مقابل تكلفة المورّد (14 يومًا)"
+
+#: admin_dashboard/overview.html:71
+msgid "CA"
+msgstr "رقم المعاملات"
+
+#: admin_dashboard/overview.html:72 storefront/pool_product.html:40
+msgid "Coût fournisseur"
+msgstr "تكلفة المورّد"
+
+#: admin_dashboard/analytics.html:112 admin_dashboard/overview.html:75
+msgid "Aucune commande sur la période."
+msgstr "لا توجد طلبات في هذه الفترة."
+
+#: admin_dashboard/analytics.html:192 admin_dashboard/overview.html:81
+msgid "Commandes par gouvernorat"
+msgstr "الطلبات حسب الولاية"
+
+#: admin_dashboard/overview.html:97
+msgid "Aucune donnée."
+msgstr "لا توجد بيانات."
+
+#: admin_dashboard/analytics.html:173 admin_dashboard/overview.html:105
+msgid "Entonnoir COD"
+msgstr "مسار التحويل عند الدفع"
+
+#: admin_dashboard/analytics.html:207 admin_dashboard/overview.html:122
+msgid "Meilleures ventes"
+msgstr "أفضل المبيعات"
+
+#: admin_dashboard/overview.html:133
+msgid "Aucune vente."
+msgstr "لا توجد مبيعات."
+
+#: admin_dashboard/overview.html:140 admin_dashboard/stores.html:10
+msgid "Boutiques de la plateforme"
+msgstr "متاجر المنصّة"
+
+#: admin_dashboard/overview.html:146
+msgid "Slug"
+msgstr "المعرّف"
+
+#: admin_dashboard/analytics.html:125 admin_dashboard/overview.html:147
+#: admin_dashboard/partials/_store_card.html:49
+#: storefront/substore_home.html:47
+msgid "Produits"
+msgstr "المنتجات"
+
+#: admin_dashboard/overview.html:148
+msgid "Publiés"
+msgstr "منشورة"
+
+#: admin_dashboard/overview.html:159
+#: admin_dashboard/partials/_store_card.html:29
+msgid "Flagship"
+msgstr "المتجر الأساسي"
+
+#: admin_dashboard/overview.html:168
+#: admin_dashboard/partials/_store_card.html:30
+msgid "Active"
+msgstr "نشِطة"
+
+#: admin_dashboard/overview.html:170
+msgid "Inactive"
+msgstr "غير نشِطة"
+
+#: admin_dashboard/overview.html:175
+msgid "Aucune boutique."
+msgstr "لا توجد متاجر."
+
+#: admin_dashboard/partials/_commission_form.html:7
+#: admin_dashboard/partials/_commission_form.html:13
+msgid "Commission de «"
+msgstr "عمولة «"
+
+#: admin_dashboard/partials/_commission_form.html:7
+msgid "» &mdash; Superadmin Karthago"
+msgstr "» — الإدارة العليا كَرْتاغو"
+
+#: admin_dashboard/partials/_commission_form.html:12
+#: admin_dashboard/store_form.html:8
+msgid "&larr; Retour aux boutiques"
+msgstr "← العودة إلى المتاجر"
+
+#: admin_dashboard/partials/_commission_form.html:15
+msgid ""
+"La commission n'est r&eacute;alis&eacute;e que sur les commandes "
+"livr&eacute;es et pay&eacute;es (paiement &agrave; la livraison). Elle "
+"s'applique aux prochaines commandes livr&eacute;es et aux r&egrave;lements "
+"qui n'ont pas encore &eacute;t&eacute; vers&eacute;s."
+msgstr ""
+"العمولة لا تتحقّق إلا على الطلبات المُسلَّمة والمدفوعة (الدفع عند الاستلام)."
+" وهي تسري على الطلبات المُسلَّمة القادمة وعلى الأداءات التي لم تُسدَّد بعد."
+
+#: admin_dashboard/partials/_commission_form.html:27
+#: admin_dashboard/store_form.html:84
+msgid "Type de commission"
+msgstr "نوع العمولة"
+
+#: admin_dashboard/partials/_commission_form.html:37
+#: admin_dashboard/store_form.html:95
+msgid "Taux (%)"
+msgstr "النسبة (%)"
+
+#: admin_dashboard/partials/_commission_form.html:41
+msgid "Frais fixe (DT)"
+msgstr "رسم ثابت (د.ت)"
+
+#: admin_dashboard/partials/_commission_form.html:47
+msgid "R&egrave;gle actuelle :"
+msgstr "القاعدة الحالية:"
+
+#: admin_dashboard/partials/_commission_form.html:52
+#: admin_dashboard/store_form.html:139 dashboard/store_settings.html:118
+msgid "Enregistrer"
+msgstr "حفظ"
+
+#: admin_dashboard/partials/_commission_form.html:55
+#: admin_dashboard/store_form.html:136 dashboard/scrapers.html:169
+#: dashboard/store_settings.html:115
+msgid "Annuler"
+msgstr "إلغاء"
+
+#: admin_dashboard/analytics.html:242
+#: admin_dashboard/partials/_feature_toggle.html:22
+msgid "OK"
+msgstr "سليم"
+
+#: admin_dashboard/partials/_scraper_run.html:12
+msgid ""
+"T&acirc;che lanc&eacute;e — le premier journal appara&icirc;tra dans "
+"quelques secondes."
+msgstr "تمّ إطلاق المهمة — سيظهر أول سجلّ بعد ثوانٍ."
+
+#: admin_dashboard/partials/_scraper_run.html:16
+msgid "Collecte en cours…"
+msgstr "الجمع جارٍ…"
+
+#: admin_dashboard/partials/_scraper_run.html:16
+msgid "produit(s) trouv&eacute;s."
+msgstr "منتج تمّ العثور عليه."
+
+#: admin_dashboard/partials/_scraper_run.html:23
+msgid "Collecte termin&eacute;e :"
+msgstr "انتهى الجمع:"
+
+#: admin_dashboard/partials/_scraper_run.html:23
+msgid "trouv&eacute;(s),"
+msgstr "تمّ العثور عليه،"
+
+#: admin_dashboard/partials/_scraper_run.html:24
+msgid "mis &agrave; jour."
+msgstr "تمّ التحديث."
+
+#: admin_dashboard/partials/_scraper_run.html:26
+msgid "Collecte termin&eacute;e avec des erreurs :"
+msgstr "انتهى الجمع مع أخطاء:"
+
+#: admin_dashboard/partials/_scraper_run.html:27
+msgid "trouv&eacute;(s)."
+msgstr "تمّ العثور عليه."
+
+#: admin_dashboard/partials/_store_card.html:31
+msgid "Maintenance"
+msgstr "صيانة"
+
+#: admin_dashboard/partials/_store_card.html:32
+msgid "Suspendue"
+msgstr "موقوفة"
+
+#: admin_dashboard/partials/_store_card.html:42
+msgid "Motif de suspension"
+msgstr "سبب الإيقاف"
+
+#: admin_dashboard/partials/_store_card.html:63
+msgid "R&egrave;gle de commission :"
+msgstr "قاعدة العمولة:"
+
+#: admin_dashboard/partials/_store_card.html:69
+msgid "Propri&eacute;taire :"
+msgstr "المالك:"
+
+#: admin_dashboard/partials/_store_card.html:69
+msgid "Sans propri&eacute;taire"
+msgstr "بدون مالك"
+
+#: admin_dashboard/partials/_store_card.html:72
+msgid "Modifier"
+msgstr "تعديل"
+
+#: admin_dashboard/partials/_store_card.html:75
+#: admin_dashboard/partials/_store_card.html:77
+msgid "Voir &rarr;"
+msgstr "عرض ←"
+
+#: admin_dashboard/partials/_store_card.html:89
+msgid "Motif de la suspension (optionnel)"
+msgstr "سبب الإيقاف (اختياري)"
+
+#: admin_dashboard/partials/_store_card.html:91
+msgid "D&eacute;sactiver la boutique"
+msgstr "تعطيل المتجر"
+
+#: admin_dashboard/partials/_store_card.html:98
+msgid "R&eacute;activer la boutique"
+msgstr "إعادة تفعيل المتجر"
+
+#: admin_dashboard/scrapers.html:3
+msgid "Scrapers &mdash; Superadmin Karthago"
+msgstr "المجمّعات — الإدارة العليا كَرْتاغو"
+
+#: admin_dashboard/scrapers.html:10
+msgid "Scrapers de la plateforme"
+msgstr "مجمّعات المنصّة"
+
+#: admin_dashboard/scrapers.html:12
+msgid ""
+"Registre des sites fournisseurs collect&eacute;s et journaux de "
+"synchronisation."
+msgstr "سجلّ مواقع المورّدين المجمَّعة وسجلّات المزامنة."
+
+#: admin_dashboard/scrapers.html:16 admin_dashboard/selector_sandbox.html:9
+msgid "Bac &agrave; sable des s&eacute;lecteurs"
+msgstr "بيئة اختبار المحدّدات"
+
+#: admin_dashboard/scrapers.html:21
+msgid "Registre des sources"
+msgstr "سجلّ المصادر"
+
+#: admin_dashboard/scrapers.html:38
+msgid "Conteneur"
+msgstr "الحاوية"
+
+#: admin_dashboard/scrapers.html:42 admin_dashboard/selector_sandbox.html:61
+#: dashboard/scrapers.html:36
+msgid "Titre"
+msgstr "العنوان"
+
+#: admin_dashboard/scrapers.html:50
+msgid "Fr&eacute;quence"
+msgstr "التكرار"
+
+#: admin_dashboard/scrapers.html:51 dashboard/scrapers.html:45
+msgid "h"
+msgstr "س"
+
+#: admin_dashboard/scrapers.html:58 dashboard/scrapers.html:51
+msgid "&#9679; Actif"
+msgstr "● نشِط"
+
+#: admin_dashboard/scrapers.html:58 dashboard/scrapers.html:51
+msgid "&#9679; Inactif"
+msgstr "● غير نشِط"
+
+#: admin_dashboard/scrapers.html:64
+msgid "Collecter"
+msgstr "جمع"
+
+#: admin_dashboard/scrapers.html:71
+msgid "Aucune source de scraping configur&eacute;e."
+msgstr "لا يوجد مصدر جمع مُهيّأ."
+
+#: admin_dashboard/scrapers.html:77
+msgid "Journaux de synchronisation"
+msgstr "سجلّات المزامنة"
+
+#: admin_dashboard/analytics.html:228 admin_dashboard/scrapers.html:83
+#: dashboard/overview.html:164 dashboard/scrapers.html:77
+msgid "Source"
+msgstr "المصدر"
+
+#: admin_dashboard/scrapers.html:85
+msgid "Trouv&eacute;s"
+msgstr "المكتشف"
+
+#: admin_dashboard/scrapers.html:86
+msgid "M.A.J"
+msgstr "آخر تحديث"
+
+#: admin_dashboard/scrapers.html:87
+msgid "D&eacute;but"
+msgstr "البداية"
+
+#: admin_dashboard/scrapers.html:88
+msgid "Fin"
+msgstr "النهاية"
+
+#: admin_dashboard/scrapers.html:89
+msgid "Erreur"
+msgstr "خطأ"
+
+#: admin_dashboard/scrapers.html:116
+msgid "Aucun journal."
+msgstr "لا توجد سجلّات."
+
+#: admin_dashboard/selector_sandbox.html:3
+msgid "Bac &agrave; sable des s&eacute;lecteurs &mdash; Superadmin Karthago"
+msgstr "بيئة اختبار المحدّدات — الإدارة العليا كَرْتاغو"
+
+#: admin_dashboard/selector_sandbox.html:8
+msgid "&larr; Retour aux scrapers"
+msgstr "← العودة إلى المجمّعات"
+
+#: admin_dashboard/selector_sandbox.html:11
+msgid ""
+"Testez un conteneur et des s&eacute;lecteurs sur une URL en direct. Rien "
+"n'est &eacute;crit en base : l'enregistrement d'une source reste une action "
+"explicite."
+msgstr ""
+"اختبر حاوية ومحدّدات على رابط مباشر. لا يُكتب أي شيء في قاعدة البيانات: "
+"تسجيل مصدر يبقى إجراءً صريحًا."
+
+#: admin_dashboard/selector_sandbox.html:18
+msgid "URL de la page"
+msgstr "رابط الصفحة"
+
+#: admin_dashboard/selector_sandbox.html:19
+msgid "https://www.tunisianet.com.tn/..."
+msgstr "https://www.tunisianet.com.tn/..."
+
+#: admin_dashboard/selector_sandbox.html:22
+msgid "S&eacute;lecteur conteneur"
+msgstr "محدّد الحاوية"
+
+#: admin_dashboard/selector_sandbox.html:23 dashboard/scrapers.html:141
+msgid ".product-item"
+msgstr ".product-item"
+
+#: admin_dashboard/selector_sandbox.html:26
+msgid "S&eacute;lecteur titre"
+msgstr "محدّد العنوان"
+
+#: admin_dashboard/selector_sandbox.html:27
+msgid ".product-item__title"
+msgstr ".product-item__title"
+
+#: admin_dashboard/selector_sandbox.html:30
+msgid "S&eacute;lecteur prix"
+msgstr "محدّد السعر"
+
+#: admin_dashboard/selector_sandbox.html:31 dashboard/scrapers.html:151
+msgid ".price"
+msgstr ".price"
+
+#: admin_dashboard/selector_sandbox.html:35
+msgid "Tester"
+msgstr "تجربة"
+
+#: admin_dashboard/selector_sandbox.html:47
+msgid "HTTP"
+msgstr "HTTP"
+
+#: admin_dashboard/selector_sandbox.html:62
+msgid "Prix brut"
+msgstr "السعر الخام"
+
+#: admin_dashboard/selector_sandbox.html:63
+msgid "Prix normalis&eacute;"
+msgstr "السعر الموحَّد"
+
+#: admin_dashboard/selector_sandbox.html:79
+msgid "Aucun &eacute;l&eacute;ment ne correspond au conteneur."
+msgstr "لا يوجد عنصر يطابق الحاوية."
+
+#: admin_dashboard/selector_sandbox.html:84
+msgid "La requ&ecirc;te a &eacute;chou&eacute;"
+msgstr "فشل الطلب"
+
+#: admin_dashboard/store_form.html:3
+msgid "Nouvelle boutique"
+msgstr "متجر جديد"
+
+#: admin_dashboard/store_form.html:3
+msgid "Modifier la boutique"
+msgstr "تعديل المتجر"
+
+#: admin_dashboard/store_form.html:3
+msgid "&mdash; Superadmin Karthago"
+msgstr "— الإدارة العليا كَرْتاغو"
+
+#: admin_dashboard/store_form.html:10
+msgid "Créer une boutique"
+msgstr "إنشاء متجر"
+
+#: admin_dashboard/store_form.html:10
+msgid "Modifier «"
+msgstr "تعديل «"
+
+#: admin_dashboard/store_form.html:14
+msgid ""
+"Une boutique est un tenant isolé : son catalogue, son panier et ses "
+"commandes lui appartiennent."
+msgstr "المتجر مستأجر معزول: كتالوجه وسلّته وطلباته تخصّه وحده."
+
+#: admin_dashboard/store_form.html:16
+msgid "URL publique :"
+msgstr "الرابط العام:"
+
+#: admin_dashboard/store_form.html:26 dashboard/store_settings.html:32
+msgid "Nom de la boutique *"
+msgstr "اسم المتجر *"
+
+#: admin_dashboard/store_form.html:27 dashboard/store_settings.html:33
+msgid "Ex. Boutique Tunisienne"
+msgstr "مثال: متجر تونسي"
+
+#: admin_dashboard/store_form.html:31 dashboard/store_settings.html:37
+msgid "Accroche"
+msgstr "الشعار"
+
+#: admin_dashboard/store_form.html:32 dashboard/store_settings.html:38
+msgid "Ex. Les meilleurs prix de Tunis"
+msgstr "مثال: أفضل أسعار تونس"
+
+#: admin_dashboard/store_form.html:36 dashboard/products.html:56
+#: dashboard/store_settings.html:42
+msgid "Description"
+msgstr "الوصف"
+
+#: admin_dashboard/store_form.html:43
+msgid "Logo (URL)"
+msgstr "الشعار (رابط)"
+
+#: admin_dashboard/store_form.html:44 dashboard/store_settings.html:67
+msgid "https://..."
+msgstr "https://..."
+
+#: admin_dashboard/store_form.html:48 dashboard/store_settings.html:80
+msgid "Téléphone"
+msgstr "الهاتف"
+
+#: admin_dashboard/store_form.html:53 dashboard/store_settings.html:84
+#: storefront/substore_home.html:35
+msgid "WhatsApp"
+msgstr "واتساب"
+
+#: admin_dashboard/store_form.html:58 dashboard/order_detail.html:46
+#: dashboard/store_settings.html:88
+msgid "Adresse"
+msgstr "العنوان"
+
+#: admin_dashboard/store_form.html:59
+msgid "Tunis, Tunisie"
+msgstr "تونس، تونس"
+
+#: admin_dashboard/store_form.html:63
+msgid "Marge par défaut (%)"
+msgstr "الهامش الافتراضي (%)"
+
+#: admin_dashboard/store_form.html:65
+msgid "Appliquée au coût fournisseur des produits de cette boutique."
+msgstr "مطبَّق على تكلفة المورّد لمنتجات هذا المتجر."
+
+#: admin_dashboard/store_form.html:69 dashboard/store_settings.html:106
+msgid "Marge fixe (DT)"
+msgstr "هامش ثابت (د.ت)"
+
+#: admin_dashboard/store_form.html:71 dashboard/store_settings.html:108
+msgid "Ajoutée à chaque vente, en dinars."
+msgstr "يُضاف إلى كل عملية بيع، بالدينار."
+
+#: admin_dashboard/store_form.html:77
+msgid "Commission de la plateforme"
+msgstr "عمولة المنصّة"
+
+#: admin_dashboard/store_form.html:79
+msgid ""
+"Prélevée uniquement sur les commandes livrées et payées (COD encaissé)."
+msgstr "تُقتطع فقط على الطلبات المُسلَّمة والمدفوعة (الدفع عند الاستلام)."
+
+#: admin_dashboard/store_form.html:97
+msgid "Appliqué au CA brut livré."
+msgstr "مطبَّقة على رقم المعاملات الخام المُسلَّم."
+
+#: admin_dashboard/store_form.html:101
+msgid "Frais fixes (DT)"
+msgstr "رسوم ثابتة (د.ت)"
+
+#: admin_dashboard/store_form.html:103
+msgid "Par commande livrée, en dinars."
+msgstr "لكل طلب مُسلَّم، بالدينار."
+
+#: admin_dashboard/store_form.html:111
+msgid "Compte propriétaire"
+msgstr "حساب المالك"
+
+#: admin_dashboard/store_form.html:113
+msgid "— Aucun (boutique gérée par la plateforme) —"
+msgstr "— لا شيء (متجر تديره المنصّة) —"
+
+#: admin_dashboard/store_form.html:120
+msgid "Le propriétaire accède à son tableau de bord et à son catalogue."
+msgstr "يستطيع المالك الوصول إلى لوحته وكتالوجه."
+
+#: admin_dashboard/store_form.html:126
+msgid "Boutique en ligne"
+msgstr "المتجر متوفّر"
+
+#: admin_dashboard/store_form.html:129
+msgid "Une boutique désactivée renvoie une 404 sur sa page publique."
+msgstr "المتجر المعطَّل يُرجِع خطأ 404 في صفحته العامة."
+
+#: admin_dashboard/store_form.html:139
+msgid "Créer la boutique"
+msgstr "إنشاء المتجر"
+
+#: admin_dashboard/stores.html:3
+msgid "Boutiques &mdash; Superadmin Karthago"
+msgstr "المتاجر — الإدارة العليا كَرْتاغو"
+
+#: admin_dashboard/stores.html:12
+msgid ""
+"Chaque boutique est un tenant isol&eacute; : son catalogue, son panier et "
+"ses commandes lui appartiennent exclusivement. La suspension d'une boutique "
+"la retire imm&eacute;diatement du catalogue, de la recherche et de la page "
+"d'accueil."
+msgstr ""
+"كل متجر مستأجر معزول: كتالوجه وسلّته وطلباته تخصّه وحده. إيقاف متجر يُخرجيه "
+"فورًا من الكتالوج والبحث والصفحة الرئيسية."
+
+#: admin_dashboard/stores.html:19
+msgid "💰 Ledger financier"
+msgstr "💰 السجلّ المالي"
+
+#: admin_dashboard/stores.html:22
+msgid "Curation du catalogue"
+msgstr "انتقاء الكتالوج"
+
+#: admin_dashboard/stores.html:25
+msgid "+ Nouvelle boutique"
+msgstr "+ متجر جديد"
+
+#: admin_dashboard/stores.html:35
+msgid "Aucune boutique enregistr&eacute;e."
+msgstr "لا يوجد متجر مسجَّل."
+
+#: dashboard/finances.html:3
+msgid "Mes finances &mdash; Karthago Commerce"
+msgstr "ماليّتي — كَرْتاغو كوميرس"
+
+#: dashboard/finances.html:12
+msgid "Votre boutique est actuellement suspendue."
+msgstr "متجرك موقوف حاليًا."
+
+#: dashboard/finances.html:14
+msgid ""
+"Veuillez contacter l'administration pour en connaître la raison et la date "
+"de r&eacute;activation."
+msgstr "يرجى الاتصال بالإدارة لمعرفة السبب وتاريخ إعادة التفعيل."
+
+#: dashboard/finances.html:18
+msgid "Motif :"
+msgstr "السبب:"
+
+#: dashboard/finances.html:27
+msgid "Mes finances"
+msgstr "ماليّتي"
+
+#: dashboard/finances.html:29
+msgid "&middot; r&egrave;gle de commission :"
+msgstr "· قاعدة العمولة:"
+
+#: dashboard/finances.html:49
+msgid "Pay&eacute;s au livreur"
+msgstr "المدفوع لسائق التوصيل"
+
+#: dashboard/finances.html:54
+msgid "Moyenne :"
+msgstr "المتوسّط:"
+
+#: dashboard/finances.html:54
+msgid "DT / commande"
+msgstr "د.ت / طلب"
+
+#: dashboard/finances.html:59
+msgid "Apr&egrave;s frais et commission"
+msgstr "بعد الرسوم والعمولة"
+
+#: dashboard/finances.html:66
+msgid "D&eacute;tail de vos encaissements"
+msgstr "تفصيل مقبوضاتك"
+
+#: dashboard/finances.html:68
+msgid "Total des commandes"
+msgstr "مجموع الطلبات"
+
+#: dashboard/finances.html:69
+msgid "CA total (tous statuts)"
+msgstr "رقم المعاملات الإجمالي (كل الحالات)"
+
+#: dashboard/finances.html:73
+msgid "Montant net &agrave; percevoir"
+msgstr "المبلغ الصافي المستحق"
+
+#: dashboard/finances.html:76
+msgid "DT)."
+msgstr "د.ت)."
+
+#: dashboard/finances.html:82
+msgid "Vos commandes par statut"
+msgstr "طلباتك حسب الحالة"
+
+#: dashboard/finances.html:88 dashboard/order_detail.html:266
+#: dashboard/orders.html:50
+msgid "&middot;"
+msgstr "·"
+
+#: dashboard/finances.html:104
+msgid "Vos r&egrave;glements"
+msgstr "أداءاتك"
+
+#: dashboard/finances.html:105
+msgid ""
+"Les montants vous ont &eacute;t&eacute; vers&eacute;s par la plateforme."
+msgstr "تمّت تحويل المبالغ إليك من طرف المنصّة."
+
+#: dashboard/finances.html:113
+msgid "M&eacute;thode"
+msgstr "الطريقة"
+
+#: dashboard/finances.html:115
+msgid "Net vers&eacute;"
+msgstr "الصافي المحوَّل"
+
+#: dashboard/finances.html:131
+msgid "En cours"
+msgstr "قيد التنفيذ"
+
+#: dashboard/finances.html:137
+msgid "Aucun r&egrave;glement pour le moment."
+msgstr "لا يوجد أداء حاليًا."
+
+#: dashboard/order_detail.html:3 dashboard/order_detail.html:11
+#: storefront/order_detail.html:3 storefront/order_detail.html:9
+msgid "Commande #"
+msgstr "الطلب رقم"
+
+#: dashboard/order_detail.html:3 storefront/catalog_base.html:3
+#: storefront/order_detail.html:3 storefront/substore_home.html:3
+msgid "&mdash; Karthago Commerce"
+msgstr "— كَرْتاغو كوميرس"
+
+#: dashboard/order_detail.html:10
+msgid "&larr; Retour aux commandes"
+msgstr "← العودة إلى الطلبات"
+
+#: dashboard/order_detail.html:13
+msgid "Re&ccedil;ue le"
+msgstr "وصلت في"
+
+#: dashboard/order_detail.html:14
+msgid "&middot; confirm&eacute;e le"
+msgstr "· تأكيدها في"
+
+#: dashboard/order_detail.html:20
+msgid "&#128222; Appeler le client"
+msgstr "📞 اتصل بالعميل"
+
+#: dashboard/order_detail.html:38
+msgid "WhatsApp &rarr;"
+msgstr "واتساب ←"
+
+#: dashboard/order_detail.html:54
+msgid "Action requise"
+msgstr "إجراء مطلوب"
+
+#: dashboard/order_detail.html:55
+msgid ""
+"Cette commande attend la confirmation t&eacute;l&eacute;phonique du client."
+msgstr "هذا الطلب في انتظار تأكيد العميل الهاتفي."
+
+#: dashboard/order_detail.html:60
+msgid "&#10003; Client confirm&eacute; par t&eacute;l&eacute;phone"
+msgstr "✓ تمّ تأكيد العميل هاتفيًا"
+
+#: dashboard/order_detail.html:67
+msgid "Client injoignable"
+msgstr "العميل غير متاح"
+
+#: dashboard/order_detail.html:75
+msgid "Changer le statut"
+msgstr "تغيير الحالة"
+
+#: dashboard/order_detail.html:84 dashboard/order_detail.html:97
+msgid "Note"
+msgstr "ملاحظة"
+
+#: dashboard/order_detail.html:85
+msgid "Note (optionnel)"
+msgstr "ملاحظة (اختياري)"
+
+#: dashboard/order_detail.html:87
+msgid "Mettre &agrave; jour"
+msgstr "تحديث"
+
+#: dashboard/order_detail.html:94
+msgid "Note interne"
+msgstr "ملاحظة داخلية"
+
+#: dashboard/order_detail.html:101
+msgid "Ajouter la note"
+msgstr "أضف الملاحظة"
+
+#: dashboard/order_detail.html:113
+msgid "Articles command&eacute;s"
+msgstr "المنتجات المطلوبة"
+
+#: dashboard/order_detail.html:124
+msgid "Prix original"
+msgstr "السعر الأصلي"
+
+#: dashboard/order_detail.html:125
+msgid "Prix vendus"
+msgstr "الأسعار المبيعة"
+
+#: dashboard/order_detail.html:127
+msgid "Qte"
+msgstr "الكمية"
+
+#: dashboard/order_detail.html:128 dashboard/overview.html:122
+#: storefront/cart.html:18 storefront/checkout.html:25
+#: storefront/order_detail.html:36
+msgid "Total"
+msgstr "المجموع"
+
+#: dashboard/order_detail.html:159 dashboard/order_detail.html:208
+#: storefront/checkout.html:16
+msgid "&times;"
+msgstr "×"
+
+#: dashboard/order_detail.html:169
+msgid ""
+"Aucun article. (Cette commande a &eacute;t&eacute; cr&eacute;&eacute;e avant"
+" l'activation du panier.)"
+msgstr "لا توجد منتجات. (أُنشئ هذا الطلب قبل تفعيل السلة.)"
+
+#: dashboard/order_detail.html:195
+msgid "Original"
+msgstr "الأصلي"
+
+#: dashboard/order_detail.html:199
+msgid "Vendu"
+msgstr "المُباع"
+
+#: dashboard/order_detail.html:208
+msgid "DT ="
+msgstr "د.ت ="
+
+#: dashboard/order_detail.html:212
+msgid "Voir chez le fournisseur &rarr;"
+msgstr "عرض لدى المورّد ←"
+
+#: dashboard/order_detail.html:217 storefront/order_detail.html:53
+msgid "Aucun article."
+msgstr "لا توجد منتجات."
+
+#: dashboard/order_detail.html:225
+msgid "Co&ucirc;t fournisseur ("
+msgstr "تكلفة المورّد ("
+
+#: dashboard/order_detail.html:225
+msgid "DT)"
+msgstr "د.ت)"
+
+#: dashboard/order_detail.html:229 storefront/product_detail.html:74
+msgid "DT ("
+msgstr "د.ت ("
+
+#: dashboard/order_detail.html:232
+msgid "Total &agrave; payer par le client"
+msgstr "المبلغ الإجمالي الواجب دفعه من العميل"
+
+#: dashboard/order_detail.html:242
+msgid "Suivi de la commande"
+msgstr "تتبّع الطلب"
+
+#: dashboard/order_detail.html:256 storefront/checkout_modal.html:53
+#: storefront/product_detail.html:102
+msgid "&rarr;"
+msgstr "←"
+
+#: dashboard/order_detail.html:271
+msgid "Aucun &eacute;v&eacute;nement de suivi."
+msgstr "لا توجد أحداث تتبّع."
+
+#: dashboard/order_detail.html:278
+msgid "Note du client"
+msgstr "ملاحظة العميل"
+
+#: dashboard/orders.html:3
+msgid "Commandes &mdash; Karthago Commerce"
+msgstr "الطلبات — كَرْتاغو كوميرس"
+
+#: dashboard/orders.html:9
+msgid "Centre de commande : confirmez, suivez et validez chaque commande."
+msgstr "مركز الطلبات: أكّد وتابِع وصادق على كل طلب."
+
+#: dashboard/orders.html:34
+msgid "Nom, t&eacute;l&eacute;phone ou n&deg; de commande"
+msgstr "الاسم أو الهاتف أو رقم الطلب"
+
+#: dashboard/orders.html:70 dashboard/overview.html:118
+msgid "Commande"
+msgstr "الطلب"
+
+#: dashboard/orders.html:72
+msgid "Contact"
+msgstr "الاتصال"
+
+#: dashboard/orders.html:74 dashboard/overview.html:121
+#: storefront/order_detail.html:29
+msgid "Articles"
+msgstr "المنتجات"
+
+#: dashboard/orders.html:76
+msgid "Total (DT)"
+msgstr "المجموع (د.ت)"
+
+#: dashboard/overview.html:3
+msgid "Tableau de bord &mdash; Karthago Commerce"
+msgstr "لوحة التحكّم — كَرْتاغو كوميرس"
+
+#: dashboard/overview.html:12
+msgid "Vue d&e9;executive de votre activit&e9; dropshipping en Tunisie."
+msgstr "نظرة تنفيذية على نشاطك في الدروبشيبينغ التونسي."
+
+#: dashboard/overview.html:27
+msgid "GMV Aujourd'hui"
+msgstr "رقم المعاملات اليوم"
+
+#: dashboard/overview.html:32
+msgid "Volume de ventes aujourd'hui"
+msgstr "حجم المبيعات اليوم"
+
+#: dashboard/overview.html:37
+msgid "GMV 7 Jours"
+msgstr "رقم المعاملات في 7 أيام"
+
+#: dashboard/overview.html:42
+msgid "Derniers 7 jours"
+msgstr "آخر 7 أيام"
+
+#: dashboard/overview.html:47
+msgid "GMV Mois en cours"
+msgstr "رقم المعاملات للشهر الحالي"
+
+#: dashboard/overview.html:52
+msgid "Mois &agrave; ce jour"
+msgstr "الشهر إلى اليوم"
+
+#: dashboard/overview.html:57
+msgid "En attente de confirmation"
+msgstr "في انتظار التأكيد"
+
+#: dashboard/overview.html:62
+msgid "Commandes &agrave; confirmer par t&e9l&e9phone"
+msgstr "طلبات تؤكَّد هاتفيًا"
+
+#: dashboard/overview.html:73
+msgid "Commandes livr&e9;es et pay&e9;es"
+msgstr "طلبات مُسلَّمة ومدفوعة"
+
+#: dashboard/overview.html:80
+msgid "Commandes retourn&e9;es (retour)"
+msgstr "طلبات مرتجِعة"
+
+#: dashboard/overview.html:83
+msgid "Produits actifs"
+msgstr "منتجات نشِطة"
+
+#: dashboard/overview.html:85 storefront/catalog_base.html:96
+#: storefront/substore_catalog.html:91
+msgid "sur"
+msgstr "من"
+
+#: dashboard/overview.html:85
+msgid "r&e9;f&e9;rences"
+msgstr "مرجع"
+
+#: dashboard/overview.html:92
+msgid "GMV par jour (7 derniers jours)"
+msgstr "رقم المعاملات يوميًا (آخر 7 أيام)"
+
+#: dashboard/overview.html:98
+msgid "R&e9;partition par statut"
+msgstr "التوزيع حسب الحالة"
+
+#: dashboard/overview.html:109
+msgid "Commandes &agrave; confirmer"
+msgstr "طلبات تحتاج تأكيدًا"
+
+#: dashboard/overview.html:110
+msgid "Appelez le client, puis validez la commande."
+msgstr "اتصل بالعميل ثم صادق على الطلب."
+
+#: dashboard/overview.html:112
+msgid "Toutes les commandes &rarr;"
+msgstr "كل الطلبات ←"
+
+#: dashboard/overview.html:120
+msgid "T&eacute;l&eacute;phone"
+msgstr "الهاتف"
+
+#: dashboard/overview.html:123 storefront/cart.html:19
+msgid "Action"
+msgstr "إجراء"
+
+#: admin_dashboard/analytics.html:158 dashboard/overview.html:140
+msgid "Ouvrir"
+msgstr "فتح"
+
+#: dashboard/overview.html:146
+msgid "Aucune commande en attente de confirmation."
+msgstr "لا توجد طلبات في انتظار التأكيد."
+
+#: dashboard/overview.html:157
+msgid "Logs de scraping r&e9;cents"
+msgstr "آخر سجلّات الجمع"
+
+#: dashboard/overview.html:158
+msgid "Voir tout"
+msgstr "عرض الكل"
+
+#: dashboard/overview.html:166 dashboard/scrapers.html:79
+msgid "Trouv&e9;s"
+msgstr "المكتشفة"
+
+#: dashboard/overview.html:167 dashboard/scrapers.html:80
+msgid "Mis &agrave; jour"
+msgstr "آخر تحديث"
+
+#: dashboard/overview.html:168 dashboard/scrapers.html:82
+msgid "D&e9but"
+msgstr "البداية"
+
+#: dashboard/overview.html:185
+msgid "Aucun log de scraping."
+msgstr "لا توجد سجلّات جمع."
+
+#: dashboard/partials/_bulk_result.html:7
+msgid "R&eacute;sultat de l'import"
+msgstr "نتيجة الاستيراد"
+
+#: dashboard/partials/_bulk_result.html:11
+msgid "Import&eacute;s"
+msgstr "المستوردة"
+
+#: dashboard/partials/_bulk_result.html:15
+msgid "Lignes lues"
+msgstr "الأسطر المقروءة"
+
+#: admin_dashboard/analytics.html:233 dashboard/partials/_bulk_result.html:19
+#: dashboard/scrapers.html:81
+msgid "Erreurs"
+msgstr "الأخطاء"
+
+#: dashboard/partials/_bulk_result.html:27
+msgid "Lignes en erreur"
+msgstr "أسطر فيها خطأ"
+
+#: dashboard/partials/_bulk_result.html:32
+msgid "Ligne"
+msgstr "السطر"
+
+#: dashboard/partials/_bulk_result.html:41
+msgid "Voir mon catalogue &rarr;"
+msgstr "عرض كتالوجي ←"
+
+#: dashboard/partials/_status_badge.html:7
+msgid "Livr&eacute; &amp; pay&eacute;"
+msgstr "مُسلَّم ومدفوع"
+
+#: dashboard/partials/_status_badge.html:9
+msgid "Retourn&eacute;"
+msgstr "مرتجِع"
+
+#: dashboard/partials/_status_badge.html:11
+msgid "&Agrave; confirmer"
+msgstr "بانتظار التأكيد"
+
+#: dashboard/partials/_status_badge.html:13
+msgid "Confirm&eacute;e"
+msgstr "مؤكَّد"
+
+#: dashboard/partials/_status_badge.html:15
+msgid "Command&eacute; fournisseur"
+msgstr "تمّ الطلب من المورّد"
+
+#: dashboard/partials/_status_badge.html:17
+msgid "Exp&eacute;di&eacute;"
+msgstr "تمّ الشحن"
+
+#: dashboard/products.html:3
+msgid "Mes produits &mdash; Karthago Commerce"
+msgstr "منتجاتي — كَرْتاغو كوميرس"
+
+#: dashboard/products.html:9
+msgid "Mes produits"
+msgstr "منتجاتي"
+
+#: dashboard/products.html:11
+msgid "Catalogue de"
+msgstr "كتالوج"
+
+#: dashboard/products.html:11
+msgid "Aucun magasin n'est associ&eacute; &agrave; votre compte."
+msgstr "لا يوجد متجر مرتبط بحسابك."
+
+#: dashboard/products.html:15 dashboard/products_bulk.html:9
+msgid "Import en masse"
+msgstr "استيراد جماعي"
+
+#: dashboard/products.html:26
+msgid "Ajouter un produit"
+msgstr "إضافة منتج"
+
+#: dashboard/products.html:30
+msgid "Titre *"
+msgstr "العنوان *"
+
+#: dashboard/products.html:34
+msgid "Co&ucirc;t d'achat (DT) *"
+msgstr "تكلفة الشراء (د.ت) *"
+
+#: dashboard/products.html:36
+msgid "Formats accept&eacute;s : 45,500 &middot; 45.500 DT &middot; 45500"
+msgstr "الصيغ المقبولة: 45,500 · 45.500 د.ت · 45500"
+
+#: dashboard/products.html:39
+msgid "Marge custom (%)"
+msgstr "هامش مخصّص (%)"
+
+#: dashboard/products.html:41
+msgid "Vide = marge de la boutique ("
+msgstr "فارغ = هامش المتجر ("
+
+#: dashboard/products.html:44
+msgid "Prix de vente (DT)"
+msgstr "سعر البيع (د.ت)"
+
+#: dashboard/products.html:45
+msgid "Calcul&eacute; automatiquement"
+msgstr "يُحسب تلقائيًا"
+
+#: dashboard/products.html:49 dashboard/products_bulk.html:74
+msgid "TV &amp; Audio"
+msgstr "تطقABLES/Audio"
+
+#: dashboard/products.html:52
+msgid "URL de l'image"
+msgstr "رابط الصورة"
+
+#: dashboard/products.html:67
+msgid "Publi&eacute;"
+msgstr "منشور"
+
+#: dashboard/products.html:73
+msgid "Ajouter le produit"
+msgstr "إضافة المنتج"
+
+#: dashboard/products.html:88
+msgid "&Eacute;tat"
+msgstr "الحالة"
+
+#: dashboard/products.html:89
+msgid "Actions"
+msgstr "إجراءات"
+
+#: admin_dashboard/analytics.html:142 dashboard/products.html:117
+msgid "En ligne"
+msgstr "متوفّر"
+
+#: dashboard/products.html:117
+msgid "Hors ligne"
+msgstr "غير متوفّر"
+
+#: dashboard/products.html:125 storefront/partials/_search_results.html:21
+#: storefront/partials/_store_product_card.html:16
+#: storefront/partials/_store_product_card.html:54
+msgid "Rupture"
+msgstr "نفد"
+
+#: dashboard/products.html:133 storefront/cart.html:46 storefront/cart.html:78
+msgid "Supprimer"
+msgstr "حذف"
+
+#: dashboard/products.html:140
+msgid ""
+"Aucun produit pour le moment. Ajoutez-en un &agrave; gauche, ou importez-en "
+"depuis le pool central."
+msgstr ""
+"لا توجد منتجات حاليًا. أضِف منتجًا على اليسار، أو استورد من المخزون المركزي."
+
+#: dashboard/products_bulk.html:3
+msgid "Import en masse &mdash; Karthago Commerce"
+msgstr "استيراد جماعي — كَرْتاغو كوميرس"
+
+#: dashboard/products_bulk.html:8 dashboard/products_import.html:8
+msgid "&larr; Retour aux produits"
+msgstr "← العودة إلى المنتجات"
+
+#: dashboard/products_bulk.html:11
+msgid ""
+"Importez un fichier CSV ou XLSX. L'import est atomique : s'il est "
+"annul&eacute;, votre catalogue reste intact."
+msgstr ""
+"استورد ملف CSV أو XLSX. الاستيراد ذرّي: إذا أُلغي، يبقى كتالوجك كما هو."
+
+#: dashboard/products_bulk.html:21
+msgid "Fichier CSV ou XLSX *"
+msgstr "ملف CSV أو XLSX *"
+
+#: dashboard/products_bulk.html:25 dashboard/products_import.html:34
+#: dashboard/products_import.html:67
+msgid "Importer"
+msgstr "استيراد"
+
+#: dashboard/products_bulk.html:28
+msgid ""
+"Le bouton fonctionne sans JavaScript : le r&eacute;sultat s'affiche alors "
+"sur la m&ecirc;me page."
+msgstr "الزر يعمل بدون JavaScript: تظهر النتيجة حينها في الصفحة نفسها."
+
+#: dashboard/products_bulk.html:35
+msgid "Colonnes attendues"
+msgstr "الأعمدة المتوقّعة"
+
+#: dashboard/products_bulk.html:37
+msgid ""
+"Les en-t&ecirc;tes ne sont pas sensibles &agrave; la casse. Les colonnes"
+msgstr "العناوين لا تتأثّر بحالة الأحرف. الأعمدة"
+
+#: dashboard/products_bulk.html:38
+msgid "et"
+msgstr "و"
+
+#: dashboard/products_bulk.html:39
+msgid "sont obligatoires."
+msgstr "إلزامية."
+
+#: dashboard/products_bulk.html:45
+msgid "Colonne"
+msgstr "العمود"
+
+#: dashboard/products_bulk.html:46
+msgid "Obligatoire"
+msgstr "إلزامي"
+
+#: dashboard/products_bulk.html:47
+msgid "Exemple"
+msgstr "مثال"
+
+#: dashboard/products_bulk.html:52
+msgid "title"
+msgstr "title"
+
+#: admin_dashboard/analytics.html:255 dashboard/products_bulk.html:53
+#: dashboard/products_bulk.html:58
+msgid "Oui"
+msgstr "نعم"
+
+#: dashboard/products_bulk.html:54
+msgid "TV Samsung 50\""
+msgstr "تلفزيون سامسونج 50\""
+
+#: dashboard/products_bulk.html:57
+msgid "source_cost"
+msgstr "source_cost"
+
+#: dashboard/products_bulk.html:62
+msgid "selling_price"
+msgstr "selling_price"
+
+#: admin_dashboard/analytics.html:255 dashboard/products_bulk.html:63
+#: dashboard/products_bulk.html:68 dashboard/products_bulk.html:73
+#: dashboard/products_bulk.html:78 dashboard/products_bulk.html:83
+msgid "Non"
+msgstr "لا"
+
+#: dashboard/products_bulk.html:67
+msgid "in_stock"
+msgstr "in_stock"
+
+#: dashboard/products_bulk.html:69
+msgid "oui"
+msgstr "نعم"
+
+#: dashboard/products_bulk.html:72
+msgid "category"
+msgstr "category"
+
+#: dashboard/products_bulk.html:77
+msgid "description"
+msgstr "description"
+
+#: dashboard/products_bulk.html:79
+msgid "Smart TV 4K"
+msgstr "تلفزيون ذكي 4K"
+
+#: dashboard/products_bulk.html:82
+msgid "image_urls"
+msgstr "image_urls"
+
+#: dashboard/products_bulk.html:84
+msgid "https://... ; https://..."
+msgstr "https://... ; https://..."
+
+#: dashboard/products_bulk.html:92
+msgid ""
+"Les prix tunisiens sont accept&eacute;s tels qu'ils sont &eacute;crits :"
+msgstr "تُقبل الأسعار التونسية كما هي مكتوبة:"
+
+#: dashboard/products_import.html:3
+msgid "Pool central &mdash; Karthago Commerce"
+msgstr "المخزون المركزي — كَرْتاغو كوميرس"
+
+#: dashboard/products_import.html:11
+msgid ""
+"Le catalogue brut des fournisseurs. S&eacute;lectionnez les produits "
+"&agrave; importer dans votre boutique."
+msgstr ""
+"الكتالوج الخام للمورّدين. اختر المنتجات التي تريد استيرادها إلى متجرك."
+
+#: dashboard/products_import.html:16
+msgid "Rechercher..."
+msgstr "بحث..."
+
+#: dashboard/products_import.html:31
+msgid "Co&ucirc;t source"
+msgstr "تكلفة المصدر"
+
+#: dashboard/products_import.html:75
+msgid "Aucun produit dans le pool central."
+msgstr "لا توجد منتجات في المخزون المركزي."
+
+#: dashboard/scrapers.html:3
+msgid "Contrôle des scrapers &mdash; Karthago Commerce"
+msgstr "مراقبة المجمّعات — كَرْتاغو كوميرس"
+
+#: dashboard/scrapers.html:8
+msgid "Contrôle des scrapers"
+msgstr "مراقبة المجمّعات"
+
+#: dashboard/scrapers.html:9
+msgid "Pilotage visuel du moteur de collecte produit."
+msgstr "قيادة بصرية لمحرك جمع المنتجات."
+
+#: dashboard/scrapers.html:12
+msgid "Ajouter une source"
+msgstr "إضافة مصدر"
+
+#: dashboard/scrapers.html:32
+msgid "S&e9;lecteur conteneur"
+msgstr "محدّد الحاوية"
+
+#: dashboard/scrapers.html:44
+msgid "Frequence"
+msgstr "التكرار"
+
+#: dashboard/scrapers.html:54
+msgid "Lancer maintenant"
+msgstr "شغّل الآن"
+
+#: dashboard/scrapers.html:61
+msgid "Aucune source de scraping configur&e9;e."
+msgstr "لا يوجد مصدر جمع مُهيّأ."
+
+#: dashboard/scrapers.html:62
+msgid "Ajouter une premi&egrave;re source"
+msgstr "أضف أوّل مصدر"
+
+#: dashboard/scrapers.html:70
+msgid "Logs d'exécution r&e9;cents"
+msgstr "آخر سجلّات التنفيذ"
+
+#: dashboard/scrapers.html:71
+msgid "Exporter"
+msgstr "تصدير"
+
+#: dashboard/scrapers.html:83
+msgid "Dur&e9;e"
+msgstr "المدّة"
+
+#: dashboard/scrapers.html:100
+msgid "s"
+msgstr "ث"
+
+#: dashboard/scrapers.html:104
+msgid "Aucun log d'exécution."
+msgstr "لا توجد سجلّات تنفيذ."
+
+#: dashboard/scrapers.html:117
+msgid "Ajouter une source de scraping"
+msgstr "إضافة مصدر جمع"
+
+#: dashboard/scrapers.html:123
+msgid "Nom de la source"
+msgstr "اسم المصدر"
+
+#: dashboard/scrapers.html:127
+msgid "Moteur"
+msgstr "المحرّك"
+
+#: dashboard/scrapers.html:129
+msgid "Statique (HTTPX + Selectolax)"
+msgstr "ثابت (HTTPX + Selectolax)"
+
+#: dashboard/scrapers.html:130
+msgid "Dynamique (Playwright)"
+msgstr "ديناميكي (Playwright)"
+
+#: dashboard/scrapers.html:135
+msgid "URL de base"
+msgstr "الرابط الأساسي"
+
+#: dashboard/scrapers.html:136
+msgid "https://exemple.com/produits"
+msgstr "https://exemple.com/produits"
+
+#: dashboard/scrapers.html:140
+msgid "Sélecteur conteneur produit"
+msgstr "محدّد حاوية المنتج"
+
+#: dashboard/scrapers.html:144
+msgid "Sélecteur titre"
+msgstr "محدّد العنوان"
+
+#: dashboard/scrapers.html:145
+msgid "h2.title"
+msgstr "h2.title"
+
+#: dashboard/scrapers.html:150
+msgid "Sélecteur prix"
+msgstr "محدّد السعر"
+
+#: dashboard/scrapers.html:154
+msgid "Sélecteur stock"
+msgstr "محدّد المخزون"
+
+#: dashboard/scrapers.html:155
+msgid ".stock"
+msgstr ".stock"
+
+#: dashboard/scrapers.html:160
+msgid "Sélecteur images"
+msgstr "محدّد الصور"
+
+#: dashboard/scrapers.html:161
+msgid "img"
+msgstr "img"
+
+#: dashboard/scrapers.html:164
+msgid "Fréquence (heures)"
+msgstr "التكرار (ساعات)"
+
+#: dashboard/scrapers.html:170
+msgid "Créer la source"
+msgstr "إنشاء المصدر"
+
+#: storefront/cart.html:4
+msgid "Panier &mdash; Karthago Commerce"
+msgstr "السلة — كَرْتاغو كوميرس"
+
+#: storefront/cart.html:7
+msgid "Votre Panier"
+msgstr "سلّتك"
+
+#: storefront/cart.html:16 storefront/order_detail.html:35
+msgid "Prix unitaire"
+msgstr "سعر الوحدة"
+
+#: storefront/cart.html:17 storefront/order_detail.html:34
+#: storefront/product_detail.html:87
+msgid "Quantit&eacute;"
+msgstr "الكمية"
+
+#: storefront/cart.html:68
+msgid "DT &times;"
+msgstr "د.ت ×"
+
+#: storefront/cart.html:87
+msgid "Total:"
+msgstr "المجموع:"
+
+#: storefront/cart.html:90
+msgid "Passer la commande &rarr;"
+msgstr "إتمام الطلب ←"
+
+#: storefront/cart.html:98 storefront/checkout.html:84
+msgid "Votre panier est vide"
+msgstr "سلّتك فارغة"
+
+#: storefront/cart.html:99
+msgid "Ajoutez des produits pour commencer vos achats."
+msgstr "أضِف منتجات لتبدأ التسوّق."
+
+#: storefront/cart.html:101 storefront/checkout.html:87
+msgid "D&eacute;couvrir les produits &rarr;"
+msgstr "تصفّح المنتجات ←"
+
+#: storefront/catalog_base.html:11 storefront/product_detail.html:16
+#: storefront/substore_catalog.html:9
+msgid "Accueil"
+msgstr "الرئيسية"
+
+#: storefront/catalog_base.html:24 storefront/substore_catalog.html:23
+msgid "Trier"
+msgstr "ترتيب"
+
+#: storefront/catalog_base.html:39 storefront/catalog_base.html:115
+msgid "Filtres"
+msgstr "الفلاتر"
+
+#: storefront/catalog_base.html:59 storefront/substore_catalog.html:34
+msgid "Résultats pour"
+msgstr "النتائج عن"
+
+#: storefront/catalog_base.html:67 storefront/substore_catalog.html:41
+msgid "Filtre :"
+msgstr "الفلتر:"
+
+#: storefront/catalog_base.html:79 storefront/substore_catalog.html:78
+msgid "Aucun produit disponible."
+msgstr "لا يوجد أي منتج متاح."
+
+#: storefront/catalog_base.html:80
+msgid "Essayez d'élargir vos filtres."
+msgstr "جرّب توسيع الفلاتر."
+
+#: storefront/catalog_base.html:81
+msgid "Voir tout le catalogue"
+msgstr "عرض الكتالوج كاملًا"
+
+#: storefront/catalog_base.html:88 storefront/substore_catalog.html:86
+msgid "Pagination"
+msgstr "تصفّح الصفحات"
+
+#: storefront/catalog_base.html:90
+msgid "Première"
+msgstr "الأولى"
+
+#: storefront/catalog_base.html:93 storefront/substore_catalog.html:88
+msgid "Précédente"
+msgstr "السابقة"
+
+#: storefront/catalog_base.html:96 storefront/substore_catalog.html:91
+msgid "Page"
+msgstr "صفحة"
+
+#: storefront/catalog_base.html:99 storefront/substore_catalog.html:94
+msgid "Suivante"
+msgstr "التالية"
+
+#: storefront/catalog_base.html:102
+msgid "Dernière"
+msgstr "الأخيرة"
+
+#: storefront/checkout.html:3
+msgid "Checkout &mdash; Karthago Commerce"
+msgstr "إتمام الطلب — كَرْتاغو كوميرس"
+
+#: storefront/checkout.html:6
+msgid "Checkout &mdash; Paiement &agrave; la livraison"
+msgstr "إتمام الطلب — الدفع عند الاستلام"
+
+#: storefront/checkout.html:11
+msgid "Votre commande"
+msgstr "طلبك"
+
+#: storefront/checkout.html:29
+msgid ""
+"Le montant est calcul&eacute; par le serveur : il ne peut pas &ecirc;tre "
+"modifi&eacute; depuis le navigateur."
+msgstr "المبلغ يُحسب من طرف الخادم: لا يمكن تعديله من المتصفّح."
+
+#: storefront/checkout.html:38 storefront/checkout_modal.html:15
+msgid "Nom complet"
+msgstr "الاسم الكامل"
+
+#: storefront/checkout.html:42 storefront/checkout_modal.html:19
+msgid "T&eacute;l&eacute;phone (8 chiffres)"
+msgstr "الهاتف (8 أرقام)"
+
+#: storefront/checkout.html:46 storefront/checkout_modal.html:23
+msgid "Email (optionnel)"
+msgstr "البريد الإلكتروني (اختياري)"
+
+#: storefront/checkout.html:58 storefront/checkout_modal.html:35
+msgid "D&eacute;l&eacute;gation / Ville"
+msgstr "البلدية / المدينة"
+
+#: storefront/checkout.html:62 storefront/checkout_modal.html:39
+msgid "Adresse d&eacute;taill&eacute;e"
+msgstr "العنوان بالتفصيل"
+
+#: storefront/checkout.html:67 storefront/checkout_modal.html:44
+msgid "Note pour le vendeur (optionnel)"
+msgstr "ملاحظة للبائع (اختياري)"
+
+#: storefront/checkout.html:68 storefront/checkout_modal.html:45
+msgid "Ex: appeler avant 18h"
+msgstr "مثال: الاتصال قبل الساعة 18:00"
+
+#: storefront/checkout.html:72
+msgid "Confirmer la commande &mdash;"
+msgstr "تأكيد الطلب —"
+
+#: storefront/checkout.html:75
+msgid ""
+"Paiement &agrave; la livraison &bull; Livraison 24&ndash;48h &bull; "
+"Confirmation t&eacute;l&eacute;phonique"
+msgstr "الدفع عند الاستلام • التوصيل خلال 24–48 ساعة • تأكيد هاتفي"
+
+#: storefront/checkout.html:85
+msgid "Ajoutez des produits avant de passer la commande."
+msgstr "أضِف منتجات قبل إتمام الطلب."
+
+#: storefront/checkout_modal.html:7
+msgid "Commander &mdash; Paiement &agrave; la livraison"
+msgstr "اطلب — الدفع عند الاستلام"
+
+#: storefront/checkout_modal.html:53
+msgid "Passer la commande"
+msgstr "إتمام الطلب"
+
+#: storefront/checkout_modal.html:55
+msgid ""
+"Paiement &agrave; la livraison &bull; Confirmation "
+"t&eacute;l&eacute;phonique sous 24h"
+msgstr "الدفع عند الاستلام • تأكيد هاتفي خلال أقل من 24 ساعة"
+
+#: storefront/home.html:3
+msgid "Karthago &mdash; Dropshipping Tunisia | Paiement à la livraison"
+msgstr "كَرْتاغو — دروبشيبينغ تونس | الدفع عند الاستلام"
+
+#: storefront/home.html:4 storefront/home.html:25
+msgid "Plus de"
+msgstr "أكثر من"
+
+#: storefront/home.html:4
+msgid ""
+"produits réels importés des meilleurs fournisseurs tunisiens. Achat en "
+"ligne, paiement à la livraison, livraison 24-48h dans les 24 gouvernorats."
+msgstr ""
+"منتج حقيقي مستورد من أفضل المورّدين التونسيين. شراء عبر الإنترنت، دفع عند "
+"الاستلام، وتوصيل خلال 24–48 ساعة في الـ24 ولاية."
+
+#: storefront/home.html:5
+msgid "Karthago &mdash; Le e-commerce tunisien, sans boutique"
+msgstr "كَرْتاغو — التجارة الإلكترونية التونسية، بلا متجر"
+
+#: storefront/home.html:6
+msgid ""
+"Produits réels, prix transparents, paiement à la livraison partout en "
+"Tunisie."
+msgstr "منتجات حقيقية، أسعار شفّافة، ودفع عند الاستلام في كل تونس."
+
+#: storefront/home.html:19
+msgid "🚚 Livraison partout en Tunisie"
+msgstr "🚚 توصيل في كل تونس"
+
+#: storefront/home.html:22
+msgid "Le e-commerce"
+msgstr "التجارة الإلكترونية"
+
+#: storefront/home.html:22
+msgid "tunisien,"
+msgstr "التونسية،"
+
+#: storefront/home.html:22
+msgid "sans boutique."
+msgstr "بلا متجر."
+
+#: storefront/home.html:25
+msgid ""
+"produits réels, importés directement des meilleurs magasins tunisiens. "
+"Paiement à la livraison, envoi sous 24 à 48&nbsp;heures."
+msgstr ""
+"منتجات حقيقية مستوردة مباشرة من أفضل المتاجر التونسية. الدفع عند الاستلام، "
+"والشحن خلال 24 إلى 48 ساعة."
+
+#: storefront/home.html:31
+msgid "Découvrir le catalogue →"
+msgstr "تصفّح الكتالوج ←"
+
+#: storefront/home.html:34
+msgid "🔥 Voir les Sélections"
+msgstr "🔥 اطّلع على المختارات"
+
+#: storefront/home.html:72 storefront/product_detail.html:39
+msgid "✨ Sélection de la plateforme"
+msgstr "✨ مختارات المنصّة"
+
+#: storefront/home.html:73
+msgid "Les produits choisis par notre équipe."
+msgstr "المنتجات التي اختارها فريقنا."
+
+#: storefront/home.html:76 storefront/home.html:96 storefront/home.html:121
+#: storefront/substore_home.html:85
+msgid "Tout voir →"
+msgstr "عرض الكل ←"
+
+#: storefront/home.html:92
+msgid "Nos catégories"
+msgstr "أقسامنا"
+
+#: storefront/home.html:93
+msgid "Trouvez ce qu'il vous faut, par univers."
+msgstr "اعثر على ما تحتاجه حسب المجال."
+
+#: storefront/home.html:106
+msgid "produits"
+msgstr "منتجات"
+
+#: storefront/home.html:117
+msgid "Nouveautés"
+msgstr "وصل حديثًا"
+
+#: storefront/home.html:118
+msgid "Les derniers produits ajoutés au catalogue."
+msgstr "آخر المنتجات المضافة إلى الكتالوج."
+
+#: storefront/home.html:129
+msgid "Le catalogue se remplit — revenez dans un instant."
+msgstr "الكتالوج يت充实 — عُد بعد قليل."
+
+#: storefront/home.html:138
+msgid "Une question sur un produit&nbsp;?"
+msgstr "لديك سؤال عن منتج؟"
+
+#: storefront/home.html:140
+msgid ""
+"Notre équipe est disponible 7j/7 pour vous conseiller et confirmer la "
+"disponibilité."
+msgstr "فريقنا متاح 7/7 чтобы ينصحك ويؤكّد التوفّر."
+
+#: storefront/home.html:144
+msgid "Voir mon panier"
+msgstr "عرض سلّتي"
+
+#: storefront/home.html:147
+msgid "Continuer mes achats"
+msgstr "متابعة التسوّق"
+
+#: storefront/order_detail.html:21
+msgid "D&e9tails"
+msgstr "التفاصيل"
+
+#: storefront/order_detail.html:22
+msgid "Mode de paiement : Paiement &agrave; la livraison"
+msgstr "طريقة الدفع: الدفع عند الاستلام"
+
+#: storefront/order_detail.html:23
+msgid "Total :"
+msgstr "المجموع:"
+
+#: storefront/order_detail.html:24
+msgid "Pass&eacute;e le"
+msgstr "بتاريخ"
+
+#: storefront/order_detail.html:45
+msgid "Fournisseur :"
+msgstr "المورّد:"
+
+#: storefront/partials/_category_tree.html:47
+msgid "✕ Réinitialiser le prix"
+msgstr "✕ إعادة ضبط السعر"
+
+#: storefront/partials/_category_tree.html:55
+msgid "Options"
+msgstr "الخيارات"
+
+#: storefront/partials/_category_tree.html:62
+msgid "En stock uniquement"
+msgstr "المتوفّر فقط"
+
+#: storefront/partials/_search_results.html:5
+msgid "Résultats pour \""
+msgstr "النتائج عن \""
+
+#: storefront/partials/_search_results.html:28
+msgid "Aucun produit trouvé."
+msgstr "لا يوجد منتج."
+
+#: storefront/partials/_search_results.html:31
+msgid "Tapez pour rechercher…"
+msgstr "اكتب للبحث…"
+
+#: storefront/partials/_store_product_card.html:20
+msgid "✨ Sélection"
+msgstr "✨ مختارات"
+
+#: storefront/partials/_store_product_card.html:45
+msgid "marge"
+msgstr "هامش"
+
+#: storefront/partials/_store_product_card.html:54
+msgid "+ Panier"
+msgstr "+ السلة"
+
+#: storefront/pool_product.html:3
+msgid "&mdash; Vue fournisseur | Karthago"
+msgstr "— عرض لدى المورّد | كَرْتاغو"
+
+#: storefront/pool_product.html:4
+msgid "Fiche fournisseur de"
+msgstr "صفحة المورّد لـ"
+
+#: storefront/pool_product.html:4
+msgid "DT."
+msgstr "د.ت."
+
+#: storefront/pool_product.html:10
+msgid "Fiche fournisseur — pas une page de vente"
+msgstr "صفحة المورّد — ليست صفحة بيع"
+
+#: storefront/pool_product.html:12
+msgid ""
+"Ce produit appartient au pool central de la plateforme. Un boutique "
+"partenaire peut l'importer dans son propre catalogue depuis son tableau de "
+"bord."
+msgstr ""
+"هذا المنتج ينتمي إلى المخزون المركزي للمنصّة. يمكن لمتجر شريك استيراده إلى "
+"كتالوجه من لوحته."
+
+#: storefront/pool_product.html:59
+msgid "Ouvrir la page du fournisseur →"
+msgstr "فتح صفحة المورّد ←"
+
+#: storefront/product_detail.html:4
+msgid "DT, livraison 24-48h partout en Tunisie, paiement à la livraison."
+msgstr "د.ت، توصيل خلال 24–48 ساعة في كل تونس، ودفع عند الاستلام."
+
+#: storefront/product_detail.html:5
+msgid "product"
+msgstr "منتج"
+
+#: storefront/product_detail.html:7
+msgid "DT, paiement à la livraison."
+msgstr "د.ت، مع الدفع عند الاستلام."
+
+#: storefront/product_detail.html:72
+msgid "Prix de vente conseill&eacute; en dinars tunisiens."
+msgstr "سعر البيع المقترح بالدينار التونسي."
+
+#: storefront/product_detail.html:81
+msgid "Disponibilit&eacute;"
+msgstr "التوفّر"
+
+#: storefront/product_detail.html:83 storefront/product_detail.html:112
+msgid "Rupture de stock"
+msgstr "نفد من المخزون"
+
+#: storefront/product_detail.html:95 storefront/product_detail.html:102
+msgid "Commander Directement"
+msgstr "اطلب مباشرة"
+
+#: storefront/product_detail.html:97
+msgid "Paiement &agrave; la livraison"
+msgstr "الدفع عند الاستلام"
+
+#: storefront/product_detail.html:104
+msgid "Paiement &agrave; la livraison &bull; 24&ndash;48h"
+msgstr "الدفع عند الاستلام • 24–48 ساعة"
+
+#: storefront/product_detail.html:112
+msgid "Ajouter au panier"
+msgstr "أضِف إلى السلة"
+
+#: storefront/product_detail.html:118
+msgid "Voir chez le fournisseur →"
+msgstr "عرض لدى المورّد ←"
+
+#: storefront/product_detail.html:128
+msgid "Livraison 24&ndash;48h"
+msgstr "التوصيل خلال 24–48 ساعة"
+
+#: storefront/product_detail.html:129
+msgid "24 gouvernorats"
+msgstr "24 ولاية"
+
+#: storefront/product_detail.html:133
+msgid "V&eacute;rifiez avant de payer"
+msgstr "تحقّق قبل الدفع"
+
+#: storefront/product_detail.html:134
+msgid "COD s&eacute;curis&eacute;"
+msgstr "دفع عند الاستلام آمن"
+
+#: storefront/product_detail.html:138
+msgid "Retour sous 7 jours"
+msgstr "إرجاع خلال 7 أيام"
+
+#: storefront/product_detail.html:139
+msgid "Satisfait ou rembours&eacute;"
+msgstr "راضٍ أو مُسترجَع"
+
+#: storefront/product_detail.html:143
+msgid "Support WhatsApp"
+msgstr "دعم واتساب"
+
+#: storefront/product_detail.html:144
+msgid "7j/7"
+msgstr "7/7"
+
+#: storefront/substore_catalog.html:3
+msgid "Catalogue &mdash;"
+msgstr "الكتالوج —"
+
+#: storefront/substore_catalog.html:4
+msgid "Tous les produits de"
+msgstr "كل منتجات"
+
+#: storefront/substore_catalog.html:4
+msgid ". Paiement à la livraison, livraison 24-48h en Tunisie."
+msgstr ". الدفع عند الاستلام، وتوصيل خلال 24–48 ساعة في تونس."
+
+#: storefront/substore_catalog.html:79 storefront/substore_home.html:92
+msgid "Cette boutique n'a pas encore de produits publiés."
+msgstr "لا يزال هذا المتجر بلا منتجات منشورة."
+
+#: storefront/substore_home.html:4
+msgid ". Paiement à la livraison partout en Tunisie."
+msgstr ". الدفع عند الاستلام في كل تونس."
+
+#: storefront/substore_home.html:20
+msgid "🏪 Boutique partenaire"
+msgstr "🏪 متجر شريك"
+
+#: storefront/substore_home.html:31
+msgid "Voir le catalogue →"
+msgstr "عرض الكتالوج ←"
+
+#: storefront/substore_home.html:56
+msgid "24-48h"
+msgstr "24–48 ساعة"
+
+#: storefront/substore_home.html:59
+msgid "Paiement"
+msgstr "الدفع"
+
+#: storefront/substore_home.html:60
+msgid "À la livraison"
+msgstr "عند الاستلام"
+
+#: storefront/substore_home.html:84
+msgid "Nos produits"
+msgstr "منتجاتنا"
+
+#: admin_dashboard/curation.html:13
+msgid "produit en s&eacute;lection."
+msgid_plural "produits en s&eacute;lection."
+msgstr[0] "لا منتجات في المختارات."
+msgstr[1] "منتج واحد في المختارات."
+msgstr[2] "منتجان في المختارات."
+msgstr[3] "منتجات في المختارات."
+msgstr[4] "منتجًا في المختارات."
+msgstr[5] "منتج في المختارات."
+
+#: admin_dashboard/financials.html:56
+msgid "Sur %(counter)s commande livr&eacute;e"
+msgid_plural "Sur %(counter)s commandes livr&eacute;es"
+msgstr[0] "لا طلبات مُسلَّمة"
+msgstr[1] "على طلب واحد مُسلَّم"
+msgstr[2] "على طلبين مُسلَّمين"
+msgstr[3] "على %(counter)s طلبات مُسلَّمة"
+msgstr[4] "على %(counter)s طلبًا مُسلَّمًا"
+msgstr[5] "على %(counter)s طلب مُسلَّم"
+
+#: admin_dashboard/financials.html:61
+msgid "%(counter)s commande en attente de r&egrave;glement"
+msgid_plural "%(counter)s commandes en attente de r&egrave;glement"
+msgstr[0] "لا طلبات في انتظار الأداء"
+msgstr[1] "طلب واحد في انتظار الأداء"
+msgstr[2] "طلبان في انتظار الأداء"
+msgstr[3] "%(counter)s طلبات في انتظار الأداء"
+msgstr[4] "%(counter)s طلبًا في انتظار الأداء"
+msgstr[5] "%(counter)s طلب في انتظار الأداء"
+
+#: admin_dashboard/financials.html:71
+msgid "%(counter)s commande non encore livr&eacute;e"
+msgid_plural "%(counter)s commandes non encore livr&eacute;es"
+msgstr[0] "لا طلبات لم تُسلَّم بعد"
+msgstr[1] "طلب واحد لم يُسلَّم بعد"
+msgstr[2] "طلبان لم يُسلَّما بعد"
+msgstr[3] "%(counter)s طلبات لم تُسلَّم بعد"
+msgstr[4] "%(counter)s طلبًا لم يُسلَّم بعد"
+msgstr[5] "%(counter)s طلب لم يُسلَّم بعد"
+
+#: admin_dashboard/overview.html:15
+msgid "%(counter)s boutique"
+msgid_plural "%(counter)s boutiques"
+msgstr[0] "لا متاجر"
+msgstr[1] "متجر واحد"
+msgstr[2] "متجران"
+msgstr[3] "%(counter)s متاجر"
+msgstr[4] "%(counter)s متجرًا"
+msgstr[5] "%(counter)s متجر"
+
+#: admin_dashboard/overview.html:16
+msgid "%(counter)s produit dans le pool central ·"
+msgid_plural "%(counter)s produits dans le pool central ·"
+msgstr[0] "لا منتجات في المخزون المركزي ·"
+msgstr[1] "منتج واحد في المخزون المركزي ·"
+msgstr[2] "منتجان في المخزون المركزي ·"
+msgstr[3] "%(counter)s منتجات في المخزون المركزي ·"
+msgstr[4] "%(counter)s منتجًا في المخزون المركزي ·"
+msgstr[5] "%(counter)s منتج في المخزون المركزي ·"
+
+#: admin_dashboard/overview.html:17
+msgid "%(counter)s source de scraping"
+msgid_plural "%(counter)s sources de scraping"
+msgstr[0] "لا مصادر جمع"
+msgstr[1] "مصدر جمع واحد"
+msgstr[2] "مصدرا جمع"
+msgstr[3] "%(counter)s مصادر جمع"
+msgstr[4] "%(counter)s مصدر جمع"
+msgstr[5] "%(counter)s مصدر جمع"
+
+#: admin_dashboard/overview.html:51
+msgid "%(counter)s retour"
+msgid_plural "%(counter)s retours"
+msgstr[0] "لا عمليات إرجاع"
+msgstr[1] "إرجاع واحد"
+msgstr[2] "إرجاعان"
+msgstr[3] "%(counter)s عمليات إرجاع"
+msgstr[4] "%(counter)s عملية إرجاع"
+msgstr[5] "%(counter)s عملية إرجاع"
+
+#: admin_dashboard/selector_sandbox.html:51
+msgid "&eacute;l&eacute;ment trouv&eacute;"
+msgid_plural "&eacute;l&eacute;ments trouv&eacute;s"
+msgstr[0] "لا عناصر"
+msgstr[1] "عنصر واحد"
+msgstr[2] "عنصران"
+msgstr[3] "%(counter)s عناصر"
+msgstr[4] "%(counter)s عنصرًا"
+msgstr[5] "%(counter)s عنصر"
+
+#: dashboard/finances.html:44
+msgid "%(counter)s commande livr&eacute;e"
+msgid_plural "%(counter)s commandes livr&eacute;es"
+msgstr[0] "لا طلبات مُسلَّمة"
+msgstr[1] "طلب واحد مُسلَّم"
+msgstr[2] "طلبان مُسلَّمان"
+msgstr[3] "%(counter)s طلبات مُسلَّمة"
+msgstr[4] "%(counter)s طلبًا مُسلَّمًا"
+msgstr[5] "%(counter)s طلب مُسلَّم"
+
+#: dashboard/finances.html:76
+msgid "%(counter)s commande livr&eacute;e en attente de r&egrave;gement ("
+msgid_plural ""
+"%(counter)s commandes livr&eacute;es en attente de r&egrave;gement ("
+msgstr[0] "لا طلبات مُسلَّمة في انتظار الأداء ("
+msgstr[1] "طلب واحد مُسلَّم في انتظار الأداء ("
+msgstr[2] "طلبان مُسلَّمان في انتظار الأداء ("
+msgstr[3] "%(counter)s طلبات مُسلَّمة في انتظار الأداء ("
+msgstr[4] "%(counter)s طلبًا مُسلَّمًا في انتظار الأداء ("
+msgstr[5] "%(counter)s طلب مُسلَّم في انتظار الأداء ("
+
+#: dashboard/order_detail.html:114
+msgid "%(counter)s article"
+msgid_plural "%(counter)s articles"
+msgstr[0] "لا منتجات"
+msgstr[1] "منتج واحد"
+msgstr[2] "منتجان"
+msgstr[3] "%(counter)s منتجات"
+msgstr[4] "%(counter)s منتجًا"
+msgstr[5] "%(counter)s منتج"
+
+#: storefront/catalog_base.html:22 apps/core/tests/test_i18n.py:135
+#: apps/core/tests/test_i18n.py:138
+msgid "%(counter)s produit"
+msgid_plural "%(counter)s produits"
+msgstr[0] "لا منتجات"
+msgstr[1] "منتج واحد"
+msgstr[2] "منتجان"
+msgstr[3] "%(counter)s منتجات"
+msgstr[4] "%(counter)s منتجًا"
+msgstr[5] "%(counter)s منتج"
+
+#: storefront/catalog_base.html:123
+msgid "Voir %(counter)s produit"
+msgid_plural "Voir %(counter)s produits"
+msgstr[0] "لا يوجد منتج لعرضه"
+msgstr[1] "عرض منتج واحد"
+msgstr[2] "عرض منتجين"
+msgstr[3] "عرض %(counter)s منتجات"
+msgstr[4] "عرض %(counter)s منتجًا"
+msgstr[5] "عرض %(counter)s منتج"
+
+#: storefront/substore_catalog.html:20
+msgid "%(counter)s produit disponible."
+msgid_plural "%(counter)s produits disponibles."
+msgstr[0] "لا منتجات متاحة."
+msgstr[1] "منتج واحد متاح."
+msgstr[2] "منتجان متاحان."
+msgstr[3] "%(counter)s منتجات متاحة."
+msgstr[4] "%(counter)s منتجًا متاحًا."
+msgstr[5] "%(counter)s منتج متاح."
+
+#: admin_dashboard/analytics.html:3
+msgid "Analytique plateforme"
+msgstr "تحليلات المنصّة"
+
+#: admin_dashboard/analytics.html:3
+msgid "Superadmin Karthago"
+msgstr "إدارة كَرْتاغو العليا"
+
+#: admin_dashboard/analytics.html:11
+msgid "📊 Analytique plateforme"
+msgstr "📊 تحليلات المنصّة"
+
+#: admin_dashboard/analytics.html:13
+msgid "Vue d'ensemble de la plateforme"
+msgstr "نظرة شاملة على المنصّة"
+
+#: admin_dashboard/analytics.html:15
+msgid "%(counter)s boutique ·"
+msgid_plural "%(counter)s boutiques ·"
+msgstr[0] "لا متاجر ·"
+msgstr[1] "متجر واحد ·"
+msgstr[2] "متجران ·"
+msgstr[3] "%(counter)s متاجر ·"
+msgstr[4] "%(counter)s متجرًا ·"
+msgstr[5] "%(counter)s متجر ·"
+
+#: admin_dashboard/analytics.html:16
+msgid "%(counter)s produit en ligne ·"
+msgid_plural "%(counter)s produits en ligne ·"
+msgstr[0] "لا منتجات منشورة ·"
+msgstr[1] "منتج واحد منشور ·"
+msgstr[2] "منتجان منشوران ·"
+msgstr[3] "%(counter)s منتجات منشورة ·"
+msgstr[4] "%(counter)s منتجًا منشورًا ·"
+msgstr[5] "%(counter)s منتج منشور ·"
+
+#: admin_dashboard/analytics.html:17
+msgid "%(counter)s commande ·"
+msgid_plural "%(counter)s commandes ·"
+msgstr[0] "لا طلبات ·"
+msgstr[1] "طلب واحد ·"
+msgstr[2] "طلبان ·"
+msgstr[3] "%(counter)s طلبات ·"
+msgstr[4] "%(counter)s طلبًا ·"
+msgstr[5] "%(counter)s طلب ·"
+
+#: admin_dashboard/analytics.html:21
+msgid "Pilotage"
+msgstr "التوجيه"
+
+#: admin_dashboard/analytics.html:24
+msgid "Exporter CSV"
+msgstr "تصدير CSV"
+
+#: admin_dashboard/analytics.html:31
+msgid "CA total"
+msgstr "إجمالي رقم الأعمال"
+
+#: admin_dashboard/analytics.html:33
+msgid "Aujourd'hui :"
+msgstr "اليوم:"
+
+#: admin_dashboard/analytics.html:41
+msgid "Commission réalisée"
+msgstr "العمولة المحقّقة"
+
+#: admin_dashboard/analytics.html:43
+msgid "% du CA livré"
+msgstr "٪ من رقم الأعمال المُسلَّم"
+
+#: admin_dashboard/analytics.html:46
+msgid "En attente de règlement"
+msgstr "في انتظار التسديد"
+
+#: admin_dashboard/analytics.html:49
+msgid "%(counter)s commande livrée non réglée"
+msgid_plural "%(counter)s commandes livrées non réglées"
+msgstr[0] "لا طلبات مُسلَّمة غير مُسدَّدة"
+msgstr[1] "طلب واحد مُسلَّم غير مُسدَّد"
+msgstr[2] "طلبان مُسلَّمان غير مُسدَّدين"
+msgstr[3] "%(counter)s طلبات مُسلَّمة غير مُسدَّدة"
+msgstr[4] "%(counter)s طلبًا مُسلَّمًا غير مُسدَّد"
+msgstr[5] "%(counter)s طلب مُسلَّم غير مُسدَّد"
+
+#: admin_dashboard/analytics.html:64
+msgid "retours"
+msgstr "مرتجعات"
+
+#: admin_dashboard/analytics.html:67
+msgid "À confirmer"
+msgstr "في انتظار التأكيد"
+
+#: admin_dashboard/analytics.html:69
+msgid "commandes en attente"
+msgstr "طلبات في الانتظار"
+
+#: admin_dashboard/analytics.html:75
+msgid "%(counter)s source active ·"
+msgid_plural "%(counter)s sources actives ·"
+msgstr[0] "لا مصدر نشط ·"
+msgstr[1] "مصدر واحد نشط ·"
+msgstr[2] "مصدران نشطان ·"
+msgstr[3] "%(counter)s مصادر نشطة ·"
+msgstr[4] "%(counter)s مصدرًا نشطًا ·"
+msgstr[5] "%(counter)s مصدر نشط ·"
+
+#: admin_dashboard/analytics.html:76
+msgid "%(counter)s source au total"
+msgid_plural "%(counter)s sources au total"
+msgstr[0] "لا مصدر"
+msgstr[1] "مصدر واحد"
+msgstr[2] "مصدران"
+msgstr[3] "%(counter)s مصادر"
+msgstr[4] "%(counter)s مصدرًا"
+msgstr[5] "%(counter)s مصدر"
+
+#: admin_dashboard/analytics.html:83
+msgid "CA, coût fournisseur et commission (30 jours)"
+msgstr "رقم الأعمال وتكلفة المورّد والعمولة (30 يومًا)"
+
+#: admin_dashboard/analytics.html:89
+msgid "Jour"
+msgstr "اليوم"
+
+#: admin_dashboard/analytics.html:91 admin_dashboard/analytics.html:127
+msgid "CA (DT)"
+msgstr "رقم الأعمال (د.ت)"
+
+#: admin_dashboard/analytics.html:92
+msgid "Coût (DT)"
+msgstr "التكلفة (د.ت)"
+
+#: admin_dashboard/analytics.html:93 admin_dashboard/analytics.html:128
+msgid "Marge (DT)"
+msgstr "الهامش (د.ت)"
+
+#: admin_dashboard/analytics.html:94 admin_dashboard/analytics.html:129
+msgid "Commission (DT)"
+msgstr "العمولة (د.ت)"
+
+#: admin_dashboard/analytics.html:118
+msgid "Performance par boutique"
+msgstr "الأداء حسب المتجر"
+
+#: admin_dashboard/analytics.html:130
+msgid "Livrées"
+msgstr "مُسلَّمة"
+
+#: admin_dashboard/analytics.html:131
+msgid "À régler"
+msgstr "في انتظار التسديد"
+
+#: admin_dashboard/analytics.html:132
+msgid "Vitrine"
+msgstr "الواجهة"
+
+#: admin_dashboard/analytics.html:166
+msgid "Aucune boutique enregistrée."
+msgstr "لا يوجد أي متجر مسجَّل."
+
+#: admin_dashboard/analytics.html:184
+msgid "conversion :"
+msgstr "معدّل التحويل:"
+
+#: admin_dashboard/analytics.html:216
+msgid "Aucune vente enregistrée."
+msgstr "لا يوجد أي بيع مسجَّل."
+
+#: admin_dashboard/analytics.html:223
+msgid "Santé des sources de scraping"
+msgstr "حالة مصادر الجمع"
+
+#: admin_dashboard/analytics.html:230
+msgid "Dernier passage"
+msgstr "آخر مرور"
+
+#: admin_dashboard/analytics.html:231
+msgid "Trouvés"
+msgstr "المكتشَف"
+
+#: admin_dashboard/analytics.html:232
+msgid "Mis à jour"
+msgstr "المُحدَّث"
+
+#: admin_dashboard/analytics.html:244
+msgid "Jamais exécutée"
+msgstr "لم تُنفَّذ أبدًا"
+
+#: admin_dashboard/analytics.html:259
+msgid "Aucune source configurée."
+msgstr "لا يوجد أي مصدر مُهيّأ."
+
+#: admin_dashboard/overview.html:21 storefront/nav.html:23
+msgid "Analytique"
+msgstr "التحليلات"
+
+#: dashboard/overview.html:18 dashboard/store_settings.html:3
+#: dashboard/store_settings.html:9 storefront/nav.html:139
+msgid "Ma boutique"
+msgstr "متجري"
+
+#: dashboard/store_settings.html:3
+msgid "Tableau de bord Karthago"
+msgstr "لوحة تحكّم كَرْتاغو"
+
+#: dashboard/store_settings.html:8
+msgid "&larr; Retour au tableau de bord"
+msgstr "&larr; العودة إلى لوحة التحكّم"
+
+#: dashboard/store_settings.html:11
+msgid "Ces informations apparaissent sur votre vitrine publique."
+msgstr "تظهر هذه المعلومات في واجهة متجرك العلنية."
+
+#: dashboard/store_settings.html:18
+msgid "Boutique non en ligne."
+msgstr "المتجر غير متاح على الإنترنت."
+
+#: dashboard/store_settings.html:22
+msgid "Vos produits ne sont pas visibles par les visiteurs."
+msgstr "منتجاتك غير مرئية للزوّار."
+
+#: dashboard/store_settings.html:43
+msgid "Présentez votre boutique en quelques lignes."
+msgstr "عرّف بمتجرك في أسطر قليلة."
+
+#: dashboard/store_settings.html:49
+msgid "Logo"
+msgstr "الشعار"
+
+#: dashboard/store_settings.html:50
+msgid "PNG, JPG ou WEBP, 2 Mo maximum. L'image est réduite à 512 px."
+msgstr "PNG أو JPG أو WEBP، بحد أقصى 2 ميغا. تُصغَّر الصورة إلى 512 بكسل."
+
+#: dashboard/store_settings.html:62
+msgid "Envoyer une image"
+msgstr "رفع صورة"
+
+#: dashboard/store_settings.html:66
+msgid "… ou une URL d'image"
+msgstr "… أو رابط صورة"
+
+#: dashboard/store_settings.html:75
+msgid "Coordonnées"
+msgstr "بيانات الاتصال"
+
+#: dashboard/store_settings.html:76
+msgid "Affichées sur votre vitrine pour que vos clients vous joignent."
+msgstr "تظهر في واجهة متجرك ليتمكّن زبائنك من الاتصال بك."
+
+#: dashboard/store_settings.html:81 dashboard/store_settings.html:85
+msgid "Ex. +216 20 123 456"
+msgstr "مثال: ‎+216 20 123 456"
+
+#: dashboard/store_settings.html:89
+msgid "Ex. 10 rue de Carthage, Tunis"
+msgstr "مثال: 10 شارع قرطاجة، تونس"
+
+#: dashboard/store_settings.html:96
+msgid "Prix par défaut"
+msgstr "الأسعار الافتراضية"
+
+#: dashboard/store_settings.html:97
+msgid "Appliqués à vos produits qui n'ont pas de prix défini."
+msgstr "تُطبَّق على منتجاتك التي لا تحتوي على سعر محدّد."
+
+#: dashboard/store_settings.html:101
+msgid "Majoration (%)"
+msgstr "نسبة الزيادة (٪)"
+
+#: dashboard/store_settings.html:103
+msgid "En pourcentage du coût fournisseur."
+msgstr "كنسبة مئوية من تكلفة المورّد."

@@ -26,6 +26,7 @@ from apps.orders.models import Order, OrderItem, PayoutSettlement
 from apps.scraper.models import ScrapedSource, ScraperLog
 
 from .admin_services import platform_analytics
+from . import analytics as analytics_plane
 
 
 def _date_range(request):
@@ -250,6 +251,99 @@ def store_commission(request, store_id):
         "admin_dashboard/partials/_commission_form.html",
         {"store": store, "commission_types": Store.COMMISSION_TYPES},
     )
+
+
+@login_required
+@staff_required
+def analytics(request):
+    """The platform analytics plane.
+
+    A single console that shows the whole platform: the headline
+    numbers, the money per tenant, the COD funnel, the geography, the
+    best sellers and the health of the scraping plane — with a link to
+    the public front of every store.
+    """
+    payload = analytics_plane.analytics_payload()
+    return render(
+        request,
+        "admin_dashboard/analytics.html",
+        {
+            "kpis": payload["kpis"],
+            "store_rows": payload["stores"],
+            "funnel": payload["funnel"],
+            "revenue": payload["revenue"],
+            # NOT ``governorates``: that name is already used by the
+            # context processor for the list of the 24 governorates,
+            # and the checkout modal unpacks it as pairs.
+            "governorate_rows": payload["governorates"],
+            "top_products": payload["top_products"],
+            "scraper_rows": payload["scrapers"],
+        },
+    )
+
+
+@login_required
+@staff_required
+def analytics_export(request):
+    """Export the platform analytics as a CSV file."""
+    import csv
+
+    from django.http import HttpResponse
+
+    payload = analytics_plane.analytics_payload()
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = (
+        'attachment; filename="karthago-analytics.csv"'
+    )
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            "Boutique",
+            "Slug",
+            "Statut",
+            "Produits",
+            "Produits en ligne",
+            "Commandes",
+            "CA (DT)",
+            "Cout fournisseur (DT)",
+            "Marge brute (DT)",
+            "Commission (DT)",
+            "Livraison net vendeur (DT)",
+            "Livrees",
+            "Commission realisee (DT)",
+            "Taux realise (%)",
+            "Commandes non reglees",
+            "Commission non reglee (DT)",
+            "Reglements",
+            "Reglements payes",
+        ]
+    )
+    for row in payload["stores"]:
+        store = row["store"]
+        writer.writerow(
+            [
+                store.name,
+                store.slug,
+                store.status_label,
+                row["products"],
+                row["published_products"],
+                row["orders"],
+                f"{row['gmv']:.3f}",
+                f"{row['supplier_cost']:.3f}",
+                f"{row['gross_margin']:.3f}",
+                f"{row['platform_cut']:.3f}",
+                f"{row['vendor_payout']:.3f}",
+                row["delivered"],
+                f"{row['delivered_cut']:.3f}",
+                row["realized_rate"],
+                row["unsettled_orders"],
+                f"{row['unsettled_cut']:.3f}",
+                row["settlements"],
+                row["paid_settlements"],
+            ]
+        )
+    return response
 
 
 @login_required

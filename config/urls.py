@@ -8,6 +8,8 @@ from apps.core import views as core_views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("healthz/", core_views.healthz, name="healthz"),
+    path("i18n/setlang/", core_views.set_language, name="set_language"),
+    path("s/<slug:slug>/logo/", core_views.store_logo, name="store_logo"),
     path("", include("apps.core.seo_urls")),
     path("", include("apps.catalog.urls")),
     path("orders/", include("apps.orders.urls")),

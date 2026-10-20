@@ -1,21 +1,22 @@
+{% load i18n %}
 {% comment %}
 Result of a bulk import, swapped in by HTMX (or rendered inline on the
 non-JavaScript path).
 {% endcomment %}
 <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-    <h2 class="text-sm font-bold text-gray-900 mb-3">R&eacute;sultat de l'import</h2>
+    <h2 class="text-sm font-bold text-gray-900 mb-3">{% trans 'R&eacute;sultat de l\'import' %}</h2>
 
     <div class="flex flex-wrap gap-3 mb-4">
         <div class="bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
-            <div class="text-xs uppercase tracking-wider text-emerald-700 font-bold">Import&eacute;s</div>
+            <div class="text-xs uppercase tracking-wider text-emerald-700 font-bold">{% trans 'Import&eacute;s' %}</div>
             <div class="text-2xl font-bold text-emerald-700">{{ imported }}</div>
         </div>
         <div class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
-            <div class="text-xs uppercase tracking-wider text-gray-500 font-bold">Lignes lues</div>
+            <div class="text-xs uppercase tracking-wider text-gray-500 font-bold">{% trans 'Lignes lues' %}</div>
             <div class="text-2xl font-bold text-gray-700">{{ total }}</div>
         </div>
         <div class="{% if errors %}bg-red-50 border border-red-200{% else %}bg-gray-50 border border-gray-200{% endif %} rounded-lg px-4 py-3">
-            <div class="text-xs uppercase tracking-wider font-bold {% if errors %}text-red-700{% else %}text-gray-500{% endif %}">Erreurs</div>
+            <div class="text-xs uppercase tracking-wider font-bold {% if errors %}text-red-700{% else %}text-gray-500{% endif %}">{% trans 'Erreurs' %}</div>
             <div class="text-2xl font-bold {% if errors %}text-red-700{% else %}text-gray-700{% endif %}">{{ errors|length }}</div>
         </div>
     </div>
@@ -23,12 +24,12 @@ non-JavaScript path).
     {% if errors %}
     <div class="border-t pt-3">
         <h3 class="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">
-            Lignes en erreur
+            {% trans 'Lignes en erreur' %}
         </h3>
         <ul class="space-y-1 max-h-64 overflow-y-auto">
             {% for error in errors %}
             <li class="text-xs text-red-700 flex gap-2">
-                <span class="font-semibold shrink-0">Ligne {{ error.line }}</span>
+                <span class="font-semibold shrink-0">{% trans 'Ligne' %} {{ error.line }}</span>
                 <span class="text-red-600">{{ error.message }}</span>
             </li>
             {% endfor %}
@@ -36,8 +37,7 @@ non-JavaScript path).
     </div>
     {% endif %}
 
-    <a href="{% url 'dashboard:product_create' %}"
-       class="inline-block mt-4 text-sm text-amber-600 font-medium hover:underline">
-        Voir mon catalogue &rarr;
+    <a href="{% url 'dashboard:product_create' %}" class="inline-block mt-4 text-sm text-amber-600 font-medium hover:underline">
+        {% trans 'Voir mon catalogue &rarr;' %}
     </a>
 </div>

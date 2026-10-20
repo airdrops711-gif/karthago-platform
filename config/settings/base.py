@@ -34,6 +34,9 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # The language of the request (fr / ar) is resolved here, after the
+    # session (the language may be stored in it) and before the views.
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -57,6 +60,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.core.context_processors.tenant_context",
+                "apps.core.context_processors.language_context",
                 "apps.core.context_processors.tunisian_governorates",
                 "apps.core.context_processors.cart_item_count",
                 "apps.core.context_processors.nav_categories",
@@ -86,7 +90,35 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-LANGUAGE_CODE = "en-us"
+# --- Bilingual (fr / ar) ----------------------------------------------
+# The platform speaks two languages: French (the source language of the
+# UI) and Tunisian Arabic. The catalogue files live in ``locale/``.
+LANGUAGE_CODE = "fr"
+
+LANGUAGES = [
+    ("fr", "Français"),
+    ("ar", "العربية"),
+]
+
+LOCALE_PATHS = [BASE_DIR / "locale"]
+
+# The language chosen by the visitor is kept in a cookie for one year.
+LANGUAGE_COOKIE_NAME = "karthago_language"
+LANGUAGE_COOKIE_AGE = 60 * 60 * 24 * 365
+
+# --- Money and numbers ------------------------------------------------
+# The prices are stored in millimes (100.000 DT = 100 dinars 000 millimes),
+# so the decimal point is a dot and the thousands are grouped with a comma.
+# Django's own ``fr``/``ar`` locale modules would use a comma as the
+# decimal separator, so the project ships its own format modules
+# (``config/formats/``) which are loaded first.
+FORMAT_MODULE_PATH = ["config.formats"]
+
+USE_THOUSAND_SEPARATOR = True
+DECIMAL_SEPARATOR = "."
+THOUSAND_SEPARATOR = ","
+NUMBER_GROUPING = 3
+
 TIME_ZONE = "Africa/Tunis"
 USE_I18N = True
 USE_TZ = True

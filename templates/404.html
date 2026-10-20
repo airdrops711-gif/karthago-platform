@@ -1,21 +1,21 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}Page introuvable &mdash; Karthago{% endblock %}
+{% block title %}{% trans 'Page introuvable &mdash; Karthago' %}{% endblock %}
 
 {% block content %}
 <div class="max-w-xl mx-auto text-center py-16">
     <div class="text-5xl mb-4">🔍</div>
-    <h1 class="text-2xl font-bold text-gray-900 mb-2">Page introuvable</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">{% trans 'Page introuvable' %}</h1>
     <p class="text-gray-600 mb-8">
         {% if tenant_store and not tenant_store.is_platform_default %}
-            La boutique demand&eacute;e n'existe pas ou n'est plus active.
+            {% trans 'La boutique demand&eacute;e n\'existe pas ou n\'est plus active.' %}
         {% else %}
-            La page que vous cherchez n'existe pas ou a &eacute;t&eacute; d&eacute;plac&eacute;e.
+            {% trans 'La page que vous cherchez n\'existe pas ou a &eacute;t&eacute; d&eacute;plac&eacute;e.' %}
         {% endif %}
     </p>
-    <a href="{% if is_sub_store %}{% url 'catalog:substore_home' tenant_store.slug %}{% else %}{% url 'catalog:home' %}{% endif %}"
-       class="inline-block px-5 py-2.5 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-700 transition">
-        Retour &agrave; la boutique
+    <a href="{% if is_sub_store %}{% url 'catalog:substore_home' tenant_store.slug %}{% else %}{% url 'catalog:home' %}{% endif %}" class="inline-block px-5 py-2.5 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-700 transition">
+        {% trans 'Retour &agrave; la boutique' %}
     </a>
 </div>
 {% endblock %}

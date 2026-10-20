@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% load static %}
-{% block title %}Superadmin &mdash; Karthago Commerce{% endblock %}
+{% load static i18n %}
+{% block title %}{% trans 'Superadmin &mdash; Karthago Commerce' %}{% endblock %}
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
@@ -8,53 +8,54 @@
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
             <span class="inline-flex items-center gap-1.5 bg-gray-900 text-white px-2.5 py-1 rounded-full text-[11px] font-semibold mb-3">
-                🛡️ Superadmin plateforme
+                {% trans '🛡️ Superadmin plateforme' %}
             </span>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Pilotage de la plateforme</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{% trans 'Pilotage de la plateforme' %}</h1>
             <p class="text-gray-500 mt-1 text-sm">
-                {{ store_count }} boutique{{ store_count|pluralize }} ·
-                {{ central_pool_size }} produit{{ central_pool_size|pluralize }} dans le pool central ·
-                {{ scraper_sources }} source{{ scraper_sources|pluralize }} de scraping
+                {% blocktrans count counter=store_count %}{{ counter }} boutique{% plural %}{{ counter }} boutiques{% endblocktrans %} ·
+                {% blocktrans count counter=central_pool_size %}{{ counter }} produit dans le pool central ·{% plural %}{{ counter }} produits dans le pool central ·{% endblocktrans %}
+                {% blocktrans count counter=scraper_sources %}{{ counter }} source de scraping{% plural %}{{ counter }} sources de scraping{% endblocktrans %}
             </p>
         </div>
         <nav class="flex flex-wrap gap-2">
-            <a href="{% url 'admin_dashboard:stores' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">Boutiques</a>
-            <a href="{% url 'admin_dashboard:curation' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">Curation</a>
-            <a href="{% url 'admin_dashboard:orders' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">Commandes</a>
-            <a href="{% url 'admin_dashboard:scrapers' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">Scrapers</a>
-            <a href="{% url 'admin_dashboard:central_pool' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">Pool central</a>
-            <a href="{% url 'admin_dashboard:financials' %}" class="px-3 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-700">Finances</a>
+            <a href="{% url 'admin_dashboard:analytics' %}" class="px-3 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800">{% trans 'Analytique' %}</a>
+            <a href="{% url 'admin_dashboard:stores' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">{% trans 'Boutiques' %}</a>
+            <a href="{% url 'admin_dashboard:curation' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">{% trans 'Curation' %}</a>
+            <a href="{% url 'admin_dashboard:orders' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">{% trans 'Commandes' %}</a>
+            <a href="{% url 'admin_dashboard:scrapers' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">{% trans 'Scrapers' %}</a>
+            <a href="{% url 'admin_dashboard:central_pool' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">{% trans 'Pool central' %}</a>
+            <a href="{% url 'admin_dashboard:financials' %}" class="px-3 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-700">{% trans 'Finances' %}</a>
         </nav>
     </div>
 
     <!-- KPI cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">GMV aujourd'hui</div>
-            <div class="text-2xl font-bold text-gray-900 mt-1">{{ gmv_today|floatformat:3 }} <span class="text-sm text-gray-400">DT</span></div>
-            <div class="text-xs text-gray-400 mt-1">30 jours : {{ gmv_mtd|floatformat:3 }} DT</div>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'GMV aujourd\'hui' %}</div>
+            <div class="text-2xl font-bold text-gray-900 mt-1">{{ gmv_today|floatformat:3 }} <span class="text-sm text-gray-400">{% trans 'DT' %}</span></div>
+            <div class="text-xs text-gray-400 mt-1">{% trans '30 jours :' %} {{ gmv_mtd|floatformat:3 }} {% trans 'DT' %}</div>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Marge brute</div>
-            <div class="text-2xl font-bold text-emerald-600 mt-1">{{ gross_margin|floatformat:3 }} <span class="text-sm text-gray-400">DT</span></div>
-            <div class="text-xs text-gray-400 mt-1">{{ margin_percent }}% du CA</div>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'Marge brute' %}</div>
+            <div class="text-2xl font-bold text-emerald-600 mt-1">{{ gross_margin|floatformat:3 }} <span class="text-sm text-gray-400">{% trans 'DT' %}</span></div>
+            <div class="text-xs text-gray-400 mt-1">{{ margin_percent }}{% trans '% du CA' %}</div>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Taux de livraison</div>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'Taux de livraison' %}</div>
             <div class="text-2xl font-bold text-gray-900 mt-1">{{ delivery_rate }}%</div>
-            <div class="text-xs text-gray-400 mt-1">{{ delivered_orders }}/{{ total_orders }} commandes livrées</div>
+            <div class="text-xs text-gray-400 mt-1">{{ delivered_orders }}/{{ total_orders }} {% trans 'commandes livrées' %}</div>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Taux de retour</div>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'Taux de retour' %}</div>
             <div class="text-2xl font-bold {% if return_rate > 10 %}text-red-600{% else %}text-gray-900{% endif %} mt-1">{{ return_rate }}%</div>
-            <div class="text-xs text-gray-400 mt-1">{{ returned_orders }} retour{{ returned_orders|pluralize }}</div>
+            <div class="text-xs text-gray-400 mt-1">{% blocktrans count counter=returned_orders %}{{ counter }} retour{% plural %}{{ counter }} retours{% endblocktrans %}</div>
         </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <!-- Revenue vs COGS -->
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h2 class="text-sm font-bold text-gray-900 mb-4">CA vs coût fournisseur (14 jours)</h2>
+            <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'CA vs coût fournisseur (14 jours)' %}</h2>
             {% if revenue_by_day %}
             <div class="flex items-end gap-1 h-48">
                 {% for row in revenue_by_day %}
@@ -67,24 +68,24 @@
                 {% endfor %}
             </div>
             <div class="flex items-center gap-4 mt-3 text-xs text-gray-500">
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-amber-500 rounded"></span> CA</span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-gray-300 rounded"></span> Coût fournisseur</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-amber-500 rounded"></span> {% trans 'CA' %}</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-gray-300 rounded"></span> {% trans 'Coût fournisseur' %}</span>
             </div>
             {% else %}
-            <p class="text-sm text-gray-400 py-10 text-center">Aucune commande sur la période.</p>
+            <p class="text-sm text-gray-400 py-10 text-center">{% trans 'Aucune commande sur la période.' %}</p>
             {% endif %}
         </div>
 
         <!-- Governorate bars -->
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h2 class="text-sm font-bold text-gray-900 mb-4">Commandes par gouvernorat</h2>
+            <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'Commandes par gouvernorat' %}</h2>
             {% if by_governorate %}
             <ul class="space-y-2.5 max-h-48 overflow-y-auto pr-1">
                 {% for row in by_governorate %}
                 <li>
                     <div class="flex items-center justify-between text-xs mb-1">
                         <span class="font-medium text-gray-700">{{ row.customer__governorate|default:"—" }}</span>
-                        <span class="text-gray-400">{{ row.count }} · {{ row.revenue|floatformat:0 }} DT</span>
+                        <span class="text-gray-400">{{ row.count }} · {{ row.revenue|floatformat:0 }} {% trans 'DT' %}</span>
                     </div>
                     <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div class="h-full bg-amber-500 rounded-full" style="width: {% widthratio row.count by_governorate.0.count 100 %}%"></div>
@@ -93,7 +94,7 @@
                 {% endfor %}
             </ul>
             {% else %}
-            <p class="text-sm text-gray-400 py-10 text-center">Aucune donnée.</p>
+            <p class="text-sm text-gray-400 py-10 text-center">{% trans 'Aucune donnée.' %}</p>
             {% endif %}
         </div>
     </div>
@@ -101,14 +102,13 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- COD funnel -->
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h2 class="text-sm font-bold text-gray-900 mb-4">Entonnoir COD</h2>
+            <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'Entonnoir COD' %}</h2>
             <ul class="space-y-2">
                 {% for stage in funnel %}
                 <li class="flex items-center gap-3">
                     <span class="w-28 text-xs font-medium text-gray-600 shrink-0">{{ stage.stage }}</span>
                     <div class="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-amber-400 to-amber-600 flex items-center px-2"
-                             style="width: {% widthratio stage.count total_orders 100 %}%">
+                        <div class="h-full bg-gradient-to-r from-amber-400 to-amber-600 flex items-center px-2" style="width: {% widthratio stage.count total_orders 100 %}%">
                             <span class="text-[10px] font-bold text-white">{{ stage.count }}</span>
                         </div>
                     </div>
@@ -119,35 +119,35 @@
 
         <!-- Top products -->
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h2 class="text-sm font-bold text-gray-900 mb-4">Meilleures ventes</h2>
+            <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'Meilleures ventes' %}</h2>
             {% if top_products %}
             <ul class="divide-y divide-gray-100">
                 {% for row in top_products %}
                 <li class="flex items-center justify-between py-2 text-sm">
                     <span class="text-gray-700 truncate mr-3">{{ row.product_title|truncatechars:40 }}</span>
-                    <span class="text-amber-700 font-semibold shrink-0">{{ row.revenue|floatformat:0 }} DT</span>
+                    <span class="text-amber-700 font-semibold shrink-0">{{ row.revenue|floatformat:0 }} {% trans 'DT' %}</span>
                 </li>
                 {% endfor %}
             </ul>
             {% else %}
-            <p class="text-sm text-gray-400 py-10 text-center">Aucune vente.</p>
+            <p class="text-sm text-gray-400 py-10 text-center">{% trans 'Aucune vente.' %}</p>
             {% endif %}
         </div>
     </div>
 
     <!-- Stores summary -->
     <div class="mt-8 bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <h2 class="text-sm font-bold text-gray-900 mb-4">Boutiques de la plateforme</h2>
+        <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'Boutiques de la plateforme' %}</h2>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
                     <tr>
-                        <th class="px-4 py-2.5 font-medium">Boutique</th>
-                        <th class="px-4 py-2.5 font-medium">Slug</th>
-                        <th class="px-4 py-2.5 font-medium text-right">Produits</th>
-                        <th class="px-4 py-2.5 font-medium text-right">Publiés</th>
-                        <th class="px-4 py-2.5 font-medium text-right">Marge</th>
-                        <th class="px-4 py-2.5 font-medium text-right">Statut</th>
+                        <th class="px-4 py-2.5 font-medium">{% trans 'Boutique' %}</th>
+                        <th class="px-4 py-2.5 font-medium">{% trans 'Slug' %}</th>
+                        <th class="px-4 py-2.5 font-medium text-right">{% trans 'Produits' %}</th>
+                        <th class="px-4 py-2.5 font-medium text-right">{% trans 'Publiés' %}</th>
+                        <th class="px-4 py-2.5 font-medium text-right">{% trans 'Marge' %}</th>
+                        <th class="px-4 py-2.5 font-medium text-right">{% trans 'Statut' %}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -156,23 +156,23 @@
                         <td class="px-4 py-2.5 font-medium text-gray-900">
                             {{ store.name }}
                             {% if store.is_platform_default %}
-                            <span class="ml-1 text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">Flagship</span>
+                            <span class="ml-1 text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">{% trans 'Flagship' %}</span>
                             {% endif %}
                         </td>
-                        <td class="px-4 py-2.5 text-gray-500 font-mono text-xs">/s/{{ store.slug }}/</td>
+                        <td class="px-4 py-2.5 text-gray-500 font-mono text-xs">{% trans '/s/' %}{{ store.slug }}/</td>
                         <td class="px-4 py-2.5 text-right">{{ store.product_count|default:0 }}</td>
                         <td class="px-4 py-2.5 text-right">{{ store.published_count|default:0 }}</td>
                         <td class="px-4 py-2.5 text-right">{{ store.default_markup_percentage }}%</td>
                         <td class="px-4 py-2.5 text-right">
                             {% if store.is_active %}
-                            <span class="text-xs font-semibold text-emerald-600">Active</span>
+                            <span class="text-xs font-semibold text-emerald-600">{% trans 'Active' %}</span>
                             {% else %}
-                            <span class="text-xs font-semibold text-red-500">Inactive</span>
+                            <span class="text-xs font-semibold text-red-500">{% trans 'Inactive' %}</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="6" class="px-4 py-6 text-center text-gray-400">Aucune boutique.</td></tr>
+                    <tr><td colspan="6" class="px-4 py-6 text-center text-gray-400">{% trans 'Aucune boutique.' %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

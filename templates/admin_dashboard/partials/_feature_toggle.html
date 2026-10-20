@@ -1,3 +1,4 @@
+{% load i18n %}
 {% comment %}
 Feature toggle of the curation table.
 
@@ -5,32 +6,20 @@ The whole cell is swapped by HTMX after a click, so the partial shows
 the current state of one product only.
 {% endcomment %}
 <div id="feature-cell-{{ product.id }}" class="flex items-center gap-2 justify-end">
-    <button type="button"
-            hx-post="{% url 'admin_dashboard:curation_toggle' product.id %}"
-            hx-target="#feature-cell-{{ product.id }}"
-            hx-swap="innerHTML"
-            title="{% if product.is_featured_on_main %}Retirer de la s&eacute;lection{% else %}Mettre en s&eacute;lection{% endif %}"
-            class="w-8 h-8 rounded-lg flex items-center justify-center transition border
+    <button type="button" hx-post="{% url 'admin_dashboard:curation_toggle' product.id %}" hx-target="#feature-cell-{{ product.id }}" hx-swap="innerHTML" title="{% if product.is_featured_on_main %}Retirer de la s&eacute;lection{% else %}Mettre en s&eacute;lection{% endif %}" class="w-8 h-8 rounded-lg flex items-center justify-center transition border
                    {% if product.is_featured_on_main %}bg-amber-600 border-amber-600 text-white
                    {% else %}bg-white border-gray-300 text-gray-400 hover:border-amber-300 hover:text-amber-600{% endif %}">
         {% if product.is_featured_on_main %}&#10003;{% else %}&#43;{% endif %}
     </button>
 
-    <form hx-post="{% url 'admin_dashboard:curation_priority' product.id %}"
-          hx-target="#feature-cell-{{ product.id }}"
-          hx-swap="innerHTML"
-          class="flex items-center gap-1">
+    <form hx-post="{% url 'admin_dashboard:curation_priority' product.id %}" hx-target="#feature-cell-{{ product.id }}" hx-swap="innerHTML" class="flex items-center gap-1">
         <input type="hidden" name="featured_priority" value="{{ product.featured_priority }}">
-        <input type="number" name="featured_priority" value="{{ product.featured_priority }}"
-               min="0" step="1"
-               {% if not product.is_featured_on_main %}disabled{% endif %}
-               class="w-16 border border-gray-300 rounded-lg px-2 py-1 text-xs text-right focus:ring-2 focus:ring-amber-500 outline-none
+        <input type="number" name="featured_priority" value="{{ product.featured_priority }}" min="0" step="1" {% if not product.is_featured_on_main %}disabled{% endif %} class="w-16 border border-gray-300 rounded-lg px-2 py-1 text-xs text-right focus:ring-2 focus:ring-amber-500 outline-none
                       {% if not product.is_featured_on_main %}bg-gray-100 text-gray-400{% endif %}">
-        <button type="submit" {% if not product.is_featured_on_main %}disabled{% endif %}
-                class="px-2 py-1 rounded-lg text-xs font-semibold transition
+        <button type="submit" {% if not product.is_featured_on_main %}disabled{% endif %} class="px-2 py-1 rounded-lg text-xs font-semibold transition
                        {% if product.is_featured_on_main %}bg-gray-900 text-white hover:bg-gray-700
                        {% else %}bg-gray-100 text-gray-400 cursor-not-allowed{% endif %}">
-        OK
+        {% trans 'OK' %}
         </button>
     </form>
 </div>

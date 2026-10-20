@@ -1,96 +1,92 @@
 {% extends "base.html" %}
-{% block title %}Ledger financier &mdash; Superadmin Karthago{% endblock %}
+{% load i18n %}
+{% block title %}{% trans 'Ledger financier &mdash; Superadmin Karthago' %}{% endblock %}
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
-            <a href="{% url 'admin_dashboard:overview' %}" class="text-xs text-gray-400 hover:text-amber-600">&larr; Retour au pilotage</a>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">Ledger financier de la plateforme</h1>
+            <a href="{% url 'admin_dashboard:overview' %}" class="text-xs text-gray-400 hover:text-amber-600">{% trans '&larr; Retour au pilotage' %}</a>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{% trans 'Ledger financier de la plateforme' %}</h1>
             <p class="text-gray-500 mt-1 text-sm">
-                La commission n'est r&eacute;alis&eacute;e que sur les commandes
+                {% blocktrans trimmed %}La commission n'est r&eacute;alis&eacute;e que sur les commandes
                 livr&eacute;es et pay&eacute;es. En paiement &agrave; la livraison, l'argent
                 est encaiss&eacute; par le livreur : le solde non r&eacute;gl&eacute; est le
-                risque que la plateforme porte encore.
+                risque que la plateforme porte encore.{% endblocktrans %}
             </p>
         </div>
         <nav class="flex flex-wrap gap-2">
-            <a href="{% url 'admin_dashboard:stores' %}"
-               class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">Boutiques</a>
-            <a href="{% url 'admin_dashboard:orders' %}"
-               class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">Commandes</a>
+            <a href="{% url 'admin_dashboard:stores' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">{% trans 'Boutiques' %}</a>
+            <a href="{% url 'admin_dashboard:orders' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">{% trans 'Commandes' %}</a>
         </nav>
     </div>
 
     <!-- Date range filter -->
     <form method="get" class="mb-6 flex flex-wrap items-end gap-3 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
         <div>
-            <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Du</label>
-            <input type="date" name="since" value="{{ since|date:'Y-m-d' }}"
-                   class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{% trans 'Du' %}</label>
+            <input type="date" name="since" value="{{ since|date:'Y-m-d' }}" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
         </div>
         <div>
-            <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Au</label>
-            <input type="date" name="until" value="{{ until|date:'Y-m-d' }}"
-                   class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{% trans 'Au' %}</label>
+            <input type="date" name="until" value="{{ until|date:'Y-m-d' }}" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
         </div>
         <div>
-            <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Boutique</label>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">{% trans 'Boutique' %}</label>
             <select name="store" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-                <option value="">Toute la plateforme</option>
+                <option value="">{% trans 'Toute la plateforme' %}</option>
                 {% for s in stores %}
                 <option value="{{ s.id }}" {% if selected_store and selected_store.id == s.id %}selected{% endif %}>{{ s.name }}</option>
                 {% endfor %}
             </select>
         </div>
         <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800">
-            Filtrer
+            {% trans 'Filtrer' %}
         </button>
-        <a href="{% url 'admin_dashboard:financials_export' %}{% if selected_store %}?store={{ selected_store.id }}{% endif %}{% if since %}&amp;since={{ since|date:'Y-m-d' }}{% endif %}{% if until %}&amp;until={{ until|date:'Y-m-d' }}{% endif %}"
-           class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
-           Exporter en CSV
+        <a href="{% url 'admin_dashboard:financials_export' %}{% if selected_store %}?store={{ selected_store.id }}{% endif %}{% if since %}&amp;since={{ since|date:'Y-m-d' }}{% endif %}{% if until %}&amp;until={{ until|date:'Y-m-d' }}{% endif %}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+           {% trans 'Exporter en CSV' %}
         </a>
     </form>
 
     <!-- KPI cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Commission r&eacute;alis&eacute;e</div>
-            <div class="text-2xl font-bold text-emerald-600 mt-1">{{ ledger.platform_cut|floatformat:3 }} <span class="text-sm text-gray-400">DT</span></div>
-            <div class="text-xs text-gray-400 mt-1">Sur {{ ledger.delivered_orders }} commande{{ ledger.delivered_orders|pluralize }} livr&eacute;e{{ ledger.delivered_orders|pluralize }}</div>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'Commission r&eacute;alis&eacute;e' %}</div>
+            <div class="text-2xl font-bold text-emerald-600 mt-1">{{ ledger.platform_cut|floatformat:3 }} <span class="text-sm text-gray-400">{% trans 'DT' %}</span></div>
+            <div class="text-xs text-gray-400 mt-1">{% blocktrans count counter=ledger.delivered_orders %}Sur {{ counter }} commande livr&eacute;e{% plural %}Sur {{ counter }} commandes livr&eacute;es{% endblocktrans %}</div>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Solde non r&eacute;gl&eacute;</div>
-            <div class="text-2xl font-bold text-amber-600 mt-1">{{ ledger.unsettled_platform_cut|floatformat:3 }} <span class="text-sm text-gray-400">DT</span></div>
-            <div class="text-xs text-gray-400 mt-1">{{ ledger.unsettled_orders }} commande{{ ledger.unsettled_orders|pluralize }} en attente de r&egrave;glement</div>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'Solde non r&eacute;gl&eacute;' %}</div>
+            <div class="text-2xl font-bold text-amber-600 mt-1">{{ ledger.unsettled_platform_cut|floatformat:3 }} <span class="text-sm text-gray-400">{% trans 'DT' %}</span></div>
+            <div class="text-xs text-gray-400 mt-1">{% blocktrans count counter=ledger.unsettled_orders %}{{ counter }} commande en attente de r&egrave;glement{% plural %}{{ counter }} commandes en attente de r&egrave;glement{% endblocktrans %}</div>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Commission moyenne</div>
-            <div class="text-2xl font-bold text-gray-900 mt-1">{{ ledger.average_commission|floatformat:3 }} <span class="text-sm text-gray-400">DT</span></div>
-            <div class="text-xs text-gray-400 mt-1">par commande livr&eacute;e</div>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'Commission moyenne' %}</div>
+            <div class="text-2xl font-bold text-gray-900 mt-1">{{ ledger.average_commission|floatformat:3 }} <span class="text-sm text-gray-400">{% trans 'DT' %}</span></div>
+            <div class="text-xs text-gray-400 mt-1">{% trans 'par commande livr&eacute;e' %}</div>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">En route (COD)</div>
-            <div class="text-2xl font-bold text-gray-900 mt-1">{{ ledger.in_flight_gmv|floatformat:3 }} <span class="text-sm text-gray-400">DT</span></div>
-            <div class="text-xs text-gray-400 mt-1">{{ ledger.in_flight_orders }} commande{{ ledger.in_flight_orders|pluralize }} non encore livr&eacute;e{{ ledger.in_flight_orders|pluralize }}</div>
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'En route (COD)' %}</div>
+            <div class="text-2xl font-bold text-gray-900 mt-1">{{ ledger.in_flight_gmv|floatformat:3 }} <span class="text-sm text-gray-400">{% trans 'DT' %}</span></div>
+            <div class="text-xs text-gray-400 mt-1">{% blocktrans count counter=ledger.in_flight_orders %}{{ counter }} commande non encore livr&eacute;e{% plural %}{{ counter }} commandes non encore livr&eacute;es{% endblocktrans %}</div>
         </div>
     </div>
 
     <!-- Per-store ledger -->
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-8">
-        <h2 class="text-sm font-bold text-gray-900 mb-4">D&eacute;composition par boutique</h2>
+        <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'D&eacute;composition par boutique' %}</h2>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
                     <tr>
-                        <th class="px-4 py-2.5 font-medium">Boutique</th>
-                        <th class="px-4 py-2.5 font-medium text-right">Commandes</th>
-                        <th class="px-4 py-2.5 font-medium text-right">Livr&eacute;es</th>
-                        <th class="px-4 py-2.5 font-medium text-right">CA livr&eacute;</th>
-                        <th class="px-4 py-2.5 font-medium text-right">Commission</th>
-                        <th class="px-4 py-2.5 font-medium text-right">Taux</th>
-                        <th class="px-4 py-2.5 font-medium text-right">Net vendeur</th>
-                        <th class="px-4 py-2.5 font-medium text-right">R&eacute;conciliation</th>
+                        <th class="px-4 py-2.5 font-medium">{% trans 'Boutique' %}</th>
+                        <th class="px-4 py-2.5 font-medium text-right">{% trans 'Commandes' %}</th>
+                        <th class="px-4 py-2.5 font-medium text-right">{% trans 'Livr&eacute;es' %}</th>
+                        <th class="px-4 py-2.5 font-medium text-right">{% trans 'CA livr&eacute;' %}</th>
+                        <th class="px-4 py-2.5 font-medium text-right">{% trans 'Commission' %}</th>
+                        <th class="px-4 py-2.5 font-medium text-right">{% trans 'Taux' %}</th>
+                        <th class="px-4 py-2.5 font-medium text-right">{% trans 'Net vendeur' %}</th>
+                        <th class="px-4 py-2.5 font-medium text-right">{% trans 'R&eacute;conciliation' %}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -98,7 +94,7 @@
                     <tr>
                         <td class="px-4 py-2.5 font-medium text-gray-900">
                             {{ row.store_name }}
-                            <span class="block text-[10px] text-gray-400 font-mono">/s/{{ row.store_slug }}/</span>
+                            <span class="block text-[10px] text-gray-400 font-mono">{% trans '/s/' %}{{ row.store_slug }}/</span>
                         </td>
                         <td class="px-4 py-2.5 text-right">{{ row.orders }}</td>
                         <td class="px-4 py-2.5 text-right">{{ row.delivered }}</td>
@@ -109,15 +105,14 @@
                         <td class="px-4 py-2.5 text-right">
                             <form method="post" action="{% url 'admin_dashboard:settlement_create' row.store_id %}" class="inline-block">
                                 {% csrf_token %}
-                                <button type="submit"
-                                        class="px-2.5 py-1 rounded-lg bg-amber-600 text-white text-[11px] font-semibold hover:bg-amber-700">
-                                    G&eacute;n&eacute;rer le lot
+                                <button type="submit" class="px-2.5 py-1 rounded-lg bg-amber-600 text-white text-[11px] font-semibold hover:bg-amber-700">
+                                    {% trans 'G&eacute;n&eacute;rer le lot' %}
                                 </button>
                             </form>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="8" class="px-4 py-6 text-center text-gray-400">Aucune commande sur la p&eacute;riode.</td></tr>
+                    <tr><td colspan="8" class="px-4 py-6 text-center text-gray-400">{% trans 'Aucune commande sur la p&eacute;riode.' %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -127,16 +122,16 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Settlements -->
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-            <h2 class="text-sm font-bold text-gray-900 mb-4">Lots de paiement</h2>
+            <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'Lots de paiement' %}</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
                     <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
                         <tr>
-                            <th class="px-3 py-2 font-medium">R&eacute;f&eacute;rence</th>
-                            <th class="px-3 py-2 font-medium">Boutique</th>
-                            <th class="px-3 py-2 font-medium text-right">Cmd.</th>
-                            <th class="px-3 py-2 font-medium text-right">Net &agrave; verser</th>
-                            <th class="px-3 py-2 font-medium text-right">Statut</th>
+                            <th class="px-3 py-2 font-medium">{% trans 'R&eacute;f&eacute;rence' %}</th>
+                            <th class="px-3 py-2 font-medium">{% trans 'Boutique' %}</th>
+                            <th class="px-3 py-2 font-medium text-right">{% trans 'Cmd.' %}</th>
+                            <th class="px-3 py-2 font-medium text-right">{% trans 'Net &agrave; verser' %}</th>
+                            <th class="px-3 py-2 font-medium text-right">{% trans 'Statut' %}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -148,20 +143,19 @@
                             <td class="px-3 py-2 text-right font-semibold">{{ s.net_payout_to_vendor|floatformat:3 }}</td>
                             <td class="px-3 py-2 text-right">
                                 {% if s.is_paid %}
-                                <span class="text-[10px] font-bold px-2 py-1 rounded bg-emerald-100 text-emerald-700">Pay&eacute;</span>
+                                <span class="text-[10px] font-bold px-2 py-1 rounded bg-emerald-100 text-emerald-700">{% trans 'Pay&eacute;' %}</span>
                                 {% else %}
                                 <form method="post" action="{% url 'admin_dashboard:settlement_paid' s.id %}" class="inline-block">
                                     {% csrf_token %}
-                                    <button type="submit"
-                                            class="px-2 py-1 rounded-lg bg-gray-100 text-gray-700 text-[10px] font-semibold hover:bg-gray-200">
-                                        Marquer pay&eacute;
+                                    <button type="submit" class="px-2 py-1 rounded-lg bg-gray-100 text-gray-700 text-[10px] font-semibold hover:bg-gray-200">
+                                        {% trans 'Marquer pay&eacute;' %}
                                     </button>
                                 </form>
                                 {% endif %}
                             </td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="5" class="px-3 py-6 text-center text-gray-400">Aucun lot de paiement.</td></tr>
+                        <tr><td colspan="5" class="px-3 py-6 text-center text-gray-400">{% trans 'Aucun lot de paiement.' %}</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -171,20 +165,20 @@
         <!-- Detail of the selected store -->
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
             {% if store_detail %}
-            <h2 class="text-sm font-bold text-gray-900 mb-1">D&eacute;tail — {{ selected_store.name }}</h2>
+            <h2 class="text-sm font-bold text-gray-900 mb-1">{% trans 'D&eacute;tail —' %} {{ selected_store.name }}</h2>
             <p class="text-xs text-gray-500 mb-4">{{ selected_store.commission_label }}</p>
             <dl class="space-y-2 text-sm">
-                <div class="flex justify-between"><dt class="text-gray-500">CA brut livr&eacute;</dt><dd class="font-semibold">{{ store_detail.gmv|floatformat:3 }} DT</dd></div>
-                <div class="flex justify-between"><dt class="text-gray-500">Co&ucirc;t fournisseur</dt><dd class="font-semibold">{{ store_detail.supplier_cost|floatformat:3 }} DT</dd></div>
-                <div class="flex justify-between"><dt class="text-gray-500">Frais de livraison</dt><dd class="font-semibold">{{ store_detail.courier_cost|floatformat:3 }} DT</dd></div>
-                <div class="flex justify-between border-t border-gray-100 pt-2"><dt class="text-gray-500">Frais de plateforme</dt><dd class="font-semibold text-emerald-600">{{ store_detail.platform_cut|floatformat:3 }} DT</dd></div>
-                <div class="flex justify-between"><dt class="text-gray-500">Net &agrave; percevoir</dt><dd class="font-bold text-gray-900">{{ store_detail.vendor_payout|floatformat:3 }} DT</dd></div>
-                <div class="flex justify-between text-xs text-gray-400"><dt>En attente de r&egrave;glement</dt><dd>{{ store_detail.unsettled_orders }} commandes</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">{% trans 'CA brut livr&eacute;' %}</dt><dd class="font-semibold">{{ store_detail.gmv|floatformat:3 }} {% trans 'DT' %}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">{% trans 'Co&ucirc;t fournisseur' %}</dt><dd class="font-semibold">{{ store_detail.supplier_cost|floatformat:3 }} {% trans 'DT' %}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">{% trans 'Frais de livraison' %}</dt><dd class="font-semibold">{{ store_detail.courier_cost|floatformat:3 }} {% trans 'DT' %}</dd></div>
+                <div class="flex justify-between border-t border-gray-100 pt-2"><dt class="text-gray-500">{% trans 'Frais de plateforme' %}</dt><dd class="font-semibold text-emerald-600">{{ store_detail.platform_cut|floatformat:3 }} {% trans 'DT' %}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">{% trans 'Net &agrave; percevoir' %}</dt><dd class="font-bold text-gray-900">{{ store_detail.vendor_payout|floatformat:3 }} {% trans 'DT' %}</dd></div>
+                <div class="flex justify-between text-xs text-gray-400"><dt>{% trans 'En attente de r&egrave;glement' %}</dt><dd>{{ store_detail.unsettled_orders }} {% trans 'commandes' %}</dd></div>
             </dl>
             {% else %}
-            <h2 class="text-sm font-bold text-gray-900 mb-4">D&eacute;tail d'une boutique</h2>
+            <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'D&eacute;tail d\'une boutique' %}</h2>
             <p class="text-sm text-gray-400 py-8 text-center">
-                S&eacute;lectionnez une boutique dans le filtre ci-dessus pour voir son d&eacute;tail financier.
+                {% trans 'S&eacute;lectionnez une boutique dans le filtre ci-dessus pour voir son d&eacute;tail financier.' %}
             </p>
             {% endif %}
         </div>

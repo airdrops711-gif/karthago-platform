@@ -1,7 +1,8 @@
+{% load i18n %}
 {% if query %}
     {% if products %}
         <div class="p-2 border-b border-gray-100">
-            <p class="text-xs font-bold text-gray-400 uppercase mb-2">Résultats pour "{{ query }}"</p>
+            <p class="text-xs font-bold text-gray-400 uppercase mb-2">{% trans 'Résultats pour "' %}{{ query }}"</p>
         </div>
         <div class="divide-y divide-gray-100">
             {% for product in products %}
@@ -14,18 +15,18 @@
                     {% endif %}
                     <div>
                         <div class="text-sm font-medium text-gray-900 truncate w-32">{{ product.title }}</div>
-                        <div class="text-xs text-amber-700 font-bold">{{ product.selling_price }} DT</div>
+                        <div class="text-xs text-amber-700 font-bold">{{ product.selling_price }} {% trans 'DT' %}</div>
                     </div>
                     <span class="ml-auto text-xs {% if product.in_stock %}text-green-600{% else %}text-red-500{% endif %} font-medium">
-                        {% if product.in_stock %}En stock{% else %}Rupture{% endif %}
+                        {% if product.in_stock %}{% trans 'En stock' %}{% else %}{% trans 'Rupture' %}{% endif %}
                     </span>
                 </div>
             </a>
             {% endfor %}
         </div>
     {% else %}
-        <div class="p-4 text-center text-gray-500 text-sm">Aucun produit trouvé.</div>
+        <div class="p-4 text-center text-gray-500 text-sm">{% trans 'Aucun produit trouvé.' %}</div>
     {% endif %}
 {% else %}
-    <div class="p-4 text-center text-gray-400 text-sm">Tapez pour rechercher…</div>
+    <div class="p-4 text-center text-gray-400 text-sm">{% trans 'Tapez pour rechercher…' %}</div>
 {% endif %}

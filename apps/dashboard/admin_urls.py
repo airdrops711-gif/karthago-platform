@@ -12,6 +12,8 @@ app_name = "admin_dashboard"
 
 urlpatterns = [
     path("", admin_views.overview, name="overview"),
+    path("analytics/", admin_views.analytics, name="analytics"),
+    path("analytics/export/", admin_views.analytics_export, name="analytics_export"),
     path("stores/", admin_views.stores, name="stores"),
     path("stores/new/", admin_views.store_create, name="store_create"),
     path("stores/<int:store_id>/edit/", admin_views.store_edit, name="store_edit"),

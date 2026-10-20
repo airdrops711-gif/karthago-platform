@@ -1,5 +1,8 @@
 """Global context processors for Karthago Platform."""
+from django.conf import settings
 from django.db.models import Sum, Count, Q
+from django.utils import translation
+
 from apps.orders.constants import TUNISIAN_GOVERNORATES
 
 
@@ -27,6 +30,22 @@ def tenant_context(request):
     }
 
 
+def language_context(request):
+    """Expose the current language and the direction of the page.
+
+    The site speaks French and Tunisian Arabic. Arabic is written from
+    right to left, so the whole layout has to be mirrored: the
+    templates read ``dir`` and the ``rtl`` class from here.
+    """
+    code = translation.get_language() or "fr"
+    return {
+        "LANGUAGE_CODE": code,
+        "LANGUAGES": settings.LANGUAGES,
+        "language_dir": "rtl" if translation.get_language_bidi() else "ltr",
+        "is_rtl": bool(translation.get_language_bidi()),
+    }
+
+
 def tunisian_governorates(request):
     """Make the 24 Tunisian governorates available in every template."""
     return {"governorates": TUNISIAN_GOVERNORATES}
@@ -36,8 +55,8 @@ def nav_categories(request):
     """Make the category list (with product counts) available in the nav.
 
     The navigation shows the categories on every page, so the list is
-    provided by a context processor instead of being added by hand in each
-    view. The categories are the ones of the tenant catalogue: a
+    provided by a context processor instead of being added by hand in
+    each view. The categories are the ones of the tenant catalogue: a
     sub-store never shows the flagship's taxonomy.
     """
     try:

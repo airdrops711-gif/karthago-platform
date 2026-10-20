@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% block title %}{% trans 'Analytique plateforme' %} &mdash; {% trans 'Superadmin Karthago' %}{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+            <span class="inline-flex items-center gap-1.5 bg-gray-900 text-white px-2.5 py-1 rounded-full text-[11px] font-semibold mb-3">
+                {% trans '📊 Analytique plateforme' %}
+            </span>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{% trans 'Vue d\'ensemble de la plateforme' %}</h1>
+            <p class="text-gray-500 mt-1 text-sm">
+                {% blocktrans count counter=kpis.store_count %}{{ counter }} boutique ·{% plural %}{{ counter }} boutiques ·{% endblocktrans %}
+                {% blocktrans count counter=kpis.published_products %}{{ counter }} produit en ligne ·{% plural %}{{ counter }} produits en ligne ·{% endblocktrans %}
+                {% blocktrans count counter=kpis.total_orders %}{{ counter }} commande ·{% plural %}{{ counter }} commandes ·{% endblocktrans %}
+            </p>
+        </div>
+        <nav class="flex flex-wrap gap-2">
+            <a href="{% url 'admin_dashboard:overview' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">{% trans 'Pilotage' %}</a>
+            <a href="{% url 'admin_dashboard:stores' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">{% trans 'Boutiques' %}</a>
+            <a href="{% url 'admin_dashboard:financials' %}" class="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:border-amber-300">{% trans 'Finances' %}</a>
+            <a href="{% url 'admin_dashboard:analytics_export' %}" class="px-3 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-700">{% trans 'Exporter CSV' %}</a>
+        </nav>
+    </div>
+
+    <!-- Headline KPIs -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'CA total' %}</div>
+            <div class="text-2xl font-bold text-gray-900 mt-1">{{ kpis.gmv|floatformat:3 }} <span class="text-sm text-gray-400">{% trans 'DT' %}</span></div>
+            <div class="text-xs text-gray-400 mt-1">{% trans 'Aujourd\'hui :' %} {{ kpis.gmv_today|floatformat:3 }} {% trans 'DT' %}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'Marge brute' %}</div>
+            <div class="text-2xl font-bold text-emerald-600 mt-1">{{ kpis.gross_margin|floatformat:3 }} <span class="text-sm text-gray-400">{% trans 'DT' %}</span></div>
+            <div class="text-xs text-gray-400 mt-1">{{ kpis.gross_margin_percent }}{% trans '% du CA' %}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'Commission réalisée' %}</div>
+            <div class="text-2xl font-bold text-gray-900 mt-1">{{ kpis.realized_cut|floatformat:3 }} <span class="text-sm text-gray-400">{% trans 'DT' %}</span></div>
+            <div class="text-xs text-gray-400 mt-1">{{ kpis.realized_cut_percent }}{% trans '% du CA livré' %}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'En attente de règlement' %}</div>
+            <div class="text-2xl font-bold text-amber-600 mt-1">{{ kpis.unsettled_cut|floatformat:3 }} <span class="text-sm text-gray-400">{% trans 'DT' %}</span></div>
+            <div class="text-xs text-gray-400 mt-1">
+                {% blocktrans count counter=kpis.unsettled_orders %}{{ counter }} commande livrée non réglée{% plural %}{{ counter }} commandes livrées non réglées{% endblocktrans %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Operational KPIs -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'Taux de livraison' %}</div>
+            <div class="text-2xl font-bold text-gray-900 mt-1">{{ kpis.delivery_rate }}%</div>
+            <div class="text-xs text-gray-400 mt-1">{{ kpis.delivered_orders }}/{{ kpis.total_orders }}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'Taux de retour' %}</div>
+            <div class="text-2xl font-bold {% if kpis.return_rate > 10 %}text-red-600{% else %}text-gray-900{% endif %} mt-1">{{ kpis.return_rate }}%</div>
+            <div class="text-xs text-gray-400 mt-1">{{ kpis.returned_orders }} {% trans 'retours' %}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'À confirmer' %}</div>
+            <div class="text-2xl font-bold text-gray-900 mt-1">{{ kpis.pending_orders }}</div>
+            <div class="text-xs text-gray-400 mt-1">{% trans 'commandes en attente' %}</div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">{% trans 'Pool central' %}</div>
+            <div class="text-2xl font-bold text-gray-900 mt-1">{{ kpis.central_pool_size }}</div>
+            <div class="text-xs text-gray-400 mt-1">
+                {% blocktrans count counter=kpis.active_scraper_sources %}{{ counter }} source active ·{% plural %}{{ counter }} sources actives ·{% endblocktrans %}
+                {% blocktrans count counter=kpis.scraper_sources %}{{ counter }} source au total{% plural %}{{ counter }} sources au total{% endblocktrans %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue series -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-8">
+        <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'CA, coût fournisseur et commission (30 jours)' %}</h2>
+        {% if revenue %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="text-left text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                        <th class="py-2 pr-3">{% trans 'Jour' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'Commandes' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'CA (DT)' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'Coût (DT)' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'Marge (DT)' %}</th>
+                        <th class="py-2 text-right">{% trans 'Commission (DT)' %}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for row in revenue %}
+                    <tr>
+                        <td class="py-2 pr-3 text-gray-600">{{ row.day|date:"d/m/Y" }}</td>
+                        <td class="py-2 pr-3 text-right text-gray-600">{{ row.orders }}</td>
+                        <td class="py-2 pr-3 text-right font-semibold text-gray-900">{{ row.revenue|floatformat:3 }}</td>
+                        <td class="py-2 pr-3 text-right text-gray-500">{{ row.cogs|floatformat:3 }}</td>
+                        <td class="py-2 pr-3 text-right text-emerald-600">{{ row.margin|floatformat:3 }}</td>
+                        <td class="py-2 text-right text-gray-600">{{ row.cut|floatformat:3 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-sm text-gray-400">{% trans 'Aucune commande sur la période.' %}</p>
+        {% endif %}
+    </div>
+
+    <!-- Stores table -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-8">
+        <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'Performance par boutique' %}</h2>
+        {% if store_rows %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="text-left text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                        <th class="py-2 pr-3">{% trans 'Boutique' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'Produits' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'Commandes' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'CA (DT)' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'Marge (DT)' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'Commission (DT)' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'Livrées' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'À régler' %}</th>
+                        <th class="py-2 text-right">{% trans 'Vitrine' %}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for row in store_rows %}
+                    <tr>
+                        <td class="py-2 pr-3">
+                            <div class="font-semibold text-gray-900">{{ row.store.name }}</div>
+                            <div class="text-gray-400">
+                                {% if row.is_operational %}
+                                <span class="text-emerald-600">{% trans 'En ligne' %}</span>
+                                {% else %}
+                                <span class="text-red-500">{{ row.store.status_label }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="py-2 pr-3 text-right text-gray-600">{{ row.published_products }}/{{ row.products }}</td>
+                        <td class="py-2 pr-3 text-right text-gray-600">{{ row.orders }}</td>
+                        <td class="py-2 pr-3 text-right font-semibold text-gray-900">{{ row.gmv|floatformat:3 }}</td>
+                        <td class="py-2 pr-3 text-right text-emerald-600">{{ row.gross_margin|floatformat:3 }}</td>
+                        <td class="py-2 pr-3 text-right text-gray-600">{{ row.platform_cut|floatformat:3 }}</td>
+                        <td class="py-2 pr-3 text-right text-gray-600">{{ row.delivered }}</td>
+                        <td class="py-2 pr-3 text-right {% if row.unsettled_orders %}text-amber-600{% else %}text-gray-400{% endif %}">
+                            {{ row.unsettled_orders }}
+                        </td>
+                        <td class="py-2 text-right">
+                            <a href="{{ row.storefront_url }}" target="_blank" rel="noopener" class="text-amber-700 hover:underline font-mono">{% trans 'Ouvrir' %}</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-sm text-gray-400">{% trans 'Aucune boutique enregistrée.' %}</p>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Funnel -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'Entonnoir COD' %}</h2>
+            {% for row in funnel %}
+            <div class="mb-3">
+                <div class="flex items-center justify-between text-xs mb-1">
+                    <span class="font-medium text-gray-700">{{ row.stage }}</span>
+                    <span class="text-gray-400">{{ row.count }} · {{ row.share }}%</span>
+                </div>
+                <div class="h-2 rounded bg-gray-100 overflow-hidden">
+                    <div class="h-full bg-amber-500 rounded" style="width: {{ row.share }}%"></div>
+                </div>
+                {% if row.step_rate is not None %}
+                <div class="text-[10px] text-gray-400 mt-0.5">{% trans 'conversion :' %} {{ row.step_rate }}%</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Governorates -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'Commandes par gouvernorat' %}</h2>
+            {% for row in governorate_rows %}
+            <div class="flex items-center justify-between text-xs py-1.5 border-b border-gray-50 last:border-0">
+                <span class="text-gray-700">{{ row.customer__governorate|default:"—" }}</span>
+                <span class="text-gray-400">
+                    {{ row.count }} · {{ row.revenue|floatformat:0 }} {% trans 'DT' %}
+                </span>
+            </div>
+            {% empty %}
+            <p class="text-sm text-gray-400">{% trans 'Aucune commande.' %}</p>
+            {% endfor %}
+        </div>
+
+        <!-- Top products -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'Meilleures ventes' %}</h2>
+            {% for row in top_products %}
+            <div class="flex items-center justify-between text-xs py-1.5 border-b border-gray-50 last:border-0">
+                <span class="text-gray-700 truncate max-w-[60%]">{{ row.product_title|truncatechars:38 }}</span>
+                <span class="text-gray-400 whitespace-nowrap">
+                    {{ row.units }} × · {{ row.revenue|floatformat:0 }} {% trans 'DT' %}
+                </span>
+            </div>
+            {% empty %}
+            <p class="text-sm text-gray-400">{% trans 'Aucune vente enregistrée.' %}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Scraper health -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+        <h2 class="text-sm font-bold text-gray-900 mb-4">{% trans 'Santé des sources de scraping' %}</h2>
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="text-left text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                        <th class="py-2 pr-3">{% trans 'Source' %}</th>
+                        <th class="py-2 pr-3">{% trans 'Statut' %}</th>
+                        <th class="py-2 pr-3">{% trans 'Dernier passage' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'Trouvés' %}</th>
+                        <th class="py-2 pr-3 text-right">{% trans 'Mis à jour' %}</th>
+                        <th class="py-2 text-right">{% trans 'Erreurs' %}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for row in scraper_rows %}
+                    <tr>
+                        <td class="py-2 pr-3 font-medium text-gray-900">{{ row.source.name }}</td>
+                        <td class="py-2 pr-3">
+                            {% if row.status == 'success' %}
+                            <span class="text-emerald-600">{% trans 'OK' %}</span>
+                            {% elif row.status == 'never' %}
+                            <span class="text-gray-400">{% trans 'Jamais exécutée' %}</span>
+                            {% else %}
+                            <span class="text-amber-600">{{ row.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-2 pr-3 text-gray-500">
+                            {% if row.last_log %}{{ row.last_log.started_at|date:"d/m/Y H:i" }}{% else %}—{% endif %}
+                        </td>
+                        <td class="py-2 pr-3 text-right text-gray-600">{{ row.products_found }}</td>
+                        <td class="py-2 pr-3 text-right text-gray-600">{{ row.products_updated }}</td>
+                        <td class="py-2 text-right {% if row.has_errors %}text-red-500{% else %}text-gray-400{% endif %}">
+                            {% if row.has_errors %}{% trans 'Oui' %}{% else %}{% trans 'Non' %}{% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="py-4 text-center text-gray-400">{% trans 'Aucune source configurée.' %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

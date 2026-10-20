@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Tableau de bord &mdash; Karthago Commerce{% endblock %}
+{% load i18n %}
+{% block title %}{% trans 'Tableau de bord &mdash; Karthago Commerce' %}{% endblock %}
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
@@ -7,13 +8,14 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Tableau de bord</h1>
-            <p class="text-gray-600 mt-1">Vue d&e9;executive de votre activit&e9; dropshipping en Tunisie.</p>
+            <h1 class="text-3xl font-bold text-gray-900">{% trans 'Tableau de bord' %}</h1>
+            <p class="text-gray-600 mt-1">{% trans 'Vue d&e9;executive de votre activit&e9; dropshipping en Tunisie.' %}</p>
         </div>
         <div class="flex gap-2">
-            <a href="{% url 'dashboard:orders' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Commandes</a>
-            <a href="{% url 'dashboard:finances' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Finances</a>
-            <a href="{% url 'dashboard:scrapers' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Scrapers</a>
+            <a href="{% url 'dashboard:orders' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">{% trans 'Commandes' %}</a>
+            <a href="{% url 'dashboard:finances' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">{% trans 'Finances' %}</a>
+            <a href="{% url 'dashboard:scrapers' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">{% trans 'Scrapers' %}</a>
+            <a href="{% url 'dashboard:store_settings' %}" class="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700">{% trans 'Ma boutique' %}</a>
         </div>
     </div>
 
@@ -22,78 +24,78 @@
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase">GMV Aujourd'hui</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ gmv_today }} DT</p>
+                    <p class="text-xs font-bold text-gray-400 uppercase">{% trans 'GMV Aujourd\'hui' %}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ gmv_today }} {% trans 'DT' %}</p>
                 </div>
                 <div class="w-10 h-10 rounded bg-blue-50 flex items-center justify-center text-blue-600">💰</div>
             </div>
-            <p class="text-xs text-gray-500 mt-2">Volume de ventes aujourd'hui</p>
+            <p class="text-xs text-gray-500 mt-2">{% trans 'Volume de ventes aujourd\'hui' %}</p>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase">GMV 7 Jours</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ gmv_7d }} DT</p>
+                    <p class="text-xs font-bold text-gray-400 uppercase">{% trans 'GMV 7 Jours' %}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ gmv_7d }} {% trans 'DT' %}</p>
                 </div>
                 <div class="w-10 h-10 rounded bg-purple-50 flex items-center justify-center text-purple-600">📈</div>
             </div>
-            <p class="text-xs text-gray-500 mt-2">Derniers 7 jours</p>
+            <p class="text-xs text-gray-500 mt-2">{% trans 'Derniers 7 jours' %}</p>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase">GMV Mois en cours</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ gmv_mtd }} DT</p>
+                    <p class="text-xs font-bold text-gray-400 uppercase">{% trans 'GMV Mois en cours' %}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ gmv_mtd }} {% trans 'DT' %}</p>
                 </div>
                 <div class="w-10 h-10 rounded bg-indigo-50 flex items-center justify-center text-indigo-600">📅</div>
             </div>
-            <p class="text-xs text-gray-500 mt-2">Mois &agrave; ce jour</p>
+            <p class="text-xs text-gray-500 mt-2">{% trans 'Mois &agrave; ce jour' %}</p>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase">En attente de confirmation</p>
+                    <p class="text-xs font-bold text-gray-400 uppercase">{% trans 'En attente de confirmation' %}</p>
                     <p class="text-2xl font-bold text-amber-600">{{ pending_confirmations }}</p>
                 </div>
                 <div class="w-10 h-10 rounded bg-amber-50 flex items-center justify-center text-amber-600">&#9888;</div>
             </div>
-            <p class="text-xs text-gray-500 mt-2">Commandes &agrave; confirmer par t&e9l&e9phone</p>
+            <p class="text-xs text-gray-500 mt-2">{% trans 'Commandes &agrave; confirmer par t&e9l&e9phone' %}</p>
         </div>
     </div>
 
     <!-- Delivery KPIs Row -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <p class="text-xs font-bold text-gray-400 uppercase mb-2">Taux de livraison</p>
+            <p class="text-xs font-bold text-gray-400 uppercase mb-2">{% trans 'Taux de livraison' %}</p>
             <div class="text-3xl font-bold {% if delivered_pct >= 90 %}text-green-600{% elif delivered_pct >= 70 %}text-amber-600{% else %}text-red-600{% endif %}">
                 {{ delivered_pct }}%
             </div>
-            <p class="text-xs text-gray-500 mt-2">Commandes livr&e9;es et pay&e9;es</p>
+            <p class="text-xs text-gray-500 mt-2">{% trans 'Commandes livr&e9;es et pay&e9;es' %}</p>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <p class="text-xs font-bold text-gray-400 uppercase mb-2">Taux de retour</p>
+            <p class="text-xs font-bold text-gray-400 uppercase mb-2">{% trans 'Taux de retour' %}</p>
             <div class="text-3xl font-bold {% if returned_pct <= 5 %}text-green-600{% elif returned_pct <= 15 %}text-amber-600{% else %}text-red-600{% endif %}">
                 {{ returned_pct }}%
             </div>
-            <p class="text-xs text-gray-500 mt-2">Commandes retourn&e9;es (retour)</p>
+            <p class="text-xs text-gray-500 mt-2">{% trans 'Commandes retourn&e9;es (retour)' %}</p>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <p class="text-xs font-bold text-gray-400 uppercase mb-2">Produits actifs</p>
+            <p class="text-xs font-bold text-gray-400 uppercase mb-2">{% trans 'Produits actifs' %}</p>
             <div class="text-3xl font-bold text-blue-600">{{ active_products }}</div>
-            <p class="text-xs text-gray-500 mt-2">sur {{ total_products }} r&e9;f&e9;rences</p>
+            <p class="text-xs text-gray-500 mt-2">{% trans 'sur' %} {{ total_products }} {% trans 'r&e9;f&e9;rences' %}</p>
         </div>
     </div>
 
     <!-- Charts Row -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">GMV par jour (7 derniers jours)</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4">{% trans 'GMV par jour (7 derniers jours)' %}</h3>
             <div class="h-64">
                 <canvas id="gmvChart"></canvas>
             </div>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">R&e9;partition par statut</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-4">{% trans 'R&e9;partition par statut' %}</h3>
             <div class="h-64">
                 <canvas id="statusChart"></canvas>
             </div>
@@ -104,21 +106,21 @@
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8 overflow-hidden">
         <div class="p-6 border-b flex flex-wrap items-center justify-between gap-3">
             <div>
-                <h3 class="text-lg font-bold text-gray-900">Commandes &agrave; confirmer</h3>
-                <p class="text-sm text-gray-500 mt-0.5">Appelez le client, puis validez la commande.</p>
+                <h3 class="text-lg font-bold text-gray-900">{% trans 'Commandes &agrave; confirmer' %}</h3>
+                <p class="text-sm text-gray-500 mt-0.5">{% trans 'Appelez le client, puis validez la commande.' %}</p>
             </div>
-            <a href="{% url 'dashboard:orders' %}" class="text-sm text-amber-600 hover:underline font-medium">Toutes les commandes &rarr;</a>
+            <a href="{% url 'dashboard:orders' %}" class="text-sm text-amber-600 hover:underline font-medium">{% trans 'Toutes les commandes &rarr;' %}</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b bg-gray-50 text-gray-500">
-                        <th class="px-4 py-3">Commande</th>
-                        <th class="px-4 py-3">Client</th>
-                        <th class="px-4 py-3">T&eacute;l&eacute;phone</th>
-                        <th class="px-4 py-3">Articles</th>
-                        <th class="px-4 py-3 text-right">Total</th>
-                        <th class="px-4 py-3 text-right">Action</th>
+                        <th class="px-4 py-3">{% trans 'Commande' %}</th>
+                        <th class="px-4 py-3">{% trans 'Client' %}</th>
+                        <th class="px-4 py-3">{% trans 'T&eacute;l&eacute;phone' %}</th>
+                        <th class="px-4 py-3">{% trans 'Articles' %}</th>
+                        <th class="px-4 py-3 text-right">{% trans 'Total' %}</th>
+                        <th class="px-4 py-3 text-right">{% trans 'Action' %}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -132,17 +134,16 @@
                             <a href="tel:{{ order.customer.phone }}" class="text-amber-700 hover:underline font-medium">{{ order.customer.phone }}</a>
                         </td>
                         <td class="px-4 py-3 text-gray-600">{{ order.item_count }}</td>
-                        <td class="px-4 py-3 text-right font-medium text-gray-900">{{ order.total_amount }} DT</td>
+                        <td class="px-4 py-3 text-right font-medium text-gray-900">{{ order.total_amount }} {% trans 'DT' %}</td>
                         <td class="px-4 py-3 text-right">
-                            <a href="{% url 'dashboard:order_detail' order.id %}"
-                               class="inline-block px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold">
-                                Ouvrir
+                            <a href="{% url 'dashboard:order_detail' order.id %}" class="inline-block px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold">
+                                {% trans 'Ouvrir' %}
                             </a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr><td colspan="6" class="px-4 py-8 text-gray-500 text-center">
-                        Aucune commande en attente de confirmation.
+                        {% trans 'Aucune commande en attente de confirmation.' %}
                     </td></tr>
                     {% endfor %}
                 </tbody>
@@ -153,18 +154,18 @@
     <!-- Recent scraper logs -->
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
         <div class="p-6 border-b flex justify-between items-center">
-            <h3 class="text-lg font-bold text-gray-900">Logs de scraping r&e9;cents</h3>
-            <a href="{% url 'dashboard:scrapers' %}" class="text-sm text-amber-600 hover:underline">Voir tout</a>
+            <h3 class="text-lg font-bold text-gray-900">{% trans 'Logs de scraping r&e9;cents' %}</h3>
+            <a href="{% url 'dashboard:scrapers' %}" class="text-sm text-amber-600 hover:underline">{% trans 'Voir tout' %}</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b text-gray-500">
-                        <th class="pb-3">Source</th>
-                        <th class="pb-3">Statut</th>
-                        <th class="pb-3">Trouv&e9;s</th>
-                        <th class="pb-3">Mis &agrave; jour</th>
-                        <th class="pb-3">D&e9but</th>
+                        <th class="pb-3">{% trans 'Source' %}</th>
+                        <th class="pb-3">{% trans 'Statut' %}</th>
+                        <th class="pb-3">{% trans 'Trouv&e9;s' %}</th>
+                        <th class="pb-3">{% trans 'Mis &agrave; jour' %}</th>
+                        <th class="pb-3">{% trans 'D&e9but' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -181,7 +182,7 @@
                         <td class="py-3 text-gray-500">{{ log.started_at|date:"d/m H:i" }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="5" class="py-4 text-gray-500 text-center">Aucun log de scraping.</td></tr>
+                    <tr><td colspan="5" class="py-4 text-gray-500 text-center">{% trans 'Aucun log de scraping.' %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

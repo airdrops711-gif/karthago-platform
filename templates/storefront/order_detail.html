@@ -1,38 +1,39 @@
 {% extends "base.html" %}
-{% block title %}Commande #{{ order.id }} &mdash; Karthago Commerce{% endblock %}
+{% load i18n %}
+{% block title %}{% trans 'Commande #' %}{{ order.id }} {% trans '&mdash; Karthago Commerce' %}{% endblock %}
 {% block content %}
 
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">Commande #{{ order.id }}</h1>
+            <h1 class="text-2xl font-bold text-gray-900">{% trans 'Commande #' %}{{ order.id }}</h1>
             {% include "dashboard/partials/_status_badge.html" with status=order.status %}
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div class="bg-gray-50 p-4 rounded-lg">
-                <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">Client</h3>
+                <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">{% trans 'Client' %}</h3>
                 <p class="text-sm text-gray-700">{{ order.customer.full_name }}</p>
                 <p class="text-sm text-gray-600">{{ order.customer.phone }}</p>
                 <p class="text-sm text-gray-600">{{ order.customer.governorate }}, {{ order.customer.address }}</p>
             </div>
             <div class="bg-gray-50 p-4 rounded-lg">
-                <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">D&e9tails</h3>
-                <p class="text-sm text-gray-700">Mode de paiement : Paiement &agrave; la livraison</p>
-                <p class="text-sm text-gray-700">Total : <span class="font-bold text-amber-700">{{ order.total_amount }} DT</span></p>
-                <p class="text-sm text-gray-600">Pass&eacute;e le {{ order.created_at|date:"d/m/Y H:i" }}</p>
+                <h3 class="text-xs font-bold text-gray-400 uppercase mb-3">{% trans 'D&e9tails' %}</h3>
+                <p class="text-sm text-gray-700">{% trans 'Mode de paiement : Paiement &agrave; la livraison' %}</p>
+                <p class="text-sm text-gray-700">{% trans 'Total :' %} <span class="font-bold text-amber-700">{{ order.total_amount }} {% trans 'DT' %}</span></p>
+                <p class="text-sm text-gray-600">{% trans 'Pass&eacute;e le' %} {{ order.created_at|date:"d/m/Y H:i" }}</p>
             </div>
         </div>
 
         <div class="border-t pt-6">
-            <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Articles</h3>
+            <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">{% trans 'Articles' %}</h3>
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b text-gray-500">
-                        <th class="pb-2">Produit</th>
-                        <th class="pb-2 text-right">Quantit&eacute;</th>
-                        <th class="pb-2 text-right">Prix unitaire</th>
-                        <th class="pb-2 text-right">Total</th>
+                        <th class="pb-2">{% trans 'Produit' %}</th>
+                        <th class="pb-2 text-right">{% trans 'Quantit&eacute;' %}</th>
+                        <th class="pb-2 text-right">{% trans 'Prix unitaire' %}</th>
+                        <th class="pb-2 text-right">{% trans 'Total' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,15 +42,15 @@
                         <td class="py-3 text-gray-700">
                         {{ item.product_title }}
                         {% if item.supplier_name %}
-                        <span class="block text-xs text-gray-400">Fournisseur : {{ item.supplier_name }}</span>
+                        <span class="block text-xs text-gray-400">{% trans 'Fournisseur :' %} {{ item.supplier_name }}</span>
                         {% endif %}
                     </td>
                         <td class="py-3 text-right">{{ item.quantity }}</td>
-                        <td class="py-3 text-right">{{ item.unit_price }} DT</td>
-                        <td class="py-3 text-right font-medium">{{ item.line_total }} DT</td>
+                        <td class="py-3 text-right">{{ item.unit_price }} {% trans 'DT' %}</td>
+                        <td class="py-3 text-right font-medium">{{ item.line_total }} {% trans 'DT' %}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="4" class="py-4 text-gray-500">Aucun article.</td></tr>
+                    <tr><td colspan="4" class="py-4 text-gray-500">{% trans 'Aucun article.' %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

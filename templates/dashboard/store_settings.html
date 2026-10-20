@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans 'Ma boutique' %} &mdash; {% trans 'Tableau de bord Karthago' %}{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <div class="mb-8">
+        <a href="{% url 'dashboard:overview' %}" class="text-xs text-gray-400 hover:text-amber-600">{% trans '&larr; Retour au tableau de bord' %}</a>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{% trans 'Ma boutique' %}</h1>
+        <p class="text-gray-500 mt-1 text-sm">
+            {% trans 'Ces informations apparaissent sur votre vitrine publique.' %}
+            <span class="font-mono text-amber-700">{{ storefront_url }}</span>
+        </p>
+    </div>
+
+    {% if not store.is_operational %}
+    <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <strong>{% trans 'Boutique non en ligne.' %}</strong>
+        {% if store.deactivation_reason %}
+        <span>{{ store.deactivation_reason }}</span>
+        {% else %}
+        <span>{% trans 'Vos produits ne sont pas visibles par les visiteurs.' %}</span>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="sm:col-span-2">
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-1.5">{% trans 'Nom de la boutique *' %}</label>
+                <input type="text" name="name" id="name" required value="{{ store.name|default:'' }}" placeholder="{% trans 'Ex. Boutique Tunisienne' %}" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="tagline" class="block text-sm font-medium text-gray-700 mb-1.5">{% trans 'Accroche' %}</label>
+                <input type="text" name="tagline" id="tagline" value="{{ store.tagline|default:'' }}" placeholder="{% trans 'Ex. Les meilleurs prix de Tunis' %}" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-1.5">{% trans 'Description' %}</label>
+                <textarea name="description" id="description" rows="4" placeholder="{% trans 'Présentez votre boutique en quelques lignes.' %}" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">{{ store.description|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Logo -->
+        <div class="border-t border-gray-100 pt-5">
+            <h2 class="text-sm font-bold text-gray-900 mb-1">{% trans 'Logo' %}</h2>
+            <p class="text-xs text-gray-400 mb-4">{% trans 'PNG, JPG ou WEBP, 2 Mo maximum. L\'image est réduite à 512 px.' %}</p>
+
+            <div class="flex items-start gap-5 flex-wrap">
+                <div class="w-20 h-20 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
+                    {% if store.logo_url %}
+                    <img src="{{ store.logo_url }}" alt="{{ store.name }}" class="w-full h-full object-contain">
+                    {% else %}
+                    <span class="text-2xl font-bold text-gray-300">K</span>
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-[220px] space-y-3">
+                    <div>
+                        <label for="logo" class="block text-xs font-medium text-gray-600 mb-1">{% trans 'Envoyer une image' %}</label>
+                        <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/webp" class="block w-full text-xs text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-amber-50 file:text-amber-700 file:text-xs file:font-semibold hover:file:bg-amber-100">
+                    </div>
+                    <div>
+                        <label for="logo_url" class="block text-xs font-medium text-gray-600 mb-1">{% trans '… ou une URL d\'image' %}</label>
+                        <input type="url" name="logo_url" id="logo_url" value="{{ store.logo_url|default:'' }}" placeholder="{% trans 'https://...' %}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="border-t border-gray-100 pt-5">
+            <h2 class="text-sm font-bold text-gray-900 mb-1">{% trans 'Coordonnées' %}</h2>
+            <p class="text-xs text-gray-400 mb-4">{% trans 'Affichées sur votre vitrine pour que vos clients vous joignent.' %}</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1.5">{% trans 'Téléphone' %}</label>
+                    <input type="text" name="phone_number" id="phone_number" value="{{ store.phone_number|default:'' }}" placeholder="{% trans 'Ex. +216 20 123 456' %}" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+                </div>
+                <div>
+                    <label for="whatsapp_number" class="block text-sm font-medium text-gray-700 mb-1.5">{% trans 'WhatsApp' %}</label>
+                    <input type="text" name="whatsapp_number" id="whatsapp_number" value="{{ store.whatsapp_number|default:'' }}" placeholder="{% trans 'Ex. +216 20 123 456' %}" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+                </div>
+                <div class="sm:col-span-2">
+                    <label for="address" class="block text-sm font-medium text-gray-700 mb-1.5">{% trans 'Adresse' %}</label>
+                    <input type="text" name="address" id="address" value="{{ store.address|default:'' }}" placeholder="{% trans 'Ex. 10 rue de Carthage, Tunis' %}" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing defaults -->
+        <div class="border-t border-gray-100 pt-5">
+            <h2 class="text-sm font-bold text-gray-900 mb-1">{% trans 'Prix par défaut' %}</h2>
+            <p class="text-xs text-gray-400 mb-4">{% trans 'Appliqués à vos produits qui n\'ont pas de prix défini.' %}</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label for="default_markup_percentage" class="block text-sm font-medium text-gray-700 mb-1.5">{% trans 'Majoration (%)' %}</label>
+                    <input type="number" name="default_markup_percentage" id="default_markup_percentage" step="0.01" min="0" value="{{ store.default_markup_percentage }}" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+                    <p class="text-xs text-gray-400 mt-1">{% trans 'En pourcentage du coût fournisseur.' %}</p>
+                </div>
+                <div>
+                    <label for="fixed_margin" class="block text-sm font-medium text-gray-700 mb-1.5">{% trans 'Marge fixe (DT)' %}</label>
+                    <input type="number" name="fixed_margin" id="fixed_margin" step="0.001" min="0" value="{{ store.fixed_margin }}" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+                    <p class="text-xs text-gray-400 mt-1">{% trans 'Ajoutée à chaque vente, en dinars.' %}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <a href="{% url 'dashboard:overview' %}" class="px-4 py-2.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                {% trans 'Annuler' %}
+            </a>
+            <button type="submit" class="px-5 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800">
+                {% trans 'Enregistrer' %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,22 +1,29 @@
-{% load static catalog_tags %}
+{% load static catalog_tags i18n %}
 <nav class="bg-white border-b sticky top-0 z-40 shadow-sm">
     <!-- ================= Desktop navbar ================= -->
     <div class="hidden md:flex items-center justify-between px-6 py-3 gap-4">
         <div class="flex items-center gap-3 shrink-0">
             <a href="{% if is_sub_store %}{% url 'catalog:substore_home' tenant_store.slug %}{% else %}{% url 'catalog:home' %}{% endif %}" class="flex items-center gap-2">
+                {% if is_sub_store and tenant_store.logo_url %}
+                <img src="{{ tenant_store.logo_url }}" alt="{{ tenant_store.name }}" class="w-8 h-8 rounded object-cover">
+                {% else %}
                 <div class="w-8 h-8 bg-amber-600 rounded flex items-center justify-center text-white font-bold text-lg">
                     {% if is_sub_store %}{{ tenant_store.name|slice:":1"|upper }}{% else %}K{% endif %}
                 </div>
+                {% endif %}
                 <span class="font-bold text-xl text-amber-700 tracking-tight">
                     {% if is_sub_store %}{{ tenant_store.name }}{% else %}Karthago{% endif %}
                 </span>
             </a>
             <a href="{% if is_sub_store %}{% url 'catalog:substore_catalog' tenant_store.slug %}{% else %}{% url 'catalog:product_list' %}{% endif %}" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">
-                Catalogue
+                {% trans "Catalogue" %}
             </a>
             {% if not is_sub_store and is_staff %}
+            <a href="{% url 'admin_dashboard:analytics' %}" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">
+                {% trans "Analytique" %}
+            </a>
             <a href="{% url 'admin_dashboard:overview' %}" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">
-                Superadmin
+                {% trans "Superadmin" %}
             </a>
             {% endif %}
         </div>
@@ -24,24 +31,25 @@
         <!-- Desktop search -->
         <div class="flex-1 max-w-md mx-4">
             <form hx-get="{% url 'catalog:search' %}" hx-target="#instant-search-results" hx-trigger="keyup changed delay:250ms" class="relative">
-                <input type="text" name="q" placeholder="Rechercher des produits…" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+                <input type="text" name="q" placeholder="{% trans 'Rechercher des produits…' %}" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
                 <button type="button" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">🔍</button>
             </form>
             <div id="instant-search-results" class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg hidden"></div>
         </div>
 
         <div class="flex items-center gap-3 shrink-0">
+            {% include "storefront/partials/_language_switcher.html" %}
             {% if is_staff %}
-            <a href="{% url 'dashboard:overview' %}" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">Tableau de bord</a>
+            <a href="{% url 'dashboard:overview' %}" class="text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50">{% trans "Tableau de bord" %}</a>
             {% endif %}
             <!-- Single cart entry: the badge is the only cart indicator in the
                  desktop navbar. It used to be duplicated by a floating
                  overlay, which made the cart appear twice. -->
             <a href="{% url 'orders:cart' %}"
                class="relative inline-flex items-center gap-2 text-gray-600 hover:text-amber-600 text-sm font-medium px-3 py-2 rounded-md hover:bg-gray-50"
-               aria-label="Panier">
+               aria-label="{% trans 'Panier' %}">
                 <span aria-hidden="true">🛒</span>
-                <span class="hidden xl:inline">Panier</span>
+                <span class="hidden xl:inline">{% trans "Panier" %}</span>
                 <span class="absolute -top-1 -right-1 bg-amber-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center"
                       data-cart-badge>{{ cart_item_count|default:0 }}</span>
             </a>
@@ -51,21 +59,25 @@
     <!-- ================= Mobile bar ================= -->
     <div class="md:hidden px-4 py-3 flex items-center justify-between">
         <a href="{% if is_sub_store %}{% url 'catalog:substore_home' tenant_store.slug %}{% else %}{% url 'catalog:home' %}{% endif %}" class="flex items-center gap-2">
+            {% if is_sub_store and tenant_store.logo_url %}
+            <img src="{{ tenant_store.logo_url }}" alt="{{ tenant_store.name }}" class="w-7 h-7 rounded object-cover">
+            {% else %}
             <div class="w-7 h-7 bg-amber-600 rounded flex items-center justify-center text-white font-bold text-lg">
                 {% if is_sub_store %}{{ tenant_store.name|slice:":1"|upper }}{% else %}K{% endif %}
             </div>
+            {% endif %}
             <span class="font-bold text-lg text-amber-700 tracking-tight">
                 {% if is_sub_store %}{{ tenant_store.name }}{% else %}Karthago{% endif %}
             </span>
         </a>
         <div class="flex items-center gap-3">
             <!-- Single cart entry on mobile too: icon + badge. -->
-            <a href="{% url 'orders:cart' %}" class="relative text-gray-600 hover:text-amber-600" aria-label="Panier">
+            <a href="{% url 'orders:cart' %}" class="relative text-gray-600 hover:text-amber-600" aria-label="{% trans 'Panier' %}">
                 <span class="text-xl" aria-hidden="true">🛒</span>
                 <span class="absolute -top-1 -right-2 bg-amber-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center"
                       data-cart-badge>{{ cart_item_count|default:0 }}</span>
             </a>
-            <button class="text-gray-600 hover:text-amber-600 text-xl" onclick="document.getElementById('mobile-menu').classList.remove('hidden')" aria-label="Menu">
+            <button class="text-gray-600 hover:text-amber-600 text-xl" onclick="document.getElementById('mobile-menu').classList.remove('hidden')" aria-label="{% trans 'Menu' %}">
                 ☰
             </button>
         </div>
@@ -76,14 +88,14 @@
         <div class="flex flex-col h-full">
             <div class="p-6 border-b flex justify-between items-center">
                 <span class="font-bold text-xl text-amber-700">Karthago</span>
-                <button class="text-gray-400 hover:text-gray-600 text-2xl" onclick="document.getElementById('mobile-menu').classList.add('hidden')" aria-label="Fermer">✕</button>
+                <button class="text-gray-400 hover:text-gray-600 text-2xl" onclick="document.getElementById('mobile-menu').classList.add('hidden')" aria-label="{% trans 'Fermer' %}">✕</button>
             </div>
 
             <div class="flex-1 overflow-y-auto p-6 space-y-6">
                 <!-- Search on mobile -->
                 <div class="bg-gray-50 p-3 rounded-lg border">
                     <form hx-get="{% url 'catalog:search' %}" hx-target="#mobile-search-results" hx-trigger="keyup changed delay:250ms" class="relative">
-                        <input type="text" name="q" placeholder="Rechercher…" class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-amber-500 outline-none text-sm">
+                        <input type="text" name="q" placeholder="{% trans 'Rechercher…' %}" class="w-full pl-9 pr-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-amber-500 outline-none text-sm">
                         <button type="button" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</button>
                     </form>
                     <div id="mobile-search-results" class="mt-2 max-h-64 overflow-y-auto bg-white border rounded text-sm"></div>
@@ -91,11 +103,11 @@
 
                 <!-- Categories -->
                 <div>
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Catégories</h3>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{% trans "Catégories" %}</h3>
                     <ul class="space-y-1">
                         <li>
                             <a href="{% url 'catalog:product_list' %}" class="block py-2 px-3 rounded-lg text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">
-                                Tous les produits
+                                {% trans "Tous les produits" %}
                             </a>
                         </li>
                         {% for category in nav_categories %}
@@ -106,23 +118,28 @@
                             </a>
                         </li>
                         {% empty %}
-                        <li class="text-gray-400 text-sm">Aucune catégorie.</li>
+                        <li class="text-gray-400 text-sm">{% trans "Aucune catégorie." %}</li>
                         {% endfor %}
                     </ul>
                 </div>
 
                 <!-- Bilingual microcopy -->
                 <div class="bg-amber-50 border border-amber-100 rounded-lg p-4">
-                    <h3 class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-2">Livraison</h3>
-                    <p class="text-sm text-amber-700 mb-1">Paiement à la livraison</p>
+                    <h3 class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-2">{% trans "Livraison" %}</h3>
+                    <p class="text-sm text-amber-700 mb-1">{% trans "Paiement à la livraison" %}</p>
                     <p class="text-sm text-amber-700" dir="rtl">توصيل إلى كامل تراب الجمهورية</p>
+                </div>
+
+                <div class="pt-2">
+                    {% include "storefront/partials/_language_switcher.html" %}
                 </div>
 
                 <div class="mt-6 space-y-3">
                     {% if is_staff %}
-                    <a href="{% url 'dashboard:overview' %}" class="block py-3 px-4 rounded-lg bg-amber-600 text-white text-center font-medium">Tableau de bord admin</a>
+                    <a href="{% url 'dashboard:store_settings' %}" class="block py-3 px-4 rounded-lg border border-gray-200 text-gray-700 text-center font-medium hover:bg-gray-50">{% trans "Ma boutique" %}</a>
+                    <a href="{% url 'dashboard:overview' %}" class="block py-3 px-4 rounded-lg bg-amber-600 text-white text-center font-medium">{% trans "Tableau de bord admin" %}</a>
                     {% endif %}
-                    <a href="{% url 'orders:cart' %}" class="block py-3 px-4 rounded-lg border border-gray-200 text-gray-700 text-center font-medium hover:bg-gray-50">Panier</a>
+                    <a href="{% url 'orders:cart' %}" class="block py-3 px-4 rounded-lg border border-gray-200 text-gray-700 text-center font-medium hover:bg-gray-50">{% trans "Panier" %}</a>
                 </div>
             </div>
         </div>

@@ -1,32 +1,32 @@
 {% extends "base.html" %}
-{% load cart_tags %}
-{% block title %}Checkout &mdash; Karthago Commerce{% endblock %}
+{% load cart_tags i18n %}
+{% block title %}{% trans 'Checkout &mdash; Karthago Commerce' %}{% endblock %}
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Checkout &mdash; Paiement &agrave; la livraison</h1>
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">{% trans 'Checkout &mdash; Paiement &agrave; la livraison' %}</h1>
 
     {% if cart_items %}
     <!-- Order summary (server-side priced) -->
     <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-6">
-        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Votre commande</h2>
+        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{% trans 'Votre commande' %}</h2>
         <ul class="divide-y divide-gray-100 text-sm">
             {% for item in cart_items %}
             <li class="flex items-center justify-between gap-3 py-2">
                 <span class="text-gray-700 min-w-0 truncate">
-                    {{ item.quantity }} &times; {{ item.product.title }}
+                    {{ item.quantity }} {% trans '&times;' %} {{ item.product.title }}
                 </span>
                 <span class="font-medium text-gray-900 whitespace-nowrap">
-                    {{ item.product.selling_price|mul:item.quantity }} DT
+                    {{ item.product.selling_price|mul:item.quantity }} {% trans 'DT' %}
                 </span>
             </li>
             {% endfor %}
         </ul>
         <div class="flex items-center justify-between pt-3 mt-2 border-t border-gray-200">
-            <span class="font-bold text-gray-900">Total</span>
-            <span class="text-xl font-bold text-amber-700">{{ total }} DT</span>
+            <span class="font-bold text-gray-900">{% trans 'Total' %}</span>
+            <span class="text-xl font-bold text-amber-700">{{ total }} {% trans 'DT' %}</span>
         </div>
         <p class="text-xs text-gray-500 mt-2">
-            Le montant est calcul&eacute; par le serveur : il ne peut pas &ecirc;tre modifi&eacute; depuis le navigateur.
+            {% trans 'Le montant est calcul&eacute; par le serveur : il ne peut pas &ecirc;tre modifi&eacute; depuis le navigateur.' %}
         </p>
     </div>
 
@@ -35,22 +35,19 @@
             {% csrf_token %}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-name">Nom complet</label>
-                    <input id="ck-name" type="text" name="full_name" required autocomplete="name"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-name">{% trans 'Nom complet' %}</label>
+                    <input id="ck-name" type="text" name="full_name" required autocomplete="name" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-phone">T&eacute;l&eacute;phone (8 chiffres)</label>
-                    <input id="ck-phone" type="tel" name="phone" pattern="[0-9]{8}" required maxlength="8" autocomplete="tel"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-phone">{% trans 'T&eacute;l&eacute;phone (8 chiffres)' %}</label>
+                    <input id="ck-phone" type="tel" name="phone" pattern="[0-9]{8}" required maxlength="8" autocomplete="tel" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-email">Email (optionnel)</label>
-                    <input id="ck-email" type="email" name="email" autocomplete="email"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-email">{% trans 'Email (optionnel)' %}</label>
+                    <input id="ck-email" type="email" name="email" autocomplete="email" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-gov">Gouvernorat</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-gov">{% trans 'Gouvernorat' %}</label>
                     <select id="ck-gov" name="governorate" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
                         {% for code, name in governorates %}
                         <option value="{{ code }}">{{ name }}</option>
@@ -58,26 +55,24 @@
                     </select>
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-delegation">D&eacute;l&eacute;gation / Ville</label>
-                    <input id="ck-delegation" type="text" name="delegation" required autocomplete="address-level2"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-delegation">{% trans 'D&eacute;l&eacute;gation / Ville' %}</label>
+                    <input id="ck-delegation" type="text" name="delegation" required autocomplete="address-level2" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-address">Adresse d&eacute;taill&eacute;e</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-address">{% trans 'Adresse d&eacute;taill&eacute;e' %}</label>
                     <textarea id="ck-address" name="address" rows="3" required autocomplete="street-address"
                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none"></textarea>
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-notes">Note pour le vendeur (optionnel)</label>
-                    <input id="ck-notes" type="text" name="notes" placeholder="Ex: appeler avant 18h"
-                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                    <label class="block text-sm font-medium text-gray-700 mb-1" for="ck-notes">{% trans 'Note pour le vendeur (optionnel)' %}</label>
+                    <input id="ck-notes" type="text" name="notes" placeholder="{% trans 'Ex: appeler avant 18h' %}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
                 </div>
             </div>
             <button type="submit" class="mt-6 w-full bg-amber-600 hover:bg-amber-700 text-white px-8 py-3.5 rounded-lg font-bold shadow-lg transition">
-                Confirmer la commande &mdash; {{ total }} DT
+                {% trans 'Confirmer la commande &mdash;' %} {{ total }} {% trans 'DT' %}
             </button>
             <p class="text-center text-xs text-gray-500 mt-3">
-                Paiement &agrave; la livraison &bull; Livraison 24&ndash;48h &bull; Confirmation t&eacute;l&eacute;phonique
+                {% trans 'Paiement &agrave; la livraison &bull; Livraison 24&ndash;48h &bull; Confirmation t&eacute;l&eacute;phonique' %}
             </p>
         </form>
     </div>
@@ -86,10 +81,10 @@
         <div class="bg-gray-100 rounded-xl p-8 inline-block mb-6">
             <span class="text-4xl" aria-hidden="true">&#128722;</span>
         </div>
-        <h2 class="text-2xl font-bold text-gray-900 mb-2">Votre panier est vide</h2>
-        <p class="text-gray-600 mb-6">Ajoutez des produits avant de passer la commande.</p>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">{% trans 'Votre panier est vide' %}</h2>
+        <p class="text-gray-600 mb-6">{% trans 'Ajoutez des produits avant de passer la commande.' %}</p>
         <a href="{% url 'catalog:product_list' %}" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-lg font-medium">
-            D&eacute;couvrir les produits &rarr;
+            {% trans 'D&eacute;couvrir les produits &rarr;' %}
         </a>
     </div>
     {% endif %}

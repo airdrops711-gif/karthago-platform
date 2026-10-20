@@ -1,29 +1,27 @@
 {% extends "base.html" %}
-{% load catalog_tags %}
-{% block title %}Commandes &mdash; Karthago Commerce{% endblock %}
+{% load catalog_tags i18n %}
+{% block title %}{% trans 'Commandes &mdash; Karthago Commerce' %}{% endblock %}
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Commandes</h1>
-            <p class="text-gray-600 mt-1 text-sm">Centre de commande : confirmez, suivez et validez chaque commande.</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{% trans 'Commandes' %}</h1>
+            <p class="text-gray-600 mt-1 text-sm">{% trans 'Centre de commande : confirmez, suivez et validez chaque commande.' %}</p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="{% url 'dashboard:overview' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Tableau de bord</a>
-            <a href="{% url 'dashboard:scrapers' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Scrapers</a>
+            <a href="{% url 'dashboard:overview' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">{% trans 'Tableau de bord' %}</a>
+            <a href="{% url 'dashboard:scrapers' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">{% trans 'Scrapers' %}</a>
         </div>
     </div>
 
     <!-- Status filter pills -->
     <div class="flex flex-wrap gap-2 mb-4">
-        <a href="{% url 'dashboard:orders' %}"
-           class="px-3 py-1.5 rounded-full text-xs font-semibold border transition
+        <a href="{% url 'dashboard:orders' %}" class="px-3 py-1.5 rounded-full text-xs font-semibold border transition
                   {% if not status %}bg-gray-900 text-white border-gray-900{% else %}bg-white text-gray-600 border-gray-300 hover:bg-gray-50{% endif %}">
-            Toutes <span class="opacity-70">({{ status_counts.ALL|default:0 }})</span>
+            {% trans 'Toutes' %} <span class="opacity-70">({{ status_counts.ALL|default:0 }})</span>
         </a>
         {% for value, label in status_choices %}
-        <a href="{% url 'dashboard:orders' %}?status={{ value }}"
-           class="px-3 py-1.5 rounded-full text-xs font-semibold border transition
+        <a href="{% url 'dashboard:orders' %}?status={{ value }}" class="px-3 py-1.5 rounded-full text-xs font-semibold border transition
                   {% if status == value %}bg-amber-600 text-white border-amber-600{% else %}bg-white text-gray-600 border-gray-300 hover:bg-gray-50{% endif %}">
             {{ label }} <span class="opacity-70">({{ status_counts|get_item:value|default:0 }})</span>
         </a>
@@ -33,37 +31,34 @@
     <!-- Search -->
     <form method="get" class="mb-4 flex flex-wrap gap-2 max-w-md">
         {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
-        <input type="text" name="q" value="{{ q }}" placeholder="Nom, t&eacute;l&eacute;phone ou n&deg; de commande"
-               class="flex-1 min-w-[14rem] border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-        <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium">Rechercher</button>
+        <input type="text" name="q" value="{{ q }}" placeholder="{% trans 'Nom, t&eacute;l&eacute;phone ou n&deg; de commande' %}" class="flex-1 min-w-[14rem] border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+        <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium">{% trans 'Rechercher' %}</button>
         {% if q %}
-        <a href="{% url 'dashboard:orders' %}{% if status %}?status={{ status }}{% endif %}"
-           class="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50">Effacer</a>
+        <a href="{% url 'dashboard:orders' %}{% if status %}?status={{ status }}{% endif %}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50">{% trans 'Effacer' %}</a>
         {% endif %}
     </form>
 
     <!-- Orders: cards on mobile, table on desktop -->
     <div class="space-y-3 md:hidden">
         {% for order in orders %}
-        <a href="{% url 'dashboard:order_detail' order.id %}"
-           class="block bg-white rounded-xl border border-gray-100 shadow-sm p-4 active:bg-gray-50">
+        <a href="{% url 'dashboard:order_detail' order.id %}" class="block bg-white rounded-xl border border-gray-100 shadow-sm p-4 active:bg-gray-50">
             <div class="flex items-start justify-between gap-3 mb-2">
                 <div class="min-w-0">
-                    <p class="font-bold text-gray-900 truncate">#{{ order.id }} &mdash; {{ order.customer.full_name }}</p>
+                    <p class="font-bold text-gray-900 truncate">#{{ order.id }} {% trans '&mdash;' %} {{ order.customer.full_name }}</p>
                     <p class="text-xs text-gray-500 mt-0.5">
                         <a href="tel:{{ order.customer.phone }}" class="hover:text-amber-600">{{ order.customer.phone }}</a>
-                        &middot; {{ order.customer.governorate }}
+                        {% trans '&middot;' %} {{ order.customer.governorate }}
                     </p>
                 </div>
                 {% include "dashboard/partials/_status_badge.html" with status=order.status %}
             </div>
             <div class="flex items-center justify-between text-sm">
                 <span class="text-gray-500">{{ order.created_at|date:"d/m H:i" }}</span>
-                <span class="font-bold text-amber-700">{{ order.total_amount }} DT</span>
+                <span class="font-bold text-amber-700">{{ order.total_amount }} {% trans 'DT' %}</span>
             </div>
         </a>
         {% empty %}
-        <div class="text-center py-12 text-gray-500 text-sm">Aucune commande.</div>
+        <div class="text-center py-12 text-gray-500 text-sm">{% trans 'Aucune commande.' %}</div>
         {% endfor %}
     </div>
 
@@ -72,15 +67,15 @@
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b bg-gray-50 text-gray-500">
-                        <th class="px-4 py-3">Commande</th>
-                        <th class="px-4 py-3">Client</th>
-                        <th class="px-4 py-3">Contact</th>
-                        <th class="px-4 py-3">Gouvernorat</th>
-                        <th class="px-4 py-3">Articles</th>
-                        <th class="px-4 py-3">Statut</th>
-                        <th class="px-4 py-3 text-right">Total (DT)</th>
-                        <th class="px-4 py-3 text-right">Marge</th>
-                        <th class="px-4 py-3">Date</th>
+                        <th class="px-4 py-3">{% trans 'Commande' %}</th>
+                        <th class="px-4 py-3">{% trans 'Client' %}</th>
+                        <th class="px-4 py-3">{% trans 'Contact' %}</th>
+                        <th class="px-4 py-3">{% trans 'Gouvernorat' %}</th>
+                        <th class="px-4 py-3">{% trans 'Articles' %}</th>
+                        <th class="px-4 py-3">{% trans 'Statut' %}</th>
+                        <th class="px-4 py-3 text-right">{% trans 'Total (DT)' %}</th>
+                        <th class="px-4 py-3 text-right">{% trans 'Marge' %}</th>
+                        <th class="px-4 py-3">{% trans 'Date' %}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -99,11 +94,11 @@
                             {% include "dashboard/partials/_status_badge.html" with status=order.status %}
                         </td>
                         <td class="px-4 py-3 text-right font-medium text-gray-900">{{ order.total_amount }}</td>
-                        <td class="px-4 py-3 text-right text-green-700 font-medium">{{ order.margin }} DT</td>
+                        <td class="px-4 py-3 text-right text-green-700 font-medium">{{ order.margin }} {% trans 'DT' %}</td>
                         <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ order.created_at|date:"d/m/Y H:i" }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="9" class="px-4 py-8 text-gray-500 text-center">Aucune commande.</td></tr>
+                    <tr><td colspan="9" class="px-4 py-8 text-gray-500 text-center">{% trans 'Aucune commande.' %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

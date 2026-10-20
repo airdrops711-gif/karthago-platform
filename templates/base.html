@@ -1,23 +1,23 @@
-{% load static catalog_tags %}
+{% load static catalog_tags i18n %}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ LANGUAGE_CODE|default:'fr' }}" dir="{{ language_dir|default:'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {% block seo %}
-    <title>{% block title %}Karthago &mdash; Dropshipping Tunisia{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}Karthago importe des produits r&eacute;els depuis les meilleurs fournisseurs tunisiens. Paiement &agrave; la livraison dans toute la Tunisie, exp&eacute;dition sous 24 &agrave; 48 heures.{% endblock %}">
+    <title>{% block title %}{% trans "Karthago — Dropshipping Tunisia" %}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{% trans "Karthago importe des produits réels depuis les meilleurs fournisseurs tunisiens. Paiement à la livraison dans toute la Tunisie, expédition sous 24 à 48 heures." %}{% endblock %}">
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
     {% endblock %}
 
     <!-- Open Graph / social sharing -->
     <meta property="og:site_name" content="Karthago">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
-    <meta property="og:title" content="{% block og_title %}{% block seo_title %}Karthago &mdash; Dropshipping Tunisia{% endblock %}{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}{% block seo_description %}Produits r&eacute;els import&eacute;s des fournisseurs tunisiens, paiement &agrave; la livraison partout en Tunisie.{% endblock %}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{% block seo_title %}{% trans "Karthago — Dropshipping Tunisia" %}{% endblock %}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{% block seo_description %}{% trans "Produits réels importés des fournisseurs tunisiens, paiement à la livraison partout en Tunisie." %}{% endblock %}{% endblock %}">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:locale" content="fr_TN">
+    <meta property="og:locale" content="{% if LANGUAGE_CODE == 'ar' %}ar_TN{% else %}fr_TN{% endif %}">
     <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.svg' %}{% endblock %}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="theme-color" content="#d97706">
@@ -29,7 +29,7 @@
     <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col {% if is_rtl %}rtl{% else %}ltr{% endif %}">
     {% include "storefront/nav.html" %}
 
     <main class="flex-1">
@@ -63,21 +63,20 @@
                         <span class="font-bold text-lg text-amber-700 tracking-tight">Karthago</span>
                     </div>
                     <p class="text-sm text-gray-500 leading-relaxed">
-                        Dropshipping tunisien. Nous importons des produits réels
-                        chez les meilleurs fournisseurs locaux et locaux vous facturons.
+                        {% blocktrans %}Dropshipping tunisien. Nous importons des produits réels chez les meilleurs fournisseurs locaux et locaux vous facturons.{% endblocktrans %}
                     </p>
                 </div>
                 <div>
-                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Boutique</h4>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{% trans "Boutique" %}</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'catalog:product_list' %}" class="text-gray-600 hover:text-amber-600">Tout le catalogue</a></li>
-                        <li><a href="{% url 'catalog:product_list' %}?on_sale=1&sort_by=discount" class="text-gray-600 hover:text-amber-600">Promotions</a></li>
-                        <li><a href="{% url 'catalog:product_list' %}?in_stock=1" class="text-gray-600 hover:text-amber-600">En stock</a></li>
-                        <li><a href="{% url 'orders:cart' %}" class="text-gray-600 hover:text-amber-600">Mon panier</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}" class="text-gray-600 hover:text-amber-600">{% trans "Tout le catalogue" %}</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}?on_sale=1&sort_by=discount" class="text-gray-600 hover:text-amber-600">{% trans "Promotions" %}</a></li>
+                        <li><a href="{% url 'catalog:product_list' %}?in_stock=1" class="text-gray-600 hover:text-amber-600">{% trans "En stock" %}</a></li>
+                        <li><a href="{% url 'orders:cart' %}" class="text-gray-600 hover:text-amber-600">{% trans "Mon panier" %}</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Catégories</h4>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{% trans "Catégories" %}</h4>
                     <ul class="space-y-2 text-sm">
                         {% for category in nav_categories|slice:":5" %}
                         <li>
@@ -89,21 +88,21 @@
                     </ul>
                 </div>
                 <div>
-                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Livraison</h4>
+                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{% trans "Livraison" %}</h4>
                     <ul class="space-y-2 text-sm text-gray-600">
-                        <li>Paiement à la livraison</li>
-                        <li>Livraison 24-48h</li>
-                        <li>Retour sous 30 jours</li>
+                        <li>{% trans "Paiement à la livraison" %}</li>
+                        <li>{% trans "Livraison 24-48h" %}</li>
+                        <li>{% trans "Retour sous 30 jours" %}</li>
                         <li class="text-gray-500" dir="rtl">توصيل إلى كامل تراب الجمهورية</li>
                     </ul>
                 </div>
             </div>
             <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <p class="text-xs text-gray-400">
-                    &copy; 2026 Karthago Commerce &mdash; Dropshipping Tunisia
+                    &copy; 2026 Karthago Commerce &mdash; {% trans "Dropshipping Tunisia" %}
                 </p>
                 <p class="text-xs text-gray-400">
-                    Catalogue synchronisé depuis les fournisseurs tunisiens
+                    {% trans "Catalogue synchronisé depuis les fournisseurs tunisiens" %}
                 </p>
             </div>
         </div>

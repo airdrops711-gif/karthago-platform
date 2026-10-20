@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static i18n %}
 {% block title %}{{ product.title }} | {{ store.name }}{% endblock %}
-{% block meta_description %}{{ product.title }} — {{ product.selling_price }} DT, livraison 24-48h partout en Tunisie, paiement à la livraison.{% endblock %}
-{% block og_type %}product{% endblock %}
+{% block meta_description %}{{ product.title }} — {{ product.selling_price }} {% trans 'DT, livraison 24-48h partout en Tunisie, paiement à la livraison.' %}{% endblock %}
+{% block og_type %}{% trans 'product' %}{% endblock %}
 {% block og_title %}{{ product.title }}{% endblock %}
-{% block og_description %}{{ product.title }} — {{ product.selling_price }} DT, paiement à la livraison.{% endblock %}
+{% block og_description %}{{ product.title }} — {{ product.selling_price }} {% trans 'DT, paiement à la livraison.' %}{% endblock %}
 {% block og_image %}{% if product.image_url %}{{ product.image_url }}{% else %}{{ block.super }}{% endif %}{% endblock %}
 {% block extra_js %}
 {% include "storefront/partials/_jsonld.html" with schema=product_schema %}
@@ -13,13 +13,13 @@
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <nav class="text-xs text-gray-400 mb-4 flex items-center gap-1 flex-wrap">
-        <a href="{% url 'catalog:home' %}" class="hover:text-amber-600">Accueil</a>
+        <a href="{% url 'catalog:home' %}" class="hover:text-amber-600">{% trans 'Accueil' %}</a>
         <span>/</span>
         {% if is_sub_store %}
         <a href="{% url 'catalog:substore_home' store.slug %}" class="hover:text-amber-600">{{ store.name }}</a>
         <span>/</span>
         {% else %}
-        <a href="{% url 'catalog:product_list' %}" class="hover:text-amber-600">Catalogue</a>
+        <a href="{% url 'catalog:product_list' %}" class="hover:text-amber-600">{% trans 'Catalogue' %}</a>
         <span>/</span>
         {% endif %}
         <span class="text-gray-600">{{ product.title|truncatechars:60 }}</span>
@@ -36,7 +36,7 @@
                     <div class="w-full h-full flex items-center justify-center text-gray-300 text-xl">📦</div>
                     {% endif %}
                     {% if product.is_featured_on_main %}
-                    <span class="absolute top-3 left-3 bg-amber-600 text-white text-xs font-bold px-2 py-1 rounded">✨ Sélection de la plateforme</span>
+                    <span class="absolute top-3 left-3 bg-amber-600 text-white text-xs font-bold px-2 py-1 rounded">{% trans '✨ Sélection de la plateforme' %}</span>
                     {% endif %}
                 </div>
                 {% if product_images|length > 1 %}
@@ -66,60 +66,56 @@
                 <div class="mb-6">
                     <div class="flex items-baseline gap-2">
                         <span class="text-3xl font-bold text-amber-700">{{ product.selling_price }}</span>
-                        <span class="text-lg font-bold text-amber-700">DT</span>
+                        <span class="text-lg font-bold text-amber-700">{% trans 'DT' %}</span>
                     </div>
                     <p class="text-sm text-gray-500 mt-1">
-                        Prix de vente conseill&eacute; en dinars tunisiens.
+                        {% trans 'Prix de vente conseill&eacute; en dinars tunisiens.' %}
                         {% if product.margin_amount %}
-                        Marge {{ product.margin_amount }} DT ({{ product.margin_percent }}%).
+                        {% trans 'Marge' %} {{ product.margin_amount }} {% trans 'DT (' %}{{ product.margin_percent }}%).
                         {% endif %}
                     </p>
                 </div>
 
                 <div class="mb-6">
                     <div class="flex items-center gap-4 mb-3">
-                        <span class="text-sm font-medium text-gray-700">Disponibilit&eacute;</span>
+                        <span class="text-sm font-medium text-gray-700">{% trans 'Disponibilit&eacute;' %}</span>
                         <span class="px-2 py-1 rounded-full text-xs font-bold {% if product.in_stock %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
-                            {% if product.in_stock %}En stock{% else %}Rupture de stock{% endif %}
+                            {% if product.in_stock %}{% trans 'En stock' %}{% else %}{% trans 'Rupture de stock' %}{% endif %}
                         </span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700">Quantit&eacute;</label>
+                        <label class="text-sm font-medium text-gray-700">{% trans 'Quantit&eacute;' %}</label>
                         <input type="number" value="1" min="1" class="w-16 border border-gray-300 rounded px-2 py-2 text-center focus:ring-2 focus:ring-amber-500 outline-none">
                     </div>
                 </div>
 
                 <!-- Sticky CTA on mobile -->
                 <div class="md:hidden mb-6">
-                    <button data-open-checkout
-                            class="w-full bg-amber-600 hover:bg-amber-700 text-white px-6 py-4 rounded-xl font-bold text-lg shadow-lg transition flex items-center justify-center gap-2">
-                        Commander Directement
+                    <button data-open-checkout class="w-full bg-amber-600 hover:bg-amber-700 text-white px-6 py-4 rounded-xl font-bold text-lg shadow-lg transition flex items-center justify-center gap-2">
+                        {% trans 'Commander Directement' %}
                     </button>
-                    <p class="text-center text-xs text-gray-500 mt-3">Paiement &agrave; la livraison</p>
+                    <p class="text-center text-xs text-gray-500 mt-3">{% trans 'Paiement &agrave; la livraison' %}</p>
                 </div>
 
                 <div class="hidden md:block">
-                    <button data-open-checkout
-                            class="w-full bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition flex items-center justify-center gap-3">
-                        Commander Directement <span>&rarr;</span>
+                    <button data-open-checkout class="w-full bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition flex items-center justify-center gap-3">
+                        {% trans 'Commander Directement' %} <span>{% trans '&rarr;' %}</span>
                     </button>
-                    <p class="text-center text-xs text-gray-500 mt-3">Paiement &agrave; la livraison &bull; 24&ndash;48h</p>
+                    <p class="text-center text-xs text-gray-500 mt-3">{% trans 'Paiement &agrave; la livraison &bull; 24&ndash;48h' %}</p>
                 </div>
 
                 <!-- Add to cart (server-side priced at checkout) -->
                 <form hx-post="{% url 'orders:add_to_cart' product.id %}" hx-target="this" hx-swap="innerHTML" class="mt-3">
                     {% csrf_token %}
                     <input type="hidden" name="quantity" value="1">
-                    <button type="submit" {% if not product.in_stock %}disabled{% endif %}
-                            class="w-full border border-amber-600 text-amber-700 hover:bg-amber-50 px-8 py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2 {% if not product.in_stock %}opacity-50 cursor-not-allowed{% endif %}">
-                        {% if not product.in_stock %}Rupture de stock{% else %}Ajouter au panier{% endif %}
+                    <button type="submit" {% if not product.in_stock %}disabled{% endif %} class="w-full border border-amber-600 text-amber-700 hover:bg-amber-50 px-8 py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2 {% if not product.in_stock %}opacity-50 cursor-not-allowed{% endif %}">
+                        {% if not product.in_stock %}{% trans 'Rupture de stock' %}{% else %}{% trans 'Ajouter au panier' %}{% endif %}
                     </button>
                 </form>
 
                 {% if product.external_url %}
-                <a href="{{ product.external_url }}" target="_blank" rel="noopener"
-                   class="mt-3 block text-center text-xs text-gray-400 hover:text-gray-600">
-                    Voir chez le fournisseur →
+                <a href="{{ product.external_url }}" target="_blank" rel="noopener" class="mt-3 block text-center text-xs text-gray-400 hover:text-gray-600">
+                    {% trans 'Voir chez le fournisseur →' %}
                 </a>
                 {% endif %}
             </div>
@@ -129,23 +125,23 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                     <div class="flex flex-col items-center gap-2">
                         <span class="text-amber-600 font-bold text-xl">🚚</span>
-                        <span class="text-xs font-medium text-amber-800">Livraison 24&ndash;48h</span>
-                        <span class="text-[10px] text-amber-600">24 gouvernorats</span>
+                        <span class="text-xs font-medium text-amber-800">{% trans 'Livraison 24&ndash;48h' %}</span>
+                        <span class="text-[10px] text-amber-600">{% trans '24 gouvernorats' %}</span>
                     </div>
                     <div class="flex flex-col items-center gap-2">
                         <span class="text-amber-600 font-bold text-xl">&#10003;</span>
-                        <span class="text-xs font-medium text-amber-800">V&eacute;rifiez avant de payer</span>
-                        <span class="text-[10px] text-amber-600">COD s&eacute;curis&eacute;</span>
+                        <span class="text-xs font-medium text-amber-800">{% trans 'V&eacute;rifiez avant de payer' %}</span>
+                        <span class="text-[10px] text-amber-600">{% trans 'COD s&eacute;curis&eacute;' %}</span>
                     </div>
                     <div class="flex flex-col items-center gap-2">
                         <span class="text-amber-600 font-bold text-xl">&#9744;</span>
-                        <span class="text-xs font-medium text-amber-800">Retour sous 7 jours</span>
-                        <span class="text-[10px] text-amber-600">Satisfait ou rembours&eacute;</span>
+                        <span class="text-xs font-medium text-amber-800">{% trans 'Retour sous 7 jours' %}</span>
+                        <span class="text-[10px] text-amber-600">{% trans 'Satisfait ou rembours&eacute;' %}</span>
                     </div>
                     <div class="flex flex-col items-center gap-2">
                         <span class="text-amber-600 font-bold text-xl">&#9993;</span>
-                        <span class="text-xs font-medium text-amber-800">Support WhatsApp</span>
-                        <span class="text-[10px] text-amber-600">7j/7</span>
+                        <span class="text-xs font-medium text-amber-800">{% trans 'Support WhatsApp' %}</span>
+                        <span class="text-[10px] text-amber-600">{% trans '7j/7' %}</span>
                     </div>
                 </div>
             </div>

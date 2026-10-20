@@ -1,30 +1,28 @@
 {% extends "base.html" %}
-{% block title %}Boutiques &mdash; Superadmin Karthago{% endblock %}
+{% load i18n %}
+{% block title %}{% trans 'Boutiques &mdash; Superadmin Karthago' %}{% endblock %}
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
-            <a href="{% url 'admin_dashboard:overview' %}" class="text-xs text-gray-400 hover:text-amber-600">&larr; Retour au pilotage</a>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">Boutiques de la plateforme</h1>
+            <a href="{% url 'admin_dashboard:overview' %}" class="text-xs text-gray-400 hover:text-amber-600">{% trans '&larr; Retour au pilotage' %}</a>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{% trans 'Boutiques de la plateforme' %}</h1>
             <p class="text-gray-500 mt-1 text-sm">
-                Chaque boutique est un tenant isol&eacute; : son catalogue, son panier et ses commandes
+                {% blocktrans trimmed %}Chaque boutique est un tenant isol&eacute; : son catalogue, son panier et ses commandes
                 lui appartiennent exclusivement. La suspension d'une boutique la retire
-                imm&eacute;diatement du catalogue, de la recherche et de la page d'accueil.
+                imm&eacute;diatement du catalogue, de la recherche et de la page d'accueil.{% endblocktrans %}
             </p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="{% url 'admin_dashboard:financials' %}"
-               class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:border-amber-300">
-                💰 Ledger financier
+            <a href="{% url 'admin_dashboard:financials' %}" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:border-amber-300">
+                {% trans '💰 Ledger financier' %}
             </a>
-            <a href="{% url 'admin_dashboard:curation' %}"
-               class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:border-amber-300">
-                Curation du catalogue
+            <a href="{% url 'admin_dashboard:curation' %}" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:border-amber-300">
+                {% trans 'Curation du catalogue' %}
             </a>
-            <a href="{% url 'admin_dashboard:store_create' %}"
-               class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800">
-                + Nouvelle boutique
+            <a href="{% url 'admin_dashboard:store_create' %}" class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800">
+                {% trans '+ Nouvelle boutique' %}
             </a>
         </div>
     </div>
@@ -34,7 +32,7 @@
         {% include "admin_dashboard/partials/_store_card.html" %}
         {% empty %}
         <div class="col-span-full text-center py-16 text-gray-500">
-            <p class="text-lg mb-2">Aucune boutique enregistr&eacute;e.</p>
+            <p class="text-lg mb-2">{% trans 'Aucune boutique enregistr&eacute;e.' %}</p>
         </div>
         {% endfor %}
     </div>

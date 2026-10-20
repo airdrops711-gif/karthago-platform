@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% load static catalog_tags %}
-{% block title %}Karthago &mdash; Dropshipping Tunisia | Paiement à la livraison{% endblock %}
-{% block meta_description %}Plus de {{ total_products }} produits réels importés des meilleurs fournisseurs tunisiens. Achat en ligne, paiement à la livraison, livraison 24-48h dans les 24 gouvernorats.{% endblock %}
-{% block og_title %}Karthago &mdash; Le e-commerce tunisien, sans boutique{% endblock %}
-{% block og_description %}Produits réels, prix transparents, paiement à la livraison partout en Tunisie.{% endblock %}
+{% load static catalog_tags i18n %}
+{% block title %}{% trans 'Karthago &mdash; Dropshipping Tunisia | Paiement à la livraison' %}{% endblock %}
+{% block meta_description %}{% trans 'Plus de' %} {{ total_products }} {% trans 'produits réels importés des meilleurs fournisseurs tunisiens. Achat en ligne, paiement à la livraison, livraison 24-48h dans les 24 gouvernorats.' %}{% endblock %}
+{% block og_title %}{% trans 'Karthago &mdash; Le e-commerce tunisien, sans boutique' %}{% endblock %}
+{% block og_description %}{% trans 'Produits réels, prix transparents, paiement à la livraison partout en Tunisie.' %}{% endblock %}
 {% block extra_js %}
 {% include "storefront/partials/_jsonld.html" with schema=itemlist_schema %}
 {% endblock %}
@@ -16,24 +16,22 @@
         <div class="grid lg:grid-cols-2 gap-10 items-center">
             <div>
                 <span class="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-semibold mb-5">
-                    🚚 Livraison partout en Tunisie
+                    {% trans '🚚 Livraison partout en Tunisie' %}
                 </span>
                 <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
-                    Le e-commerce<br>tunisien, <span class="text-amber-50">sans boutique.</span>
+                    {% trans 'Le e-commerce' %}<br>{% trans 'tunisien,' %} <span class="text-amber-50">{% trans 'sans boutique.' %}</span>
                 </h1>
                 <p class="mt-5 text-lg text-amber-50/90 max-w-lg leading-relaxed">
-                    Plus de {{ total_products }} produits réels, importés directement
+                    {% trans 'Plus de' %} {{ total_products }} {% blocktrans trimmed %}produits réels, importés directement
                     des meilleurs magasins tunisiens. Paiement à la livraison,
-                    envoi sous 24 à 48&nbsp;heures.
+                    envoi sous 24 à 48&nbsp;heures.{% endblocktrans %}
                 </p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="{% url 'catalog:product_list' %}"
-                       class="bg-white text-amber-700 hover:bg-amber-50 px-7 py-3.5 rounded-xl font-bold shadow-lg transition">
-                        Découvrir le catalogue →
+                    <a href="{% url 'catalog:product_list' %}" class="bg-white text-amber-700 hover:bg-amber-50 px-7 py-3.5 rounded-xl font-bold shadow-lg transition">
+                        {% trans 'Découvrir le catalogue →' %}
                     </a>
-                    <a href="{% url 'catalog:product_list' %}?in_stock=1&sort_by=featured"
-                       class="bg-white/15 hover:bg-white/25 backdrop-blur text-white px-7 py-3.5 rounded-xl font-semibold transition">
-                        🔥 Voir les Sélections
+                    <a href="{% url 'catalog:product_list' %}?in_stock=1&sort_by=featured" class="bg-white/15 hover:bg-white/25 backdrop-blur text-white px-7 py-3.5 rounded-xl font-semibold transition">
+                        {% trans '🔥 Voir les Sélections' %}
                     </a>
                 </div>
             </div>
@@ -71,12 +69,11 @@
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="flex items-end justify-between mb-6">
         <div>
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">✨ Sélection de la plateforme</h2>
-            <p class="text-gray-500 mt-1 text-sm">Les produits choisis par notre équipe.</p>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">{% trans '✨ Sélection de la plateforme' %}</h2>
+            <p class="text-gray-500 mt-1 text-sm">{% trans 'Les produits choisis par notre équipe.' %}</p>
         </div>
-        <a href="{% url 'catalog:product_list' %}?sort_by=featured"
-           class="text-amber-600 hover:text-amber-700 text-sm font-medium shrink-0">
-            Tout voir →
+        <a href="{% url 'catalog:product_list' %}?sort_by=featured" class="text-amber-600 hover:text-amber-700 text-sm font-medium shrink-0">
+            {% trans 'Tout voir →' %}
         </a>
     </div>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -92,22 +89,21 @@
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="flex items-end justify-between mb-6">
         <div>
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">Nos catégories</h2>
-            <p class="text-gray-500 mt-1 text-sm">Trouvez ce qu'il vous faut, par univers.</p>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">{% trans 'Nos catégories' %}</h2>
+            <p class="text-gray-500 mt-1 text-sm">{% trans 'Trouvez ce qu\'il vous faut, par univers.' %}</p>
         </div>
         <a href="{% url 'catalog:product_list' %}" class="text-amber-600 hover:text-amber-700 text-sm font-medium shrink-0">
-            Tout voir →
+            {% trans 'Tout voir →' %}
         </a>
     </div>
     <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
         {% for category in showcase_categories %}
-        <a href="{% url 'catalog:product_list' %}?category={{ category.category|urlencode }}"
-           class="group bg-white rounded-xl border border-gray-100 hover:border-amber-300 hover:shadow-md p-4 text-center transition">
+        <a href="{% url 'catalog:product_list' %}?category={{ category.category|urlencode }}" class="group bg-white rounded-xl border border-gray-100 hover:border-amber-300 hover:shadow-md p-4 text-center transition">
             <div class="text-2xl mb-2">📦</div>
             <div class="text-sm font-semibold text-gray-800 group-hover:text-amber-700 leading-tight line-clamp-2">
                 {{ category.category }}
             </div>
-            <div class="text-xs text-gray-400 mt-1">{{ category.n }} produits</div>
+            <div class="text-xs text-gray-400 mt-1">{{ category.n }} {% trans 'produits' %}</div>
         </a>
         {% endfor %}
     </div>
@@ -118,11 +114,11 @@
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
     <div class="flex items-end justify-between mb-6">
         <div>
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">Nouveautés</h2>
-            <p class="text-gray-500 mt-1 text-sm">Les derniers produits ajoutés au catalogue.</p>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">{% trans 'Nouveautés' %}</h2>
+            <p class="text-gray-500 mt-1 text-sm">{% trans 'Les derniers produits ajoutés au catalogue.' %}</p>
         </div>
         <a href="{% url 'catalog:product_list' %}?sort_by=-created_at" class="text-amber-600 hover:text-amber-700 text-sm font-medium shrink-0">
-            Tout voir →
+            {% trans 'Tout voir →' %}
         </a>
     </div>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -130,7 +126,7 @@
         {% include "storefront/partials/_store_product_card.html" with product=product store=store %}
         {% empty %}
         <div class="col-span-full text-center py-10 text-gray-400 text-sm">
-            Le catalogue se remplit — revenez dans un instant.
+            {% trans 'Le catalogue se remplit — revenez dans un instant.' %}
         </div>
         {% endfor %}
     </div>
@@ -139,16 +135,16 @@
 <!-- ================= CTA BANNER ================= -->
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
     <div class="bg-gray-900 rounded-2xl px-6 sm:px-10 py-10 text-center text-white">
-        <h2 class="text-2xl sm:text-3xl font-bold">Une question sur un produit&nbsp;?</h2>
+        <h2 class="text-2xl sm:text-3xl font-bold">{% trans 'Une question sur un produit&nbsp;?' %}</h2>
         <p class="text-gray-300 mt-2 max-w-xl mx-auto text-sm">
-            Notre équipe est disponible 7j/7 pour vous conseiller et confirmer la disponibilité.
+            {% trans 'Notre équipe est disponible 7j/7 pour vous conseiller et confirmer la disponibilité.' %}
         </p>
         <div class="mt-6 flex flex-wrap justify-center gap-3">
             <a href="{% url 'orders:cart' %}" class="bg-amber-500 hover:bg-amber-400 text-gray-900 px-6 py-3 rounded-xl font-bold text-sm transition">
-                Voir mon panier
+                {% trans 'Voir mon panier' %}
             </a>
             <a href="{% url 'catalog:product_list' %}" class="bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl font-semibold text-sm transition">
-                Continuer mes achats
+                {% trans 'Continuer mes achats' %}
             </a>
         </div>
     </div>

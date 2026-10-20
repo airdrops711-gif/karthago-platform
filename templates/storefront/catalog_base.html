@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% load static catalog_tags %}
-{% block title %}{{ page_title }} &mdash; Karthago Commerce{% endblock %}
+{% load static catalog_tags i18n %}
+{% block title %}{{ page_title }} {% trans '&mdash; Karthago Commerce' %}{% endblock %}
 {% block content %}
 
 <!-- Page header -->
@@ -8,7 +8,7 @@
     <div>
         {% if category %}
         <nav class="text-xs text-gray-400 mb-1 flex items-center gap-1">
-            <a href="{% url 'catalog:product_list' %}" class="hover:text-amber-600">Accueil</a>
+            <a href="{% url 'catalog:product_list' %}" class="hover:text-amber-600">{% trans 'Accueil' %}</a>
             <span>/</span>
             <span class="text-gray-600">{{ category.category }}</span>
         </nav>
@@ -19,12 +19,10 @@
     <div class="flex items-center gap-3">
         <span class="hidden sm:inline text-sm text-gray-500">
             <span class="font-semibold text-gray-900">{{ paginator.count }}</span>
-            produit{{ paginator.count|pluralize }}
+            {% blocktrans count counter=paginator.count %}{{ counter }} produit{% plural %}{{ counter }} produits{% endblocktrans %}
         </span>
-        <label for="sort-select" class="sr-only">Trier</label>
-        <select id="sort-select" name="sort_by"
-                onchange="window.location.href=this.value"
-                class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+        <label for="sort-select" class="sr-only">{% trans 'Trier' %}</label>
+        <select id="sort-select" name="sort_by" onchange="window.location.href=this.value" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white">
             {% for value, label in sort_options.items %}
             <option value="{{ value }}" {% if sort_by == value %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
@@ -34,13 +32,11 @@
 
 <!-- Mobile filter trigger -->
 <div class="lg:hidden mb-4">
-    <button type="button"
-            onclick="document.getElementById('filter-drawer').classList.remove('-translate-x-full')"
-            class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-sm">
+    <button type="button" onclick="document.getElementById('filter-drawer').classList.remove('-translate-x-full')" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-sm">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.6a1 1 0 01-.293.707L13 13.414V20a1 1 0 01-1 1H9a1 1 0 01-1-1v-6.586L3.293 7.307A1 1 0 013 6.6V4z"/>
         </svg>
-        Filtres
+        {% trans 'Filtres' %}
         {% if selected_category or min_price or max_price or in_stock %}
         <span class="bg-amber-600 text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">•</span>
         {% endif %}
@@ -60,17 +56,16 @@
         {% if q %}
         <div class="mb-4 flex items-center justify-between bg-amber-50 border border-amber-100 rounded-lg px-4 py-2.5">
             <span class="text-sm text-amber-800">
-                Résultats pour <span class="font-semibold">« {{ q }} »</span>
+                {% trans 'Résultats pour' %} <span class="font-semibold">« {{ q }} »</span>
             </span>
-            <a href="{% filter_url q=None %}" class="text-sm text-amber-700 hover:underline">Effacer</a>
+            <a href="{% filter_url q=None %}" class="text-sm text-amber-700 hover:underline">{% trans 'Effacer' %}</a>
         </div>
         {% endif %}
 
         {% if selected_category %}
         <div class="mb-4 flex items-center gap-2 text-sm text-gray-600">
-            <span class="text-gray-400">Filtre :</span>
-            <a href="{% category_url '' %}"
-               class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-xs font-medium hover:bg-amber-200">
+            <span class="text-gray-400">{% trans 'Filtre :' %}</span>
+            <a href="{% category_url '' %}" class="inline-flex items-center gap-1 bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-xs font-medium hover:bg-amber-200">
                 {{ category_name|default:selected_category }} ✕
             </a>
         </div>
@@ -81,35 +76,30 @@
             {% include "storefront/partials/_store_product_card.html" with product=product store=store %}
             {% empty %}
             <div class="col-span-full text-center py-16 text-gray-500">
-                <p class="text-lg mb-2">Aucun produit disponible.</p>
-                <p class="text-sm text-gray-400">Essayez d'élargir vos filtres.</p>
-                <a href="{% url 'catalog:product_list' %}"
-                   class="inline-block mt-4 text-amber-600 text-sm font-medium hover:underline">Voir tout le catalogue</a>
+                <p class="text-lg mb-2">{% trans 'Aucun produit disponible.' %}</p>
+                <p class="text-sm text-gray-400">{% trans 'Essayez d\'élargir vos filtres.' %}</p>
+                <a href="{% url 'catalog:product_list' %}" class="inline-block mt-4 text-amber-600 text-sm font-medium hover:underline">{% trans 'Voir tout le catalogue' %}</a>
             </div>
             {% endfor %}
         </div>
 
         <!-- Pagination -->
         {% if is_paginated %}
-        <nav class="mt-8 flex items-center justify-center gap-2" aria-label="Pagination">
+        <nav class="mt-8 flex items-center justify-center gap-2" aria-label="{% trans 'Pagination' %}">
             {% if page_obj.has_previous %}
-            <a href="{% filter_url page=1 %}"
-               class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Première</a>
+            <a href="{% filter_url page=1 %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">{% trans 'Première' %}</a>
             {% endif %}
             {% if page_obj.has_previous %}
-            <a href="{% filter_url page=page_obj.previous_page_number %}"
-               class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Précédente</a>
+            <a href="{% filter_url page=page_obj.previous_page_number %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">{% trans 'Précédente' %}</a>
             {% endif %}
             <span class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 bg-gray-50">
-                Page {{ page_obj.number }} sur {{ paginator.num_pages }}
+                {% trans 'Page' %} {{ page_obj.number }} {% trans 'sur' %} {{ paginator.num_pages }}
             </span>
             {% if page_obj.has_next %}
-            <a href="{% filter_url page=page_obj.next_page_number %}"
-               class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Suivante</a>
+            <a href="{% filter_url page=page_obj.next_page_number %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">{% trans 'Suivante' %}</a>
             {% endif %}
             {% if page_obj.has_next %}
-            <a href="{% filter_url page=paginator.num_pages %}"
-               class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Dernière</a>
+            <a href="{% filter_url page=paginator.num_pages %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">{% trans 'Dernière' %}</a>
             {% endif %}
         </nav>
         {% endif %}
@@ -117,25 +107,20 @@
 </div>
 
 <!-- Mobile filter drawer -->
-<div id="filter-drawer"
-     class="fixed inset-0 z-50 lg:hidden hidden">
-    <div class="absolute inset-0 bg-black/40"
-         onclick="document.getElementById('filter-drawer').classList.add('hidden')"></div>
+<div id="filter-drawer" class="fixed inset-0 z-50 lg:hidden hidden">
+    <div class="absolute inset-0 bg-black/40" onclick="document.getElementById('filter-drawer').classList.add('hidden')"></div>
     <div class="absolute inset-y-0 left-0 w-80 max-w-[85vw] bg-white shadow-2xl flex flex-col
                 transform -translate-x-full transition-transform duration-200">
         <div class="p-4 border-b flex items-center justify-between">
-            <span class="font-bold text-gray-900">Filtres</span>
-            <button type="button"
-                    onclick="document.getElementById('filter-drawer').classList.add('hidden')"
-                    class="text-gray-400 hover:text-gray-600 text-2xl leading-none">✕</button>
+            <span class="font-bold text-gray-900">{% trans 'Filtres' %}</span>
+            <button type="button" onclick="document.getElementById('filter-drawer').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">✕</button>
         </div>
         <div class="flex-1 overflow-y-auto p-4">
             {% include "storefront/partials/_category_tree.html" %}
         </div>
         <div class="p-4 border-t">
-            <a href="{% filter_url %}"
-               class="block w-full py-2.5 rounded-lg bg-amber-600 text-white text-center text-sm font-medium">
-                Voir {{ paginator.count }} produit{{ paginator.count|pluralize }}
+            <a href="{% filter_url %}" class="block w-full py-2.5 rounded-lg bg-amber-600 text-white text-center text-sm font-medium">
+                {% blocktrans count counter=paginator.count %}Voir {{ counter }} produit{% plural %}Voir {{ counter }} produits{% endblocktrans %}
             </a>
         </div>
     </div>

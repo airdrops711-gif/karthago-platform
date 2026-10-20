@@ -11,3 +11,6 @@ redis>=5.0.0
 python-dotenv>=1.0.0
 Pillow>=10.0.0
 openpyxl>=3.1.0
+# Translations (fr / ar): used by the makemessages_karthago command and
+# by tools/ar_translations.py to write and compile the .po / .mo files.
+polib>=1.1.1
