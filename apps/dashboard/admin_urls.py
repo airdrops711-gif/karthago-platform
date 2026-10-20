@@ -13,6 +13,8 @@ app_name = "admin_dashboard"
 urlpatterns = [
     path("", admin_views.overview, name="overview"),
     path("stores/", admin_views.stores, name="stores"),
+    path("stores/new/", admin_views.store_create, name="store_create"),
+    path("stores/<int:store_id>/edit/", admin_views.store_edit, name="store_edit"),
     path("curation/", admin_views.curation, name="curation"),
     path(
         "curation/<int:product_id>/toggle/",

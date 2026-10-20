@@ -35,7 +35,8 @@ class Category(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name_plural = "Categories"
+        verbose_name = "Catégorie"
+        verbose_name_plural = "Catégories"
         ordering = ["name"]
 
     def __str__(self):
@@ -247,6 +248,8 @@ class Store(models.Model):
 
     class Meta:
         ordering = ["name"]
+        verbose_name = "Boutique"
+        verbose_name_plural = "Boutiques"
 
     def __str__(self):
         return f"{self.name} {'(Flagship)' if self.is_platform_default else ''}"
@@ -354,6 +357,8 @@ class StoreProduct(models.Model):
     class Meta:
         unique_together = ("store", "slug")
         ordering = ["-featured_priority", "-created_at"]
+        verbose_name = "Produit de boutique"
+        verbose_name_plural = "Produits de boutique"
         indexes = [
             models.Index(fields=["store", "is_published"]),
             models.Index(fields=["is_featured_on_main", "featured_priority"]),

@@ -34,6 +34,10 @@ class Customer(models.Model):
     def __str__(self):
         return self.full_name
 
+    class Meta:
+        verbose_name = "Client"
+        verbose_name_plural = "Clients"
+
 
 class Order(models.Model):
     STATUS_PENDING_CONFIRMATION = "PENDING_CONFIRMATION"
@@ -77,6 +81,8 @@ class Order(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = "Commande"
+        verbose_name_plural = "Commandes"
 
     def __str__(self):
         return f"Order {self.id} - {self.customer.full_name}"
@@ -171,6 +177,10 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.quantity}x {self.product_title}"
 
+    class Meta:
+        verbose_name = "Ligne de commande"
+        verbose_name_plural = "Lignes de commande"
+
 
 class OrderEvent(models.Model):
     """History of the status changes of an order (the tracking trail)."""
@@ -184,6 +194,8 @@ class OrderEvent(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = "Événement de commande"
+        verbose_name_plural = "Événements de commande"
 
     def __str__(self):
         return f"Order {self.order_id}: {self.from_status or 'NEW'} -> {self.to_status}"
@@ -215,6 +227,10 @@ class Delivery(models.Model):
     def __str__(self):
         return f"Delivery for Order {self.order.id}"
 
+    class Meta:
+        verbose_name = "Livraison"
+        verbose_name_plural = "Livraisons"
+
 
 class Cart(models.Model):
     session_key = models.CharField(max_length=40, db_index=True)
@@ -234,6 +250,8 @@ class Cart(models.Model):
     class Meta:
         unique_together = [("session_key", "product")]
         ordering = ["-created_at"]
+        verbose_name = "Panier"
+        verbose_name_plural = "Paniers"
 
     def __str__(self):
         return f"{self.quantity}x {self.product.title} ({self.session_key[:8]})"

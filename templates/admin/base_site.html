@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}{{ title }} | Karthago Commerce{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}">Karthago Commerce</a>
+</div>
+{# The Django admin holds the raw models; the day-to-day platform
+   operations (tenants, curation, scrapers) live in the superadmin
+   console. The link is right here because this is where the owner
+   logs in. #}
+{% if user.is_staff %}
+<div class="karthago-console-link">
+    <a href="{% url 'admin_dashboard:overview' %}" class="button" style="padding:8px 14px;">
+        Console plateforme &rarr;
+    </a>
+</div>
+{% endif %}
+{% endblock %}

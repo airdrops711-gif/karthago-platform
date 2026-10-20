@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}{% if is_create %}Nouvelle boutique{% else %}Modifier la boutique{% endif %} &mdash; Superadmin Karthago{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <div class="mb-8">
+        <a href="{% url 'admin_dashboard:stores' %}" class="text-xs text-gray-400 hover:text-amber-600">&larr; Retour aux boutiques</a>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+            {% if is_create %}Créer une boutique{% else %}Modifier « {{ store.name }} »{% endif %}
+        </h1>
+        <p class="text-gray-500 mt-1 text-sm">
+            {% if is_create %}
+                Une boutique est un tenant isolé : son catalogue, son panier et ses commandes lui appartiennent.
+            {% else %}
+                URL publique : <span class="font-mono text-amber-700">{{ store.storefront_url }}</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <form method="post" class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="sm:col-span-2">
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-1.5">Nom de la boutique *</label>
+                <input type="text" name="name" id="name" required
+                       value="{{ store.name|default:'' }}"
+                       placeholder="Ex. Boutique Tunisienne"
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="tagline" class="block text-sm font-medium text-gray-700 mb-1.5">Accroche</label>
+                <input type="text" name="tagline" id="tagline"
+                       value="{{ store.tagline|default:'' }}"
+                       placeholder="Ex. Les meilleurs prix de Tunis"
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                <textarea name="description" id="description" rows="3"
+                          placeholder="Présentation de la boutique, visible sur sa page d'accueil."
+                          class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">{{ store.description|default:'' }}</textarea>
+            </div>
+
+            <div>
+                <label for="logo_url" class="block text-sm font-medium text-gray-700 mb-1.5">Logo (URL)</label>
+                <input type="url" name="logo_url" id="logo_url"
+                       value="{{ store.logo_url|default:'' }}"
+                       placeholder="https://..."
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+            </div>
+
+            <div>
+                <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1.5">Téléphone</label>
+                <input type="text" name="phone_number" id="phone_number"
+                       value="{{ store.phone_number|default:'' }}"
+                       placeholder="+216 .. ... ..."
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+            </div>
+
+            <div>
+                <label for="whatsapp_number" class="block text-sm font-medium text-gray-700 mb-1.5">WhatsApp</label>
+                <input type="text" name="whatsapp_number" id="whatsapp_number"
+                       value="{{ store.whatsapp_number|default:'' }}"
+                       placeholder="+216 .. ... ..."
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+            </div>
+
+            <div>
+                <label for="address" class="block text-sm font-medium text-gray-700 mb-1.5">Adresse</label>
+                <input type="text" name="address" id="address"
+                       value="{{ store.address|default:'' }}"
+                       placeholder="Tunis, Tunisie"
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+            </div>
+
+            <div>
+                <label for="default_markup_percentage" class="block text-sm font-medium text-gray-700 mb-1.5">Marge par défaut (%)</label>
+                <input type="number" name="default_markup_percentage" id="default_markup_percentage"
+                       step="0.01" min="0"
+                       value="{% if store %}{{ store.default_markup_percentage }}{% else %}25.00{% endif %}"
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+                <p class="text-xs text-gray-400 mt-1">Appliquée au coût fournisseur des produits de cette boutique.</p>
+            </div>
+
+            <div>
+                <label for="fixed_margin" class="block text-sm font-medium text-gray-700 mb-1.5">Marge fixe (DT)</label>
+                <input type="number" name="fixed_margin" id="fixed_margin"
+                       step="0.001" min="0"
+                       value="{% if store %}{{ store.fixed_margin }}{% else %}0.000{% endif %}"
+                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+                <p class="text-xs text-gray-400 mt-1">Ajoutée à chaque vente, en dinars.</p>
+            </div>
+
+            <div>
+                <label for="owner" class="block text-sm font-medium text-gray-700 mb-1.5">Compte propriétaire</label>
+                <select name="owner" id="owner"
+                        class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm bg-white">
+                    <option value="">— Aucun (boutique gérée par la plateforme) —</option>
+                    {% for owner in owners %}
+                    <option value="{{ owner.pk }}"
+                            {% if store and store.owner_id == owner.pk %}selected{% endif %}>
+                        {{ owner.username }}{% if owner.email %} ({{ owner.email }}){% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                <p class="text-xs text-gray-400 mt-1">Le propriétaire accède à son tableau de bord et à son catalogue.</p>
+            </div>
+
+            <div class="sm:col-span-2">
+                <label class="flex items-center gap-2.5 cursor-pointer">
+                    <input type="checkbox" name="is_active" value="1"
+                           {% if is_create or store.is_active %}checked{% endif %}
+                           class="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500">
+                    <span class="text-sm font-medium text-gray-700">Boutique en ligne</span>
+                </label>
+                <p class="text-xs text-gray-400 mt-1 ml-6.5">
+                    Une boutique désactivée renvoie une 404 sur sa page publique.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <a href="{% url 'admin_dashboard:stores' %}"
+               class="px-4 py-2.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                Annuler
+            </a>
+            <button type="submit"
+                    class="px-5 py-2.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800">
+                {% if is_create %}Créer la boutique{% else %}Enregistrer{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

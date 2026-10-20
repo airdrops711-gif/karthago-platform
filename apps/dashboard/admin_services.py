@@ -6,11 +6,11 @@ in apps.dashboard.services and is scoped to a single store.
 from datetime import timedelta
 from decimal import Decimal
 
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, F, Sum
 from django.db.models.functions import TruncDay
 from django.utils import timezone
 
-from apps.orders.models import Order
+from apps.orders.models import Order, OrderItem
 
 
 def platform_analytics():
@@ -81,11 +81,14 @@ def platform_analytics():
     ]
 
     # Top products by revenue, platform-wide.
+    # The revenue of a line is the price actually charged times the
+    # quantity: summing the unit price alone would rank a product sold
+    # once above a product sold ten times.
     top_products = list(
         OrderItem.objects.values("product_title")
         .annotate(
-            revenue=Sum("unit_price"),
-            units=Count("id"),
+            revenue=Sum(F("unit_price") * F("quantity")),
+            units=Sum("quantity"),
         )
         .order_by("-revenue")[:10]
     )

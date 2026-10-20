@@ -15,6 +15,7 @@ from django.db.models.functions import TruncDay
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.text import slugify
 from datetime import timedelta
 
 from apps.catalog.models import Product, Store, StoreProduct
@@ -60,6 +61,201 @@ def stores(request):
         ),
     )
     return render(request, "admin_dashboard/stores.html", {"stores": stores})
+
+
+# ---------------------------------------------------------------------------
+# Tenant management: create a vendor store, edit its commercial settings.
+# ---------------------------------------------------------------------------
+#: The fields the superadmin may change on a tenant.
+STORE_FIELDS = [
+    "name",
+    "tagline",
+    "description",
+    "logo_url",
+    "phone_number",
+    "whatsapp_number",
+    "address",
+    "default_markup_percentage",
+    "fixed_margin",
+    "is_active",
+]
+
+
+def _parse_decimal(raw, default="0"):
+    """Parse a decimal posted by the tenant form."""
+    from decimal import InvalidOperation
+
+    text = str(raw or "").strip().replace(",", ".")
+    if not text:
+        return Decimal(default)
+    try:
+        return Decimal(text)
+    except (InvalidOperation, ValueError):
+        raise ValueError(f"Valeur numérique invalide: {raw!r}")
+
+
+def _unique_slug(name, exclude_pk=None):
+    """Build a slug for a tenant, unique across the platform."""
+    base = slugify(name)[:170] or "boutique"
+    slug = base
+    index = 2
+    while (
+        Store.objects.filter(slug=slug).exclude(pk=exclude_pk).exists()
+    ):
+        slug = f"{base}-{index}"
+        index += 1
+    return slug
+
+
+@login_required
+@staff_required
+def store_create(request):
+    """Create a new vendor tenant.
+
+    The new store is online by default; the superadmin unchecks the box
+    to keep it hidden from the storefront until its catalogue is filled.
+    """
+    if request.method == "POST":
+        name = (request.POST.get("name") or "").strip()
+        error = None
+
+        if not name:
+            error = "Le nom de la boutique est obligatoire."
+        else:
+            try:
+                markup = _parse_decimal(
+                    request.POST.get("default_markup_percentage"), "25"
+                )
+                margin = _parse_decimal(request.POST.get("fixed_margin"), "0")
+            except ValueError as exc:
+                error = str(exc)
+
+        if error is None:
+            owner = None
+            owner_id = request.POST.get("owner") or ""
+            if owner_id.isdigit():
+                owner = get_object_or_404(
+                    Store._meta.get_field("owner").related_model, pk=int(owner_id)
+                )
+
+            store = Store(
+                name=name,
+                slug=_unique_slug(request.POST.get("slug") or name),
+                owner=owner,
+                tagline=(request.POST.get("tagline") or "").strip(),
+                description=(request.POST.get("description") or "").strip(),
+                logo_url=(request.POST.get("logo_url") or "").strip(),
+                phone_number=(request.POST.get("phone_number") or "").strip(),
+                whatsapp_number=(request.POST.get("whatsapp_number") or "").strip(),
+                address=(request.POST.get("address") or "").strip(),
+                default_markup_percentage=markup,
+                fixed_margin=margin,
+                is_active=bool(request.POST.get("is_active")),
+                # A tenant is never the platform flagship.
+                is_platform_default=False,
+            )
+            store.save()
+            messages.success(
+                request,
+                f"Boutique « {store.name} » créée. "
+                f"Elle est en ligne sur {store.storefront_url}.",
+            )
+            return redirect("admin_dashboard:stores")
+
+        messages.error(request, error)
+
+    return render(
+        request,
+        "admin_dashboard/store_form.html",
+        {
+            "store": None,
+            "is_create": True,
+            "owners": _available_owners(),
+        },
+    )
+
+
+@login_required
+@staff_required
+def store_edit(request, store_id):
+    """Edit the commercial settings of a tenant."""
+    store = get_object_or_404(Store, pk=store_id)
+
+    if request.method == "POST":
+        name = (request.POST.get("name") or "").strip()
+        error = None
+
+        if not name:
+            error = "Le nom de la boutique est obligatoire."
+        else:
+            try:
+                markup = _parse_decimal(
+                    request.POST.get("default_markup_percentage"),
+                    str(store.default_markup_percentage),
+                )
+                margin = _parse_decimal(
+                    request.POST.get("fixed_margin"), str(store.fixed_margin)
+                )
+            except ValueError as exc:
+                error = str(exc)
+
+        if error is None:
+            owner = store.owner
+            owner_id = request.POST.get("owner") or ""
+            if owner_id == "":
+                owner = None
+            elif owner_id.isdigit():
+                owner = get_object_or_404(
+                    Store._meta.get_field("owner").related_model, pk=int(owner_id)
+                )
+
+            store.name = name
+            store.owner = owner
+            store.tagline = (request.POST.get("tagline") or "").strip()
+            store.description = (request.POST.get("description") or "").strip()
+            store.logo_url = (request.POST.get("logo_url") or "").strip()
+            store.phone_number = (request.POST.get("phone_number") or "").strip()
+            store.whatsapp_number = (request.POST.get("whatsapp_number") or "").strip()
+            store.address = (request.POST.get("address") or "").strip()
+            store.default_markup_percentage = markup
+            store.fixed_margin = margin
+            store.is_active = bool(request.POST.get("is_active"))
+            if store.is_platform_default:
+                # The flagship owns the root of the site: taking it
+                # offline would take the whole platform down.
+                store.is_active = True
+            store.save()
+            messages.success(
+                request, f"Boutique « {store.name} » mise à jour."
+            )
+            return redirect("admin_dashboard:stores")
+
+        messages.error(request, error)
+
+    return render(
+        request,
+        "admin_dashboard/store_form.html",
+        {
+            "store": store,
+            "is_create": False,
+            "owners": _available_owners(),
+        },
+    )
+
+
+def _available_owners():
+    """The vendor accounts that can own a store.
+
+    A user owns at most one store, so the accounts already owning a
+    store are excluded from the list.
+    """
+    from django.contrib.auth import get_user_model
+
+    user_model = get_user_model()
+    taken = set(
+        Store.objects.exclude(owner__isnull=True).values_list("owner_id", flat=True)
+    )
+    return user_model.objects.filter(is_staff=True).exclude(pk__in=taken)
 
 
 @login_required

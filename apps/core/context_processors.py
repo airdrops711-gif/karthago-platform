@@ -16,9 +16,14 @@ def tenant_context(request):
         and store is not None
         and not store.is_platform_default
     )
+    user = getattr(request, "user", None)
+    is_staff = bool(user is not None and user.is_authenticated and user.is_staff)
     return {
         "tenant_store": store,
         "is_sub_store": is_sub_store,
+        # The staff-only entries of the navbar (superadmin console,
+        # dashboard) are hidden from the anonymous visitors.
+        "is_staff": is_staff,
     }
 
 

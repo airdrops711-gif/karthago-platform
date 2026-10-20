@@ -12,10 +12,16 @@
                 lui appartiennent exclusivement.
             </p>
         </div>
-        <a href="{% url 'admin_dashboard:curation' %}"
-           class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800">
-            Curation du catalogue
-        </a>
+        <div class="flex flex-wrap gap-2">
+            <a href="{% url 'admin_dashboard:curation' %}"
+               class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:border-amber-300">
+                Curation du catalogue
+            </a>
+            <a href="{% url 'admin_dashboard:store_create' %}"
+               class="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800">
+                + Nouvelle boutique
+            </a>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -68,8 +74,19 @@
                 <span class="text-gray-400">
                     {% if store.owner %}Propri&eacute;taire : {{ store.owner.username }}{% else %}Sans propri&eacute;taire{% endif %}
                 </span>
-                <a href="{% url 'catalog:substore_home' store.slug %}"
-                   class="text-amber-600 font-medium hover:underline">Voir la boutique &rarr;</a>
+                <span class="flex items-center gap-3">
+                    {% if not store.is_platform_default %}
+                    <a href="{% url 'admin_dashboard:store_edit' store.id %}"
+                       class="text-gray-500 font-medium hover:text-amber-600">Modifier</a>
+                    {% endif %}
+                    {% if store.is_platform_default %}
+                    <a href="{% url 'catalog:home' %}"
+                       class="text-amber-600 font-medium hover:underline">Voir la boutique &rarr;</a>
+                    {% else %}
+                    <a href="{% url 'catalog:substore_home' store.slug %}"
+                       class="text-amber-600 font-medium hover:underline">Voir la boutique &rarr;</a>
+                    {% endif %}
+                </span>
             </div>
         </div>
         {% empty %}
