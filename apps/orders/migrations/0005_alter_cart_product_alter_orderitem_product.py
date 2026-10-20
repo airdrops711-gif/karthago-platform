@@ -4,7 +4,7 @@
 ``catalog.Product`` row. They now reference a ``catalog.StoreProduct`` —
 the row of the store that actually sells the product.
 
-The legacy rows still hold the ids of the old table, so they are
+The legacy rows still hold the ids of the old table, so the values are
 remapped through the ``scraped_source_product`` link of the tenant
 catalogue:
 
@@ -16,11 +16,18 @@ catalogue:
   cleared when the product is not in the tenant catalogue, because the
   price snapshot on the line is the historical truth.
 
-Ordering matters. The foreign keys are ``DEFERRABLE INITIALLY
-DEFERRED`` on PostgreSQL, so the constraint check happens at COMMIT and
-not at statement time. The fields are therefore re-pointed *first*,
-while the column still holds the legacy ids, and the values are remapped
-afterwards, before the transaction commits.
+Ordering matters. PostgreSQL validates the existing rows when
+``ADD CONSTRAINT`` creates a foreign key, so the old constraint has to
+be dropped *before* the ids are rewritten. The migration therefore runs
+in three steps:
+
+1. drop the legacy constraints (``db_constraint=False``),
+2. remap the ids,
+3. re-point the fields and restore the constraints.
+
+Step 1 and step 3 are both ``AlterField`` operations: ``db_constraint``
+is part of the field deconstruction, so Django notices the change and
+emits the matching ``DROP CONSTRAINT`` / ``ADD CONSTRAINT``.
 """
 import django.db.models.deletion
 from django.db import migrations, models
@@ -127,6 +134,31 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # --- 1. drop the legacy constraints --------------------------------
+        migrations.AlterField(
+            model_name="cart",
+            name="product",
+            field=models.ForeignKey(
+                db_constraint=False,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="catalog.product",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="orderitem",
+            name="product",
+            field=models.ForeignKey(
+                blank=True,
+                db_constraint=False,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="order_items",
+                to="catalog.product",
+            ),
+        ),
+        # --- 2. remap the ids while nothing constrains them -----------------
+        migrations.RunPython(remap_product_ids, restore_nothing),
+        # --- 3. re-point the fields and restore the constraints ------------
         migrations.AlterField(
             model_name="cart",
             name="product",
@@ -145,5 +177,4 @@ class Migration(migrations.Migration):
                 to="catalog.storeproduct",
             ),
         ),
-        migrations.RunPython(remap_product_ids, restore_nothing),
     ]
