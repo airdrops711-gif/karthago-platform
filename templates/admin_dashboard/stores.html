@@ -75,10 +75,8 @@
                     {% if store.owner %}Propri&eacute;taire : {{ store.owner.username }}{% else %}Sans propri&eacute;taire{% endif %}
                 </span>
                 <span class="flex items-center gap-3">
-                    {% if not store.is_platform_default %}
                     <a href="{% url 'admin_dashboard:store_edit' store.id %}"
                        class="text-gray-500 font-medium hover:text-amber-600">Modifier</a>
-                    {% endif %}
                     {% if store.is_platform_default %}
                     <a href="{% url 'catalog:home' %}"
                        class="text-amber-600 font-medium hover:underline">Voir la boutique &rarr;</a>
