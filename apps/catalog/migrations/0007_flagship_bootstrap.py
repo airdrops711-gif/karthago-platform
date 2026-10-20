@@ -63,12 +63,24 @@ def forwards(apps, schema_editor):
     # --- 1. the existing catalogue becomes the flagship inventory --------
     existing = StoreProduct.objects.filter(store=flagship).count()
     if existing == 0:
+        used_slugs = set()
         for product in Product.objects.filter(is_active=True).order_by("id").iterator():
             images = [img.image for img in product.images.all() if img.image]
+            title = product.title[:300]
+            # A historical model has no custom save(): the slug must be
+            # computed here, and it must be unique inside the store.
+            base = slugify(title)[:340] or "produit"
+            slug = base
+            index = 2
+            while slug in used_slugs:
+                slug = f"{base}-{index}"
+                index += 1
+            used_slugs.add(slug)
             StoreProduct.objects.create(
                 store=flagship,
                 scraped_source_product=product,
-                title=product.title[:300],
+                title=title,
+                slug=slug,
                 description=product.description,
                 category=product.category.name if product.category else "",
                 source_cost=product.raw_cost,
