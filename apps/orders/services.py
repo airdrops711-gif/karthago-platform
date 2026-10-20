@@ -167,6 +167,11 @@ def change_order_status(order, new_status, *, note="", user=None):
 
     Returns the created OrderEvent. The confirmation timestamp is set the
     first time the order leaves the pending state.
+
+    The commission is recomputed on every transition: it is realized
+    when the order reaches the delivered and paid state, and it goes
+    back to zero when the order is returned. A COD order that never
+    reached the customer must not leave a platform fee behind.
     """
     from .models import Order as OrderModel
 
@@ -179,6 +184,10 @@ def change_order_status(order, new_status, *, note="", user=None):
     if new_status != OrderModel.STATUS_PENDING_CONFIRMATION and not order.confirmed_at:
         order.confirmed_at = timezone.now()
     order.save(update_fields=["status", "confirmed_at", "updated_at"])
+
+    # The platform fee follows the status: realized on delivery, zero
+    # everywhere else.
+    order.calculate_commissions(save=True)
 
     event = OrderEvent.objects.create(
         order=order,

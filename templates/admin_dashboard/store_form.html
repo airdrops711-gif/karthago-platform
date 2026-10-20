@@ -93,6 +93,50 @@
                        class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
                 <p class="text-xs text-gray-400 mt-1">Ajoutée à chaque vente, en dinars.</p>
             </div>
+        </div>
+
+        <!-- Commission de la plateforme -->
+        <div class="border-t border-gray-100 pt-5">
+            <h2 class="text-sm font-bold text-gray-900 mb-1">Commission de la plateforme</h2>
+            <p class="text-xs text-gray-400 mb-4">
+                Prélevée uniquement sur les commandes livrées et payées (COD encaissé).
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div>
+                    <label for="commission_type" class="block text-sm font-medium text-gray-700 mb-1.5">Type de commission</label>
+                    <select name="commission_type" id="commission_type"
+                            class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm bg-white">
+                        {% for value, label in commission_types %}
+                        <option value="{{ value }}"
+                                {% if store and store.commission_type == value %}selected{% elif not store and value == "PERCENT" %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="commission_rate" class="block text-sm font-medium text-gray-700 mb-1.5">Taux (%)</label>
+                    <input type="number" name="commission_rate" id="commission_rate"
+                           step="0.01" min="0" max="100"
+                           value="{% if store %}{{ store.commission_rate }}{% else %}5.00{% endif %}"
+                           class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+                    <p class="text-xs text-gray-400 mt-1">Appliqué au CA brut livré.</p>
+                </div>
+
+                <div>
+                    <label for="flat_fee_per_order" class="block text-sm font-medium text-gray-700 mb-1.5">Frais fixes (DT)</label>
+                    <input type="number" name="flat_fee_per_order" id="flat_fee_per_order"
+                           step="0.001" min="0"
+                           value="{% if store %}{{ store.flat_fee_per_order }}{% else %}0.000{% endif %}"
+                           class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-sm">
+                    <p class="text-xs text-gray-400 mt-1">Par commande livrée, en dinars.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
             <div>
                 <label for="owner" class="block text-sm font-medium text-gray-700 mb-1.5">Compte propriétaire</label>

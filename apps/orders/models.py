@@ -79,6 +79,34 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # --- COD commission accounting -------------------------------------
+    # In the Tunisian cash-on-delivery flow the platform fee is only
+    # realized when the order is actually delivered and paid. The cut
+    # and the vendor share are therefore computed at the delivery, and
+    # they stay at zero for every other status (pending, returned,
+    # cancelled...).
+    courier_cost = models.DecimalField(
+        max_digits=10, decimal_places=3, default=Decimal("7.000"),
+        validators=[MinValueValidator(0)],
+        help_text="Delivery fee paid to the courier, in TND.",
+    )
+    platform_cut = models.DecimalField(
+        max_digits=10, decimal_places=3, default=Decimal("0.000"),
+        help_text="Platform commission realized on this order, in TND.",
+    )
+    vendor_payout = models.DecimalField(
+        max_digits=10, decimal_places=3, default=Decimal("0.000"),
+        help_text="Net amount owed to the vendor for this order, in TND.",
+    )
+    is_settled = models.BooleanField(
+        default=False,
+        help_text="True once the payout has been disbursed to the vendor.",
+    )
+    settlement_batch = models.ForeignKey(
+        "PayoutSettlement", on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="orders",
+    )
+
     class Meta:
         ordering = ["-created_at"]
         verbose_name = "Commande"
@@ -86,6 +114,71 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order {self.id} - {self.customer.full_name}"
+
+    # -- money aliases --------------------------------------------------
+    @property
+    def gross_total(self):
+        """Total charged to the customer, in TND."""
+        return self.total_amount
+
+    @property
+    def supplier_cost(self):
+        """Total supplier cost of the items, in TND."""
+        return self.total_cost
+
+    @property
+    def is_delivered(self):
+        """True when the order reached the paid-delivery state."""
+        return self.status == self.STATUS_DELIVERED_AND_PAID
+
+    def calculate_commissions(self, *, save=True):
+        """Compute the platform cut and the vendor payout of the order.
+
+        The platform fee is only realized on a delivered and paid order:
+        every other status (pending, confirmed, shipped, returned) keeps
+        the cut and the payout at zero, because the money was never
+        collected.
+
+        The vendor share is the gross amount minus the supplier cost,
+        the courier fee and the platform commission. It never goes
+        negative: a loss stays a loss, it is not turned into a debt for
+        the vendor.
+        """
+        store = self.store
+        if store is None or not self.is_delivered:
+            self.platform_cut = Decimal("0.000")
+            self.vendor_payout = Decimal("0.000")
+        else:
+            gross = self.total_amount or Decimal("0.000")
+            cut = Decimal("0.000")
+            if store.commission_type == store.COMMISSION_TYPE_PERCENT:
+                cut = gross * (store.commission_rate / Decimal("100"))
+            elif store.commission_type == store.COMMISSION_TYPE_FLAT:
+                cut = store.flat_fee_per_order
+            elif store.commission_type == store.COMMISSION_TYPE_HYBRID:
+                cut = (
+                    gross * (store.commission_rate / Decimal("100"))
+                ) + store.flat_fee_per_order
+
+            self.platform_cut = cut.quantize(Decimal("0.001"))
+            deductions = (
+                (self.total_cost or Decimal("0.000"))
+                + (self.courier_cost or Decimal("0.000"))
+                + self.platform_cut
+            )
+            self.vendor_payout = max(
+                Decimal("0.000"), (gross - deductions).quantize(Decimal("0.001"))
+            )
+
+        if save:
+            self.save(
+                update_fields=[
+                    "platform_cut",
+                    "vendor_payout",
+                    "updated_at",
+                ]
+            )
+        return self.platform_cut, self.vendor_payout
 
     @property
     def margin(self):
@@ -180,6 +273,57 @@ class OrderItem(models.Model):
     class Meta:
         verbose_name = "Ligne de commande"
         verbose_name_plural = "Lignes de commande"
+
+
+class PayoutSettlement(models.Model):
+    """A batch payout of the platform fees owed to one vendor.
+
+    The COD money is collected by the courier on delivery, so the
+    platform fee is only real once the order is delivered and paid. The
+    settlement groups the delivered orders of a vendor into a single
+    disbursement the operator can mark as paid.
+    """
+
+    store = models.ForeignKey(
+        Store, on_delete=models.CASCADE, related_name="settlements"
+    )
+    reference = models.CharField(max_length=64, unique=True)
+    total_delivered_orders = models.PositiveIntegerField(default=0)
+    total_gmv = models.DecimalField(
+        max_digits=10, decimal_places=3, default=Decimal("0.000"),
+    )
+    total_platform_cut = models.DecimalField(
+        max_digits=10, decimal_places=3, default=Decimal("0.000"),
+    )
+    net_payout_to_vendor = models.DecimalField(
+        max_digits=10, decimal_places=3, default=Decimal("0.000"),
+    )
+    payout_method = models.CharField(
+        max_length=50, default="Virement Bancaire / D17",
+    )
+    is_paid = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Règlement de paiement"
+        verbose_name_plural = "Règlements de paiement"
+
+    def __str__(self):
+        return f"{self.reference} — {self.store.name} ({self.net_payout_to_vendor} DT)"
+
+    def mark_paid(self):
+        """Flag the batch as disbursed and settle its orders."""
+        from django.utils import timezone
+
+        self.is_paid = True
+        self.paid_at = timezone.now()
+        self.save(update_fields=["is_paid", "paid_at"])
+        self.orders.filter(is_settled=False).update(
+            is_settled=True, settlement_batch=self
+        )
+        return self
 
 
 class OrderEvent(models.Model):

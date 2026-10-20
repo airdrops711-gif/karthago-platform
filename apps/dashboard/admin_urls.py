@@ -15,6 +15,28 @@ urlpatterns = [
     path("stores/", admin_views.stores, name="stores"),
     path("stores/new/", admin_views.store_create, name="store_create"),
     path("stores/<int:store_id>/edit/", admin_views.store_edit, name="store_edit"),
+    path(
+        "stores/<int:store_id>/toggle-status/",
+        admin_views.store_toggle_status,
+        name="store_toggle_status",
+    ),
+    path(
+        "stores/<int:store_id>/commission/",
+        admin_views.store_commission,
+        name="store_commission",
+    ),
+    path("financials/", admin_views.financials, name="financials"),
+    path("financials/export/", admin_views.financials_export, name="financials_export"),
+    path(
+        "settlements/<int:store_id>/create/",
+        admin_views.settlement_create,
+        name="settlement_create",
+    ),
+    path(
+        "settlements/<int:settlement_id>/paid/",
+        admin_views.settlement_paid,
+        name="settlement_paid",
+    ),
     path("curation/", admin_views.curation, name="curation"),
     path(
         "curation/<int:product_id>/toggle/",

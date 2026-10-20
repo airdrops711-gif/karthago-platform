@@ -141,6 +141,23 @@ def document_for(store_product):
     }
 
 
+def operational_store_ids():
+    """The ids of the stores that may be searched.
+
+    A suspended store is excluded from the index filtering: the search
+    never returns the products of an offline shop, even before the
+    asynchronous eviction of its documents has run.
+    """
+    from apps.catalog.models import Store
+
+    return list(
+        Store.objects.filter(
+            is_active=True, status=Store.STATUS_ACTIVE
+        ).values_list("id", flat=True)
+    )
+
+
+
 def index_products(store_products, *, batch_size=500):
     """Push catalogue rows to Meilisearch. Returns the number of documents sent."""
     documents = [document_for(product) for product in store_products]
@@ -174,6 +191,36 @@ def delete_product(store_product):
     )
 
 
+def delete_store_documents(store):
+    """Remove every document of a store from the index.
+
+    Used when a store is suspended: its products must disappear from the
+    search results at once. The ids are read from the database (the
+    index itself is not enumerable through a filter on a non-filtered
+    attribute).
+    """
+    from apps.catalog.models import StoreProduct
+
+    ids = list(
+        StoreProduct.objects.filter(store=store).values_list("id", flat=True)
+    )
+    if not ids:
+        return 0
+
+    deleted = 0
+    for start in range(0, len(ids), 500):
+        chunk = ids[start : start + 500]
+        body = _request(
+            "POST",
+            f"/indexes/{INDEX_NAME}/documents/delete-batch",
+            json=chunk,
+        )
+        if body is None:
+            return deleted
+        deleted += len(chunk)
+    return deleted
+
+
 # ---------------------------------------------------------------------------
 # Search
 # ---------------------------------------------------------------------------
@@ -204,6 +251,14 @@ def search(
     filters = []
     if store is not None and not store.is_platform_default:
         filters.append(f"store_id = {store.id}")
+    else:
+        # The flagship searches the whole index: the stores that are not
+        # operational are excluded, so a suspended shop never shows up
+        # in the results even before its documents have been evicted.
+        allowed = operational_store_ids()
+        if allowed:
+            joined = " OR ".join(f"store_id = {sid}" for sid in allowed)
+            filters.append(f"({joined})")
     if category:
         filters.append(f'category = "{category}"')
     if in_stock_only:

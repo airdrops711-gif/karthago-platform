@@ -133,19 +133,24 @@ class TenantMiddleware:
         if not slug:
             return None
         return (
-            Store.objects.filter(slug=slug, is_active=True)
+            Store.objects.filter(
+                slug=slug, is_active=True, status=Store.STATUS_ACTIVE
+            )
             .select_related("owner")
             .first()
         )
 
     @staticmethod
     def _get_user_store(user):
-        from apps.catalog.models import Store
+        """The store owned by the signed-in user, whatever its status.
 
+        The dashboard of a suspended vendor still resolves to *its own*
+        store: the vendor must see the suspension banner and its own
+        numbers, not the flagship. The storefront, on the other hand, is
+        closed for a suspended store (see ``_get_active_store``).
+        """
         store = getattr(user, "store", None)
         if store is None:
-            return None
-        if not store.is_active:
             return None
         return store
 

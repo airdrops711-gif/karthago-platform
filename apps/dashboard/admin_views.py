@@ -8,10 +8,12 @@ strictly scoped to the store owned by the signed-in user.
 """
 from decimal import Decimal
 
+import csv
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Count, Max, Q, Sum
-from django.db.models.functions import TruncDay
+from django.db.models import Count, Max, Q, Sum, Value
+from django.db.models.functions import Coalesce, TruncDay
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -20,10 +22,38 @@ from datetime import timedelta
 
 from apps.catalog.models import Product, Store, StoreProduct
 from apps.catalog.tenancy import central_pool
-from apps.orders.models import Order, OrderItem
+from apps.orders.models import Order, OrderItem, PayoutSettlement
 from apps.scraper.models import ScrapedSource, ScraperLog
 
 from .admin_services import platform_analytics
+
+
+def _date_range(request):
+    """The (since, until) date range requested in the query string.
+
+    The dates are parsed as ISO strings and the day boundaries are
+    applied, so a range covers the whole day.
+    """
+    from datetime import datetime, time
+
+    from django.utils import timezone as django_timezone
+
+    def _parse(raw, end_of_day=False):
+        if not raw:
+            return None
+        try:
+            parsed = datetime.strptime(raw.strip(), "%Y-%m-%d")
+        except ValueError:
+            return None
+        naive = datetime.combine(parsed.date(), time.max if end_of_day else time.min)
+        # The model stores timezone-aware timestamps: a naive boundary
+        # would be interpreted in the local time of the server and shift
+        # the edges of the period.
+        if django_timezone.is_naive(naive):
+            return django_timezone.make_aware(naive, django_timezone.get_current_timezone())
+        return naive
+
+    return _parse(request.GET.get("since")), _parse(request.GET.get("until"), True)
 
 
 def _is_staff(user):
@@ -51,7 +81,13 @@ def overview(request):
 @login_required
 @staff_required
 def stores(request):
-    """Registry of every tenant of the platform."""
+    """Registry of every tenant of the platform.
+
+    The table carries the operational status of each store, its volume
+    of products, its delivered orders and the commission the platform
+    has realized on it. The lifecycle actions (suspend / reactivate)
+    and the commission drawer are posted from this page.
+    """
     stores = Store.objects.annotate(
         product_count=Count("store_products", distinct=True),
         published_count=Count(
@@ -59,8 +95,305 @@ def stores(request):
             filter=Q(store_products__is_published=True),
             distinct=True,
         ),
+        delivered_orders=Count(
+            "orders",
+            filter=Q(orders__status=Order.STATUS_DELIVERED_AND_PAID),
+            distinct=True,
+        ),
+        total_orders=Count("orders", distinct=True),
+        platform_cut=Coalesce(
+            Sum(
+                "orders__platform_cut",
+                filter=Q(orders__status=Order.STATUS_DELIVERED_AND_PAID),
+            ),
+            Value(Decimal("0.000")),
+        ),
+        gmv=Coalesce(
+            Sum(
+                "orders__total_amount",
+                filter=Q(orders__status=Order.STATUS_DELIVERED_AND_PAID),
+            ),
+            Value(Decimal("0.000")),
+        ),
     )
-    return render(request, "admin_dashboard/stores.html", {"stores": stores})
+
+    context = {
+        "stores": stores,
+        "status_choices": Store.STATUS_CHOICES,
+        "commission_types": Store.COMMISSION_TYPES,
+    }
+    return render(request, "admin_dashboard/stores.html", context)
+
+
+@login_required
+@staff_required
+def store_toggle_status(request, store_id):
+    """Suspend or reactivate a store (HTMX, one click).
+
+    The suspension is immediate and propagates site-wide: the storefront
+    of the store answers 404, its products leave the catalogue and the
+    homepage showcase, and its documents are evicted from the search
+    index. The reason of the suspension is kept and shown to the
+    vendor.
+    """
+    store = get_object_or_404(Store, pk=store_id)
+
+    if store.is_platform_default:
+        messages.error(
+            request,
+            "La boutique flagship ne peut pas être désactivée : elle porte "
+            "la racine du site.",
+        )
+        if request.headers.get("HX-Request"):
+            return render(
+                request,
+                "admin_dashboard/partials/_store_card.html",
+                {"store": store},
+            )
+        return redirect("admin_dashboard:stores")
+
+    if request.method != "POST":
+        return redirect("admin_dashboard:stores")
+
+    action = (request.POST.get("action") or "toggle").strip()
+    reason = (request.POST.get("deactivation_reason") or "").strip()
+
+    if action == "suspend" or (action == "toggle" and store.is_operational):
+        store.suspend(reason)
+        messages.success(
+            request,
+            f"Boutique « {store.name} » suspendue. Ses produits ne sont "
+            "plus visibles sur la plateforme.",
+        )
+    else:
+        store.reactivate()
+        messages.success(
+            request,
+            f"Boutique « {store.name} » réactivée. Son catalogue est de "
+            "nouveau en ligne.",
+        )
+
+    # An HTMX request swaps the card of the store: the operator sees the
+    # new state without a full page reload.
+    if request.headers.get("HX-Request"):
+        store.refresh_from_db()
+        return render(
+            request,
+            "admin_dashboard/partials/_store_card.html",
+            {"store": store},
+        )
+
+    return redirect("admin_dashboard:stores")
+
+
+@login_required
+@staff_required
+def store_commission(request, store_id):
+    """Edit the commission rule of a store (HTMX drawer).
+
+    The rule is applied to the next delivered order and to the
+    settlements that are not paid yet.
+    """
+    store = get_object_or_404(Store, pk=store_id)
+
+    if request.method == "POST":
+        error = None
+        try:
+            rate = _parse_decimal(
+                request.POST.get("commission_rate"),
+                str(store.commission_rate),
+            )
+            flat = _parse_decimal(
+                request.POST.get("flat_fee_per_order"),
+                str(store.flat_fee_per_order),
+            )
+        except ValueError as exc:
+            error = str(exc)
+            rate, flat = store.commission_rate, store.flat_fee_per_order
+
+        commission_type = (
+            request.POST.get("commission_type") or store.commission_type
+        ).strip()
+        if commission_type not in dict(Store.COMMISSION_TYPES):
+            error = "Type de commission inconnu."
+            commission_type = store.commission_type
+
+        if error is None:
+            if rate < 0 or rate > 100:
+                error = "Le taux de commission doit être compris entre 0 et 100."
+            elif flat < 0:
+                error = "Le frais fixe ne peut pas être négatif."
+
+        if error is None:
+            store.commission_type = commission_type
+            store.commission_rate = rate
+            store.flat_fee_per_order = flat
+            store.save(
+                update_fields=[
+                    "commission_type",
+                    "commission_rate",
+                    "flat_fee_per_order",
+                    "updated_at",
+                ]
+            )
+            messages.success(
+                request,
+                f"Commission de « {store.name} » mise à jour : "
+                f"{store.commission_label()}.",
+            )
+            return redirect("admin_dashboard:stores")
+
+        messages.error(request, error)
+
+    return render(
+        request,
+        "admin_dashboard/partials/_commission_form.html",
+        {"store": store, "commission_types": Store.COMMISSION_TYPES},
+    )
+
+
+@login_required
+@staff_required
+def financials(request):
+    """The financial ledger of the platform.
+
+    Three KPI cards (realized commission, unsettled balance, average
+    commission per delivered order), a per-store breakdown and the
+    reconciliation action that builds a payout batch for a vendor.
+    """
+    from apps.orders.finance import platform_ledger, store_ledger
+
+    since, until = _date_range(request)
+
+    ledger = platform_ledger(since=since, until=until)
+    selected_store_id = request.GET.get("store")
+    selected_store = None
+    if selected_store_id and selected_store_id.isdigit():
+        selected_store = Store.objects.filter(pk=int(selected_store_id)).first()
+
+    store_detail = store_ledger(selected_store, since=since, until=until) if selected_store else None
+
+    return render(
+        request,
+        "admin_dashboard/financials.html",
+        {
+            "ledger": ledger,
+            "by_store": ledger["by_store"],
+            "stores": Store.objects.all(),
+            "selected_store": selected_store,
+            "store_detail": store_detail,
+            "since": since,
+            "until": until,
+            "settlements": PayoutSettlement.objects.select_related("store").order_by(
+                "-created_at"
+            )[:30],
+        },
+    )
+
+
+@login_required
+@staff_required
+def financials_export(request):
+    """Export the ledger of a store (or of the platform) as a CSV file."""
+    from apps.orders.finance import settlement_rows
+
+    since, until = _date_range(request)
+    store = None
+    store_id = request.GET.get("store")
+    if store_id and store_id.isdigit():
+        store = Store.objects.filter(pk=int(store_id)).first()
+
+    rows = settlement_rows(store, since=since, until=until)
+
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    filename = f"ledger-{store.slug if store else 'platform'}.csv"
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            "Commande",
+            "Date",
+            "Boutique",
+            "Client",
+            "CA brut",
+            "Cout fournisseur",
+            "Livraison",
+            "Commission plateforme",
+            "Net vendeur",
+            "Reglee",
+            "Lot",
+        ]
+    )
+    for row in rows:
+        writer.writerow(
+            [
+                row["order_id"],
+                row["date"],
+                row["store"],
+                row["customer"],
+                row["gross_total"],
+                row["supplier_cost"],
+                row["courier_cost"],
+                row["platform_cut"],
+                row["vendor_payout"],
+                row["settled"],
+                row["settlement"],
+            ]
+        )
+    return response
+
+
+@login_required
+@staff_required
+def settlement_create(request, store_id):
+    """Build the payout batch of a store (reconciliation).
+
+    Every delivered and paid order that is not settled yet is attached
+    to a new batch. The batch keeps the totals of the commission and of
+    the net payout.
+    """
+    from apps.orders.finance import build_settlement
+
+    store = get_object_or_404(Store, pk=store_id)
+
+    if request.method != "POST":
+        return redirect("admin_dashboard:financials")
+
+    payout_method = (
+        request.POST.get("payout_method") or "Virement Bancaire / D17"
+    ).strip()
+    settlement = build_settlement(store, payout_method=payout_method)
+
+    if settlement is None:
+        messages.warning(
+            request,
+            f"Aucune commande livrée non réglée pour « {store.name} ».",
+        )
+    else:
+        messages.success(
+            request,
+            f"Lot {settlement.reference} créé : {settlement.total_delivered_orders} "
+            f"commandes, {settlement.net_payout_to_vendor} DT à verser.",
+        )
+    return redirect("admin_dashboard:financials")
+
+
+@login_required
+@staff_required
+def settlement_paid(request, settlement_id):
+    """Flag a payout batch as disbursed."""
+    settlement = get_object_or_404(PayoutSettlement, pk=settlement_id)
+
+    if request.method != "POST":
+        return redirect("admin_dashboard:financials")
+
+    settlement.mark_paid()
+    messages.success(
+        request,
+        f"Lot {settlement.reference} marqué comme payé.",
+    )
+    return redirect("admin_dashboard:financials")
 
 
 # ---------------------------------------------------------------------------
@@ -127,6 +460,12 @@ def store_create(request):
                     request.POST.get("default_markup_percentage"), "25"
                 )
                 margin = _parse_decimal(request.POST.get("fixed_margin"), "0")
+                commission_rate = _parse_decimal(
+                    request.POST.get("commission_rate"), "5"
+                )
+                flat_fee = _parse_decimal(
+                    request.POST.get("flat_fee_per_order"), "0"
+                )
             except ValueError as exc:
                 error = str(exc)
 
@@ -137,6 +476,13 @@ def store_create(request):
                 owner = get_object_or_404(
                     Store._meta.get_field("owner").related_model, pk=int(owner_id)
                 )
+
+            commission_type = (
+                request.POST.get("commission_type")
+                or Store.COMMISSION_TYPE_PERCENT
+            ).strip()
+            if commission_type not in dict(Store.COMMISSION_TYPES):
+                commission_type = Store.COMMISSION_TYPE_PERCENT
 
             store = Store(
                 name=name,
@@ -150,6 +496,9 @@ def store_create(request):
                 address=(request.POST.get("address") or "").strip(),
                 default_markup_percentage=markup,
                 fixed_margin=margin,
+                commission_type=commission_type,
+                commission_rate=commission_rate,
+                flat_fee_per_order=flat_fee,
                 is_active=bool(request.POST.get("is_active")),
                 # A tenant is never the platform flagship.
                 is_platform_default=False,
@@ -171,6 +520,7 @@ def store_create(request):
             "store": None,
             "is_create": True,
             "owners": _available_owners(),
+            "commission_types": Store.COMMISSION_TYPES,
         },
     )
 
@@ -196,6 +546,14 @@ def store_edit(request, store_id):
                 margin = _parse_decimal(
                     request.POST.get("fixed_margin"), str(store.fixed_margin)
                 )
+                commission_rate = _parse_decimal(
+                    request.POST.get("commission_rate"),
+                    str(store.commission_rate),
+                )
+                flat_fee = _parse_decimal(
+                    request.POST.get("flat_fee_per_order"),
+                    str(store.flat_fee_per_order),
+                )
             except ValueError as exc:
                 error = str(exc)
 
@@ -209,6 +567,12 @@ def store_edit(request, store_id):
                     Store._meta.get_field("owner").related_model, pk=int(owner_id)
                 )
 
+            commission_type = (
+                request.POST.get("commission_type") or store.commission_type
+            ).strip()
+            if commission_type not in dict(Store.COMMISSION_TYPES):
+                commission_type = store.commission_type
+
             store.name = name
             store.owner = owner
             store.tagline = (request.POST.get("tagline") or "").strip()
@@ -219,6 +583,9 @@ def store_edit(request, store_id):
             store.address = (request.POST.get("address") or "").strip()
             store.default_markup_percentage = markup
             store.fixed_margin = margin
+            store.commission_type = commission_type
+            store.commission_rate = commission_rate
+            store.flat_fee_per_order = flat_fee
             store.is_active = bool(request.POST.get("is_active"))
             if store.is_platform_default:
                 # The flagship owns the root of the site: taking it
@@ -239,6 +606,7 @@ def store_edit(request, store_id):
             "store": store,
             "is_create": False,
             "owners": _available_owners(),
+            "commission_types": Store.COMMISSION_TYPES,
         },
     )
 

@@ -15,6 +15,7 @@ from decimal import Decimal
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 from django.utils.text import slugify
 
 
@@ -243,6 +244,59 @@ class Store(models.Model):
         help_text="Fixed margin added to every sale, in TND.",
     )
     is_active = models.BooleanField(default=True)
+
+    # --- Operational lifecycle -----------------------------------------
+    # ``status`` is the source of truth of the lifecycle; ``is_active``
+    # is kept in sync with it for backward compatibility with the
+    # console forms and the tenant middleware.
+    STATUS_ACTIVE = "ACTIVE"
+    STATUS_SUSPENDED = "SUSPENDED"
+    STATUS_MAINTENANCE = "MAINTENANCE"
+
+    STATUS_CHOICES = [
+        (STATUS_ACTIVE, "Active / Operating"),
+        (STATUS_SUSPENDED, "Suspended / Deactivated by Admin"),
+        (STATUS_MAINTENANCE, "Store Inactive / Maintenance Mode"),
+    ]
+
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default=STATUS_ACTIVE,
+        help_text="Operational status of the store.",
+    )
+    deactivation_reason = models.TextField(
+        blank=True, null=True,
+        help_text="Why the store was taken offline (shown to the vendor).",
+    )
+    deactivated_at = models.DateTimeField(null=True, blank=True)
+
+    # --- Commission structure ------------------------------------------
+    # In the Tunisian COD flow the platform fee is only realized when an
+    # order reaches DELIVERED_AND_PAID, so the rule is configured per
+    # store and applied at the moment of the delivery.
+    COMMISSION_TYPE_PERCENT = "PERCENT"
+    COMMISSION_TYPE_FLAT = "FLAT"
+    COMMISSION_TYPE_HYBRID = "HYBRID"
+
+    COMMISSION_TYPES = [
+        (COMMISSION_TYPE_PERCENT, "Percentage of Gross Order Total"),
+        (COMMISSION_TYPE_FLAT, "Fixed TND Fee per Delivered Order"),
+        (COMMISSION_TYPE_HYBRID, "Percentage + Flat Fee"),
+    ]
+
+    commission_type = models.CharField(
+        max_length=20, choices=COMMISSION_TYPES, default=COMMISSION_TYPE_PERCENT,
+    )
+    commission_rate = models.DecimalField(
+        max_digits=5, decimal_places=2, default=Decimal("5.00"),
+        validators=[MinValueValidator(0)],
+        help_text="Platform fee in percent of the gross order total.",
+    )
+    flat_fee_per_order = models.DecimalField(
+        max_digits=10, decimal_places=3, default=Decimal("0.000"),
+        validators=[MinValueValidator(0)],
+        help_text="Fixed platform fee per delivered order, in TND.",
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -257,7 +311,76 @@ class Store(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
+        self._sync_lifecycle()
         super().save(*args, **kwargs)
+
+    def _sync_lifecycle(self):
+        """Keep ``status``, ``is_active`` and the deactivation fields aligned.
+
+        * a non-active status always means an inactive store;
+        * an active store that was flagged inactive is suspended;
+        * the flagship can never be taken offline: it owns the root of
+          the site, and suspending it would take the whole platform down.
+        """
+        if self.is_platform_default:
+            self.is_active = True
+            self.status = self.STATUS_ACTIVE
+            self.deactivated_at = None
+            return
+
+        if self.status == self.STATUS_ACTIVE and not self.is_active:
+            # The status was not touched but the store was flagged
+            # inactive: this is a suspension.
+            self.status = self.STATUS_SUSPENDED
+
+        if self.status != self.STATUS_ACTIVE:
+            self.is_active = False
+            if not self.deactivated_at:
+                self.deactivated_at = timezone.now()
+        else:
+            self.deactivated_at = None
+            if not self.deactivation_reason:
+                self.deactivation_reason = ""
+
+    # -- lifecycle helpers ----------------------------------------------
+    @property
+    def is_operational(self):
+        """True when the store may be browsed and searched."""
+        return self.is_active and self.status == self.STATUS_ACTIVE
+
+    @property
+    def status_label(self):
+        for code, label in self.STATUS_CHOICES:
+            if code == self.status:
+                return label
+        return self.status
+
+    def suspend(self, reason=""):
+        """Take the store offline, with the reason shown to the vendor."""
+        self.status = self.STATUS_SUSPENDED
+        self.is_active = False
+        self.deactivation_reason = (reason or "").strip()
+        self.deactivated_at = timezone.now()
+        self.save()
+
+    def reactivate(self):
+        """Put the store back online."""
+        self.status = self.STATUS_ACTIVE
+        self.is_active = True
+        self.deactivation_reason = ""
+        self.deactivated_at = None
+        self.save()
+
+    def commission_label(self):
+        """Human readable commission rule of the store."""
+        if self.commission_type == self.COMMISSION_TYPE_FLAT:
+            return f"{self.flat_fee_per_order} DT / commande livrée"
+        if self.commission_type == self.COMMISSION_TYPE_HYBRID:
+            return (
+                f"{self.commission_rate}% + {self.flat_fee_per_order} DT "
+                "par commande livrée"
+            )
+        return f"{self.commission_rate}% du CA livré"
 
     @property
     def storefront_url(self):
@@ -280,6 +403,25 @@ class Store(models.Model):
         rate = Decimal(str(markup)) if markup is not None else self.default_markup_percentage
         return ((cost * (1 + rate / Decimal("100"))) + self.fixed_margin).quantize(
             Decimal("0.001")
+        )
+
+
+class ActiveStoreProductManager(models.Manager):
+    """Only the products a visitor may actually see.
+
+    A row survives this filter when it is published, in stock, and its
+    store is operational (active *and* in the ACTIVE status). This is
+    the queryset the storefront and the search use: the moment a store
+    is suspended its products disappear from the catalogue, from the
+    homepage showcase and from the search results.
+    """
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            is_published=True,
+            in_stock=True,
+            store__is_active=True,
+            store__status=Store.STATUS_ACTIVE,
         )
 
 
@@ -363,6 +505,12 @@ class StoreProduct(models.Model):
             models.Index(fields=["store", "is_published"]),
             models.Index(fields=["is_featured_on_main", "featured_priority"]),
         ]
+
+    # ``objects`` stays unfiltered: the dashboards and the admin need
+    # the suspended products too (to show them, count them, restore
+    # them). ``active_objects`` is the public view.
+    objects = models.Manager()
+    active_objects = ActiveStoreProductManager()
 
     def __str__(self):
         return f"{self.title} ({self.store.name})"

@@ -1,7 +1,15 @@
 """Django admin registration for the orders."""
 from django.contrib import admin
 
-from .models import Cart, Customer, Delivery, Order, OrderEvent, OrderItem
+from .models import (
+    Cart,
+    Customer,
+    Delivery,
+    Order,
+    OrderEvent,
+    OrderItem,
+    PayoutSettlement,
+)
 
 
 class OrderItemInline(admin.TabularInline):
@@ -36,17 +44,49 @@ class OrderAdmin(admin.ModelAdmin):
         "total_amount",
         "total_cost",
         "margin",
+        "platform_cut",
+        "vendor_payout",
+        "is_settled",
         "created_at",
     )
-    list_filter = ("status", "store", "payment_method", "created_at")
+    list_filter = ("status", "store", "payment_method", "is_settled", "created_at")
     search_fields = ("id", "customer__full_name", "customer__phone")
     autocomplete_fields = ("customer", "store")
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+        "platform_cut",
+        "vendor_payout",
+        "gross_total",
+        "supplier_cost",
+        "is_delivered",
+    )
     inlines = [OrderItemInline, OrderEventInline]
 
     @admin.display(description="Marge")
     def margin(self, obj):
         return obj.margin
+
+
+@admin.register(PayoutSettlement)
+class PayoutSettlementAdmin(admin.ModelAdmin):
+    """The payout batches sent to the vendors."""
+
+    list_display = (
+        "reference",
+        "store",
+        "total_delivered_orders",
+        "total_gmv",
+        "total_platform_cut",
+        "net_payout_to_vendor",
+        "payout_method",
+        "is_paid",
+        "created_at",
+    )
+    list_filter = ("store", "payout_method", "is_paid", "created_at")
+    search_fields = ("reference", "store__name", "store__slug")
+    autocomplete_fields = ("store",)
+    readonly_fields = ("created_at",)
 
 
 @admin.register(Customer)

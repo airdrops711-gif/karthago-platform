@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Mes finances &mdash; Karthago Commerce{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    {% if is_suspended %}
+    <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-5">
+        <div class="flex items-start gap-3">
+            <div class="bg-red-100 text-red-600 rounded-full p-2 text-lg">&#9888;</div>
+            <div class="min-w-0">
+                <h2 class="font-bold text-red-800">Votre boutique est actuellement suspendue.</h2>
+                <p class="text-sm text-red-700 mt-1">
+                    Veuillez contacter l'administration pour en connaître la raison
+                    et la date de r&eacute;activation.
+                </p>
+                {% if store.deactivation_reason %}
+                <p class="text-sm text-red-700 mt-2 italic">Motif : {{ store.deactivation_reason }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Mes finances</h1>
+            <p class="text-gray-600 mt-1 text-sm">
+                {{ store.name }} &middot; r&egrave;gle de commission :
+                <strong>{{ store.commission_label }}</strong>
+            </p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{% url 'dashboard:overview' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Tableau de bord</a>
+            <a href="{% url 'dashboard:orders' %}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Commandes</a>
+        </div>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">CA brut livr&eacute;</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">{{ ledger.gmv|floatformat:3 }} <span class="text-sm text-gray-400">DT</span></p>
+            <p class="text-xs text-gray-500 mt-1">{{ ledger.delivered_orders }} commande{{ ledger.delivered_orders|pluralize }} livr&eacute;e{{ ledger.delivered_orders|pluralize }}</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Frais de livraison</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">{{ ledger.courier_cost|floatformat:3 }} <span class="text-sm text-gray-400">DT</span></p>
+            <p class="text-xs text-gray-500 mt-1">Pay&eacute;s au livreur</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Frais de plateforme</p>
+            <p class="text-2xl font-bold text-amber-600 mt-1">{{ ledger.platform_cut|floatformat:3 }} <span class="text-sm text-gray-400">DT</span></p>
+            <p class="text-xs text-gray-500 mt-1">Moyenne : {{ ledger.average_commission|floatformat:3 }} DT / commande</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Net &agrave; percevoir</p>
+            <p class="text-2xl font-bold text-emerald-600 mt-1">{{ ledger.vendor_payout|floatformat:3 }} <span class="text-sm text-gray-400">DT</span></p>
+            <p class="text-xs text-gray-500 mt-1">Apr&egrave;s frais et commission</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Breakdown -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <h2 class="text-sm font-bold text-gray-900 mb-4">D&eacute;tail de vos encaissements</h2>
+            <dl class="space-y-2 text-sm">
+                <div class="flex justify-between"><dt class="text-gray-500">Total des commandes</dt><dd class="font-semibold">{{ ledger.total_orders }}</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">CA total (tous statuts)</dt><dd class="font-semibold">{{ ledger.total_gmv|floatformat:3 }} DT</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">Co&ucirc;t fournisseur</dt><dd class="font-semibold">{{ ledger.supplier_cost|floatformat:3 }} DT</dd></div>
+                <div class="flex justify-between border-t border-gray-100 pt-2"><dt class="text-gray-500">Frais de livraison</dt><dd class="font-semibold">{{ ledger.courier_cost|floatformat:3 }} DT</dd></div>
+                <div class="flex justify-between"><dt class="text-gray-500">Frais de plateforme</dt><dd class="font-semibold text-amber-600">{{ ledger.platform_cut|floatformat:3 }} DT</dd></div>
+                <div class="flex justify-between border-t border-gray-100 pt-2"><dt class="font-semibold text-gray-700">Montant net &agrave; percevoir</dt><dd class="font-bold text-emerald-600 text-lg">{{ ledger.vendor_payout|floatformat:3 }} DT</dd></div>
+            </dl>
+            <div class="mt-4 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 text-xs text-blue-800">
+                {{ ledger.unsettled_orders }} commande{{ ledger.unsettled_orders|pluralize }}
+                livr&eacute;e{{ ledger.unsettled_orders|pluralize }} en attente de r&egrave;gement
+                ({{ ledger.unsettled_vendor_payout|floatformat:3 }} DT).
+            </div>
+        </div>
+
+        <!-- Orders by status -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+            <h2 class="text-sm font-bold text-gray-900 mb-4">Vos commandes par statut</h2>
+            <ul class="space-y-2.5">
+                {% for row in ledger.by_status %}
+                <li>
+                    <div class="flex items-center justify-between text-xs mb-1">
+                        <span class="font-medium text-gray-700">{{ row.status }}</span>
+                        <span class="text-gray-400">{{ row.count }} &middot; {{ row.revenue|floatformat:0 }} DT</span>
+                    </div>
+                    <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-amber-500 rounded-full"
+                             style="width: {% widthratio row.count ledger.total_orders 100 %}%"></div>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="text-sm text-gray-400 py-6 text-center">Aucune commande.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Settlements -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="p-5 border-b">
+            <h2 class="text-sm font-bold text-gray-900">Vos r&egrave;glements</h2>
+            <p class="text-xs text-gray-500 mt-0.5">Les montants vous ont &eacute;t&eacute; vers&eacute;s par la plateforme.</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                    <tr>
+                        <th class="px-4 py-2.5 font-medium">R&eacute;f&eacute;rence</th>
+                        <th class="px-4 py-2.5 font-medium">Date</th>
+                        <th class="px-4 py-2.5 font-medium">M&eacute;thode</th>
+                        <th class="px-4 py-2.5 font-medium text-right">Commandes</th>
+                        <th class="px-4 py-2.5 font-medium text-right">Net vers&eacute;</th>
+                        <th class="px-4 py-2.5 font-medium text-right">Statut</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for s in ledger.settlements %}
+                    <tr>
+                        <td class="px-4 py-2.5 font-mono text-xs">{{ s.reference }}</td>
+                        <td class="px-4 py-2.5 text-gray-600">{{ s.created_at|date:"d/m/Y" }}</td>
+                        <td class="px-4 py-2.5 text-gray-600">{{ s.payout_method }}</td>
+                        <td class="px-4 py-2.5 text-right">{{ s.total_delivered_orders }}</td>
+                        <td class="px-4 py-2.5 text-right font-semibold">{{ s.net_payout_to_vendor|floatformat:3 }} DT</td>
+                        <td class="px-4 py-2.5 text-right">
+                            {% if s.is_paid %}
+                            <span class="text-[10px] font-bold px-2 py-1 rounded bg-emerald-100 text-emerald-700">Pay&eacute;</span>
+                            {% else %}
+                            <span class="text-[10px] font-bold px-2 py-1 rounded bg-amber-100 text-amber-700">En cours</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-400">
+                        Aucun r&egrave;glement pour le moment.
+                    </td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

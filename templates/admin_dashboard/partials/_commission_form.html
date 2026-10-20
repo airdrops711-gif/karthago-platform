@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% comment %}
+Commission drawer of a store: the platform fee rule applied to the
+delivered orders of the tenant. Loaded from the store directory.
+{% endcomment %}
+{% block title %}Commission de « {{ store.name }} » &mdash; Superadmin Karthago{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <div class="mb-6">
+        <a href="{% url 'admin_dashboard:stores' %}" class="text-xs text-gray-400 hover:text-amber-600">&larr; Retour aux boutiques</a>
+        <h1 class="text-2xl font-bold text-gray-900 mt-1">Commission de « {{ store.name }} »</h1>
+        <p class="text-gray-500 mt-1 text-sm">
+            La commission n'est r&eacute;alis&eacute;e que sur les commandes
+            livr&eacute;es et pay&eacute;es (paiement &agrave; la livraison).
+            Elle s'applique aux prochaines commandes livr&eacute;es et aux
+            r&egrave;lements qui n'ont pas encore &eacute;t&eacute; vers&eacute;s.
+        </p>
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <form method="post"
+              action="{% url 'admin_dashboard:store_commission' store.id %}"
+              class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label for="commission_type" class="block text-xs font-semibold text-gray-600 mb-1">Type de commission</label>
+                <select name="commission_type" id="commission_type"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+                    {% for value, label in commission_types %}
+                    <option value="{{ value }}" {% if store.commission_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label for="commission_rate" class="block text-xs font-semibold text-gray-600 mb-1">Taux (%)</label>
+                    <input type="text" name="commission_rate" id="commission_rate" value="{{ store.commission_rate }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+                <div>
+                    <label for="flat_fee_per_order" class="block text-xs font-semibold text-gray-600 mb-1">Frais fixe (DT)</label>
+                    <input type="text" name="flat_fee_per_order" id="flat_fee_per_order" value="{{ store.flat_fee_per_order }}"
+                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 text-xs text-amber-800">
+                R&egrave;gle actuelle : <strong>{{ store.commission_label }}</strong>
+            </div>
+
+            <div class="flex gap-2 pt-1">
+                <button type="submit"
+                        class="flex-1 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800">
+                    Enregistrer
+                </button>
+                <a href="{% url 'admin_dashboard:stores' %}"
+                   class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

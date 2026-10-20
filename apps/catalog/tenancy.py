@@ -92,11 +92,21 @@ def sub_store_listing(store, *, published_only=True):
 
 
 def flagship_listing(store=None, *, published_only=True):
-    """Products of the flagship, curated rows first."""
+    """Products of the flagship, curated rows first.
+
+    The flagship is always operational, but the rows curated on the main
+    platform may belong to a suspended sub-store: those are excluded,
+    so the platform catalogue never advertises the products of an
+    offline shop.
+    """
     store = store or flagship_store()
     if store is None:
         return StoreProduct.objects.none()
-    queryset = StoreProduct.objects.filter(store=store)
+    queryset = StoreProduct.objects.filter(
+        store=store,
+        store__is_active=True,
+        store__status=Store.STATUS_ACTIVE,
+    )
     if published_only:
         queryset = queryset.filter(is_published=True)
     return _ranked(queryset, featured_first=True)
@@ -106,7 +116,9 @@ def featured_showcase(store=None, *, limit=12, in_stock_only=True):
     """The curated showcase of the flagship homepage.
 
     Only the products the superadmin explicitly flagged are shown, in
-    the order given by ``featured_priority``.
+    the order given by ``featured_priority``. The products of a store
+    that is not operational are excluded: a suspended shop disappears
+    from the homepage at once.
     """
     if store is None:
         store = flagship_store()
@@ -114,7 +126,9 @@ def featured_showcase(store=None, *, limit=12, in_stock_only=True):
         return StoreProduct.objects.none()
 
     queryset = StoreProduct.objects.filter(
-        is_featured_on_main=True, is_published=True
+        is_featured_on_main=True, is_published=True,
+        store__is_active=True,
+        store__status=Store.STATUS_ACTIVE,
     )
     if in_stock_only:
         queryset = queryset.filter(in_stock=True)

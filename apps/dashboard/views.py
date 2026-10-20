@@ -137,6 +137,44 @@ def overview(request):
 
 @login_required
 @staff_required
+def finances(request):
+    """The finances of the store of the request.
+
+    The vendor sees a transparent breakdown: the gross sales, the
+    courier costs, the platform fee and the net amount it will receive.
+    The platform fee is only realized on the delivered and paid orders
+    — a pending or returned order carries no commission.
+    """
+    from apps.orders.finance import store_ledger
+
+    store = _tenant_store(request)
+    if store is None:
+        messages.error(request, "Aucune boutique n'est associée à ce compte.")
+        return redirect("dashboard:overview")
+
+    ledger = store_ledger(store)
+
+    # The recent orders, to show the status of the money.
+    orders = (
+        _scoped(Order.objects.all(), request)
+        .select_related("customer")
+        .order_by("-created_at")[:15]
+    )
+
+    return render(
+        request,
+        "dashboard/finances.html",
+        {
+            "store": store,
+            "ledger": ledger,
+            "orders": orders,
+            "is_suspended": not store.is_operational,
+        },
+    )
+
+
+@login_required
+@staff_required
 def scrapers(request):
     from apps.scraper.models import ScrapedSource
     sources = ScrapedSource.objects.all()
