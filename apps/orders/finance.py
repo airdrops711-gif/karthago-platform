@@ -174,6 +174,10 @@ def per_store_ledger(*, since=None, until=None):
     results = []
     for row in rows:
         gmv = row["gmv"] or ZERO
+        # The filtered sums are NULL when the store has no delivered
+        # order: the rate is computed on a real number.
+        platform_cut = row["platform_cut"] or ZERO
+        vendor_payout = row["vendor_payout"] or ZERO
         results.append(
             {
                 "store_id": row["store_id"],
@@ -183,10 +187,10 @@ def per_store_ledger(*, since=None, until=None):
                 "gmv": gmv,
                 "supplier_cost": row["supplier_cost"] or ZERO,
                 "delivered": row["delivered"] or 0,
-                "platform_cut": row["platform_cut"] or ZERO,
-                "vendor_payout": row["vendor_payout"] or ZERO,
+                "platform_cut": platform_cut,
+                "vendor_payout": vendor_payout,
                 "realized_rate": (
-                    (row["platform_cut"] / gmv * Decimal("100")).quantize(
+                    (platform_cut / gmv * Decimal("100")).quantize(
                         Decimal("0.01")
                     )
                     if gmv

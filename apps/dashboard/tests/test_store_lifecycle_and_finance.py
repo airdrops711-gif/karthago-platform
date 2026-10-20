@@ -327,6 +327,25 @@ class LedgerTests(TestCase):
         self.assertTrue(ledger["by_status"])
         self.assertIn("settlements", ledger)
 
+    def test_a_store_without_any_delivered_order_does_not_break_the_ledger(self):
+        """A store with orders but no delivery has a NULL commission sum.
+
+        Dividing it by the gross total raised a TypeError and took the
+        whole financial console down with a 500.
+        """
+        from apps.orders.finance import per_store_ledger
+
+        make_order(self.store, total="200.000", status=Order.STATUS_CONFIRMED)
+
+        rows = per_store_ledger()
+        row = next(r for r in rows if r["store_id"] == self.store.pk)
+
+        self.assertEqual(row["orders"], 1)
+        self.assertEqual(row["delivered"], 0)
+        self.assertEqual(row["platform_cut"], Decimal("0.000"))
+        self.assertEqual(row["vendor_payout"], Decimal("0.000"))
+        self.assertEqual(row["realized_rate"], Decimal("0.00"))
+
     def test_the_unsettled_balance_is_reported(self):
         delivered = make_order(self.store, total="200.000")
         change_order_status(delivered, Order.STATUS_DELIVERED_AND_PAID)
@@ -410,6 +429,17 @@ class FinanceConsoleTests(TestCase):
         self.other_store = make_store(
             name="Boutique Autres", slug="boutique-autres", owner=self.other_vendor
         )
+
+    def test_the_financial_console_survives_a_store_without_delivery(self):
+        """A store with orders but no delivery must not break the console.
+
+        The commission sum of such a store is NULL: dividing it by the
+        gross total took the whole page down with a 500.
+        """
+        make_order(self.store, total="200.000", status=Order.STATUS_CONFIRMED)
+        self.client.force_login(self.staff)
+        response = self.client.get(reverse("admin_dashboard:financials"))
+        self.assertEqual(response.status_code, 200)
 
     def test_the_financial_console_renders_for_a_staff_account(self):
         self.client.force_login(self.staff)
